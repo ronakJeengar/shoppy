@@ -28,8 +28,12 @@ class _HomePageState extends State<HomePage> {
 
   void getCurrentUser() async {
     currentUserModel = await context.read<UserProvider>().getCurrentUser();
-    log('current user data :- ${currentUserModel!.toJson()}');
-    setState(() {});
+    if (currentUserModel != null) {
+      log('current user data :- ${currentUserModel!.toJson()}');
+    }
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override

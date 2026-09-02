@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
@@ -8,15 +7,8 @@ import 'package:shopp_app/core/preferences.dart';
 class Api {
   final Dio _dio = Dio();
 
-  static const String basicAuthClientId = "c5eeed0e457e69240fedd7108082dc4e";
-  static const String basicAuthClientSecret =
-      "6e4dbec0721e0563e9a66ca4dec7e6ce";
-  static String auth =
-      'Basic ${base64Encode(utf8.encode('$basicAuthClientId:$basicAuthClientSecret'))}';
-
   Map<String, dynamic> defaultHeader = {
     "Content-Type": "application/json",
-    // "Authorization": auth,
   };
 
   Api() {
@@ -33,9 +25,10 @@ class Api {
       onRequest: (RequestOptions options, handler) async {
         String? token = await Preferences.getString('token');
 
-        if (options.path != Urls.signIn || options.path != Urls.signUp) {
-          log("TOKEN ==== $token");
-          options.headers["x-auth-token"] = "$token";
+        if (options.path != Urls.signIn && options.path != Urls.signUp) {
+          if (token != null && token.isNotEmpty) {
+            options.headers["Authorization"] = "Bearer $token";
+          }
         }
         return handler.next(options);
       },
