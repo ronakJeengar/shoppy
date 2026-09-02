@@ -8,9 +8,14 @@ import 'package:shopp_app/views/login_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Preferences.init();
-  runApp(MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => UserProvider())],
-      child: const MyApp()));
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -25,19 +30,29 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-    getToken();
     super.initState();
+    getToken();
   }
 
   void getToken() async {
-    token = await Preferences.getString('token');
-    setState(() {});
+    token = Preferences.getAccessToken() ?? await Preferences.getString('token');
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: (token != null) ? const HomePage() : LoginPage(),
+      title: 'Shoppy',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        useMaterial3: true,
+      ),
+      home: (token != null && token!.isNotEmpty)
+          ? const HomePage()
+          : const LoginPage(),
     );
   }
 }

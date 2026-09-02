@@ -23,23 +23,56 @@ class Api {
 
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (RequestOptions options, handler) async {
-        String? token = await Preferences.getString('token');
+        String? token = Preferences.getAccessToken() ?? await Preferences.getString('token');
 
-        if (options.path != Urls.signIn && options.path != Urls.signUp) {
+        if (options.path != Urls.signIn &&
+            options.path != Urls.signUp &&
+            options.path != Urls.refreshToken) {
           if (token != null && token.isNotEmpty) {
             options.headers["Authorization"] = "Bearer $token";
           }
         }
         return handler.next(options);
       },
-      onError: (DioException error, handler) {
-        if (error.response?.statusCode == 401) {
-          log('response : - ${error.response}');
-          // Navigator.pushNamedAndRemoveUntil(
-          //   NavigationService.navigatorKey.currentContext!,
-          //   SignInScreen.rootName,
-          //       (route) => false,
-          // );
+      onError: (DioException error, handler) async {
+        if (error.response?.statusCode == 401 &&
+            error.requestOptions.path != Urls.signIn &&
+            error.requestOptions.path != Urls.signUp &&
+            error.requestOptions.path != Urls.refreshToken &&
+            error.requestOptions.extra['retry'] != true) {
+          error.requestOptions.extra['retry'] = true;
+          final refreshToken = Preferences.getRefreshToken();
+
+          if (refreshToken != null && refreshToken.isNotEmpty) {
+            try {
+              final refreshDio = Dio(BaseOptions(baseUrl: Urls.baseUrl));
+              final refreshResponse = await refreshDio.post(
+                Urls.refreshToken,
+                data: {'refreshToken': refreshToken},
+              );
+
+              if (refreshResponse.statusCode == 200 &&
+                  refreshResponse.data?['data']?['accessToken'] != null) {
+                final newAccessToken =
+                    refreshResponse.data['data']['accessToken'] as String;
+                final newRefreshToken =
+                    refreshResponse.data['data']['refreshToken'] as String?;
+
+                await Preferences.saveTokens(
+                  accessToken: newAccessToken,
+                  refreshToken: newRefreshToken,
+                );
+
+                error.requestOptions.headers["Authorization"] =
+                    "Bearer $newAccessToken";
+                final response = await _dio.fetch(error.requestOptions);
+                return handler.resolve(response);
+              }
+            } catch (refreshError) {
+              log('Automatic token refresh failed: $refreshError');
+              await Preferences.clearAuth();
+            }
+          }
         }
 
         return handler.next(error);

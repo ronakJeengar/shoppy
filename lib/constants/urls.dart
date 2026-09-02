@@ -10,7 +10,14 @@ class Urls {
     return "http://localhost:8000/api/v1/";
   }
 
-  static const String signUp = "auth/register";
-  static const String signIn = "auth/login";
-  static const String currentUser = "auth/me";
+  static const String register = "auth/register";
+  static const String login = "auth/login";
+  static const String refreshToken = "auth/refresh-token";
+  static const String logout = "auth/logout";
+  static const String me = "auth/me";
+
+  // Backwards-compatibility aliases
+  static const String signUp = register;
+  static const String signIn = login;
+  static const String currentUser = me;
 }

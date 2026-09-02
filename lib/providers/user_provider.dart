@@ -7,14 +7,17 @@ import 'package:shopp_app/data/models/currrent_user_model.dart';
 import 'package:shopp_app/data/models/user_model.dart';
 import 'package:shopp_app/data/repositories/auth_repository.dart';
 import 'package:shopp_app/views/home_page.dart';
+import 'package:shopp_app/views/login_page.dart';
 
 class UserProvider extends ChangeNotifier {
   bool isLoading = false;
+  String? errorMessage;
   final AuthRepository authRepository = AuthRepository();
   User _user = User(name: '', email: '', password: '');
   CurrentUserModel? currentUser;
 
   User get user => _user;
+  bool get isAuthenticated => Preferences.getAccessToken() != null;
 
   void setUser(String user) {
     _user = User.fromJson(user);
@@ -26,80 +29,167 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> userSignUp(
-      {required BuildContext context, required User user}) async {
+  void clearError() {
+    errorMessage = null;
+    notifyListeners();
+  }
+
+  Future<bool> userSignUp({
+    required BuildContext context,
+    required User user,
+  }) async {
     try {
       isLoading = true;
+      errorMessage = null;
       notifyListeners();
 
-      ApiResponse apiResponse = await authRepository.signUp(userData: user);
+      final ApiResponse apiResponse = await authRepository.signUp(userData: user);
 
-      if (!apiResponse.status) {
-        isLoading = false;
-        notifyListeners();
-        //show toast or snackbar
-        return;
-      }
       isLoading = false;
+      if (!apiResponse.status) {
+        errorMessage = apiResponse.message;
+        notifyListeners();
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(apiResponse.message),
+              backgroundColor: Colors.red.shade700,
+            ),
+          );
+        }
+        return false;
+      }
+
       notifyListeners();
       if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Account created successfully! Please log in.'),
+            backgroundColor: Colors.green,
+          ),
+        );
         Navigator.of(context).pop();
       }
-      //show toast or snackbar
+      return true;
     } catch (e) {
       isLoading = false;
+      errorMessage = e.toString();
       notifyListeners();
-      log('error : $e');
+      log('userSignUp error: $e');
+      return false;
     }
   }
 
-  Future<void> userSignIn(
-      {required BuildContext context,
-      required Map<String, dynamic> data}) async {
+  Future<bool> userSignIn({
+    required BuildContext context,
+    required Map<String, dynamic> data,
+  }) async {
     try {
       isLoading = true;
+      errorMessage = null;
       notifyListeners();
 
-      ApiResponse response = await authRepository.signIn(loginData: data);
+      final ApiResponse response = await authRepository.signIn(loginData: data);
 
-      if (!response.status) {
-        isLoading = false;
+      isLoading = false;
+      if (!response.status || response.data == null) {
+        errorMessage = response.message.isNotEmpty
+            ? response.message
+            : 'Login failed. Please check your credentials.';
         notifyListeners();
-        return;
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMessage!),
+              backgroundColor: Colors.red.shade700,
+            ),
+          );
+        }
+        return false;
       }
 
-      String token = response.data['token'];
-      Preferences.setString('token', token);
+      final dynamic responseData = response.data;
+      final String accessToken =
+          (responseData['accessToken'] ?? responseData['token'] ?? '').toString();
+      final String? refreshToken = responseData['refreshToken']?.toString();
+
+      await Preferences.saveTokens(
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      );
+
+      // Populate current user
+      if (responseData['user'] != null && responseData['user'] is Map<String, dynamic>) {
+        currentUser = CurrentUserModel.fromJson(responseData['user']);
+      } else {
+        await getCurrentUser();
+      }
+
+      notifyListeners();
 
       if (context.mounted) {
-        isLoading = false;
-        notifyListeners();
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (BuildContext context) => const HomePage()));
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (BuildContext context) => const HomePage()),
+          (route) => false,
+        );
       }
+      return true;
     } catch (e) {
       isLoading = false;
+      errorMessage = e.toString();
       notifyListeners();
-      log('error : $e');
+      log('userSignIn error: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error signing in: $e'),
+            backgroundColor: Colors.red.shade700,
+          ),
+        );
+      }
+      return false;
     }
   }
 
   Future<CurrentUserModel?> getCurrentUser() async {
     try {
-      ApiResponse response = await authRepository.getCurrentUser();
+      final ApiResponse response = await authRepository.getCurrentUser();
 
-      if (!response.status) {
-        log('current user getting error');
+      if (!response.status || response.data == null) {
+        log('current user fetch unsuccessful: ${response.message}');
+        return null;
       }
 
-      currentUser = CurrentUserModel.fromJson(response.data);
+      if (response.data is Map<String, dynamic>) {
+        currentUser = CurrentUserModel.fromJson(response.data as Map<String, dynamic>);
+      }
       notifyListeners();
       return currentUser;
     } catch (e) {
-      log('error :- $e');
+      log('getCurrentUser exception: $e');
       return null;
+    }
+  }
+
+  Future<void> logout(BuildContext context) async {
+    try {
+      await authRepository.logout();
+    } catch (e) {
+      log('Backend logout error: $e');
+    } finally {
+      await Preferences.clearAuth();
+      currentUser = null;
+      errorMessage = null;
+      notifyListeners();
+
+      if (context.mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (BuildContext context) => const LoginPage()),
+          (route) => false,
+        );
+      }
     }
   }
 }
