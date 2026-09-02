@@ -5,6 +5,7 @@ class Preferences {
 
   static const String keyAccessToken = 'token';
   static const String keyRefreshToken = 'refreshToken';
+  static const String keyRecentSearches = 'recent_searches';
 
   static Future<void> init() async {
     preferences = await SharedPreferences.getInstance();
@@ -72,5 +73,34 @@ class Preferences {
   static Future<void> clearAuth() async {
     await preferences?.remove(keyAccessToken);
     await preferences?.remove(keyRefreshToken);
+  }
+
+  // Recent Search History helpers
+  static List<String> getRecentSearches() {
+    return preferences?.getStringList(keyRecentSearches) ?? [];
+  }
+
+  static Future<void> addRecentSearch(String query) async {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) return;
+
+    final list = preferences?.getStringList(keyRecentSearches) ?? [];
+    list.removeWhere((item) => item.toLowerCase() == trimmed.toLowerCase());
+    list.insert(0, trimmed);
+    if (list.length > 10) {
+      list.removeRange(10, list.length);
+    }
+    await preferences?.setStringList(keyRecentSearches, list);
+  }
+
+  static Future<void> removeRecentSearch(String query) async {
+    final list = preferences?.getStringList(keyRecentSearches) ?? [];
+    list.removeWhere(
+        (item) => item.toLowerCase() == query.trim().toLowerCase());
+    await preferences?.setStringList(keyRecentSearches, list);
+  }
+
+  static Future<void> clearRecentSearches() async {
+    await preferences?.remove(keyRecentSearches);
   }
 }

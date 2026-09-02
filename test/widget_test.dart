@@ -6,8 +6,11 @@ import 'package:shopp_app/core/preferences.dart';
 import 'package:shopp_app/data/models/product_model.dart';
 import 'package:shopp_app/main.dart';
 import 'package:shopp_app/providers/catalog_provider.dart';
+import 'package:shopp_app/providers/search_provider.dart';
 import 'package:shopp_app/providers/user_provider.dart';
 import 'package:shopp_app/views/product_detail_page.dart';
+import 'package:shopp_app/views/search_page.dart';
+import 'package:shopp_app/views/widgets/filter_bottom_sheet.dart';
 import 'package:shopp_app/views/widgets/product_card.dart';
 
 void main() {
@@ -25,6 +28,7 @@ void main() {
         providers: [
           ChangeNotifierProvider(create: (_) => UserProvider()),
           ChangeNotifierProvider(create: (_) => CatalogProvider()),
+          ChangeNotifierProvider(create: (_) => SearchProvider()),
         ],
         child: const MyApp(),
       ),
@@ -43,6 +47,7 @@ void main() {
         providers: [
           ChangeNotifierProvider(create: (_) => UserProvider()),
           ChangeNotifierProvider(create: (_) => CatalogProvider()),
+          ChangeNotifierProvider(create: (_) => SearchProvider()),
         ],
         child: const MyApp(),
       ),
@@ -64,6 +69,7 @@ void main() {
         providers: [
           ChangeNotifierProvider(create: (_) => UserProvider()),
           ChangeNotifierProvider(create: (_) => CatalogProvider()),
+          ChangeNotifierProvider(create: (_) => SearchProvider()),
         ],
         child: const MyApp(),
       ),
@@ -91,6 +97,7 @@ void main() {
         providers: [
           ChangeNotifierProvider(create: (_) => UserProvider()),
           ChangeNotifierProvider(create: (_) => CatalogProvider()),
+          ChangeNotifierProvider(create: (_) => SearchProvider()),
         ],
         child: const MyApp(),
       ),
@@ -101,6 +108,13 @@ void main() {
     expect(find.byIcon(Icons.logout), findsOneWidget);
     expect(find.text('Categories'), findsOneWidget);
     expect(find.text('Search products, brands and categories...'), findsOneWidget);
+
+    // Tap search bar to verify navigation to SearchPage
+    await tester.tap(find.text('Search products, brands and categories...'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SearchPage), findsOneWidget);
+    expect(find.byIcon(Icons.tune), findsOneWidget);
   });
 
   testWidgets('ProductCard displays information and navigates to ProductDetailPage',
@@ -141,5 +155,41 @@ void main() {
     expect(find.byType(ProductDetailPage), findsOneWidget);
     expect(find.text('Sold by KeyCrafters'), findsOneWidget);
     expect(find.text('Add to Cart'), findsOneWidget);
+  });
+
+  testWidgets('SearchPage displays recent searches and opens filter sheet',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({
+      Preferences.keyRecentSearches: ['Headphones', 'Keyboard'],
+    });
+    await Preferences.init();
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => UserProvider()),
+          ChangeNotifierProvider(create: (_) => CatalogProvider()),
+          ChangeNotifierProvider(create: (_) => SearchProvider()),
+        ],
+        child: const MaterialApp(
+          home: SearchPage(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Recent Searches'), findsOneWidget);
+    expect(find.text('Headphones'), findsOneWidget);
+    expect(find.text('Keyboard'), findsOneWidget);
+    expect(find.text('Clear All'), findsOneWidget);
+
+    // Tap filters button
+    await tester.tap(find.byIcon(Icons.tune));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(FilterBottomSheet), findsOneWidget);
+    expect(find.text('Filters'), findsOneWidget);
+    expect(find.text('Apply Filters'), findsOneWidget);
+    expect(find.text('In-Stock Items Only'), findsOneWidget);
   });
 }

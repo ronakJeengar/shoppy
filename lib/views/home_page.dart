@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shopp_app/data/models/currrent_user_model.dart';
 import 'package:shopp_app/providers/catalog_provider.dart';
 import 'package:shopp_app/providers/user_provider.dart';
+import 'package:shopp_app/views/search_page.dart';
 import 'package:shopp_app/views/widgets/category_selector.dart';
 import 'package:shopp_app/views/widgets/product_card.dart';
 
@@ -155,30 +156,41 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
-            // Search Trigger Placeholder (Foundational for Phase 04)
+            // Interactive Search Bar Trigger
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.search, color: Colors.grey.shade500),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Search products, brands and categories...',
-                        style: TextStyle(
-                          color: Colors.grey.shade500,
-                          fontSize: 13,
-                        ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(10),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SearchPage(),
                       ),
-                    ],
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.search, color: Colors.grey.shade500),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Search products, brands and categories...',
+                          style: TextStyle(
+                            color: Colors.grey.shade500,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

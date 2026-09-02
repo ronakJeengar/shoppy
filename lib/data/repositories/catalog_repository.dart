@@ -50,6 +50,10 @@ class CatalogRepository {
     String? categoryId,
     String? search,
     String? sort,
+    double? minPrice,
+    double? maxPrice,
+    double? minRating,
+    bool? inStockOnly,
   }) async {
     try {
       final Map<String, dynamic> queryParams = {
@@ -65,6 +69,18 @@ class CatalogRepository {
       }
       if (sort != null && sort.isNotEmpty) {
         queryParams['sort'] = sort;
+      }
+      if (minPrice != null) {
+        queryParams['minPrice'] = minPrice;
+      }
+      if (maxPrice != null) {
+        queryParams['maxPrice'] = maxPrice;
+      }
+      if (minRating != null) {
+        queryParams['minRating'] = minRating;
+      }
+      if (inStockOnly == true) {
+        queryParams['inStock'] = 'true';
       }
 
       final response = await _api.getRequest(
@@ -119,6 +135,50 @@ class CatalogRepository {
           'products': <Product>[],
           'pagination': {},
         },
+      );
+    }
+  }
+
+  Future<ApiResponse> getSuggestions(String query) async {
+    try {
+      final response = await _api.getRequest(
+        Urls.searchSuggestions,
+        queryParameters: {'q': query.trim()},
+      );
+      final apiResponse = ApiResponse.fromJson(response.data);
+
+      if (apiResponse.status && apiResponse.data is Map<String, dynamic>) {
+        final rawData = apiResponse.data as Map<String, dynamic>;
+        final List<Map<String, dynamic>> suggestions = [];
+        if (rawData['suggestions'] is List) {
+          for (final item in rawData['suggestions'] as List) {
+            if (item is Map<String, dynamic>) {
+              suggestions.add(item);
+            }
+          }
+        }
+        return ApiResponse(
+          status: true,
+          message: apiResponse.message,
+          data: suggestions,
+          statusCode: apiResponse.statusCode,
+        );
+      }
+      return apiResponse;
+    } on DioException catch (e) {
+      log('CatalogRepository getSuggestions DioException: $e');
+      return ApiResponse(
+        status: false,
+        message: e.message ?? 'Failed to get suggestions',
+        data: <Map<String, dynamic>>[],
+        statusCode: e.response?.statusCode ?? 500,
+      );
+    } catch (e) {
+      log('CatalogRepository getSuggestions error: $e');
+      return ApiResponse(
+        status: false,
+        message: e.toString(),
+        data: <Map<String, dynamic>>[],
       );
     }
   }

@@ -20,6 +20,7 @@ class Urls {
   // Product Catalog & Categories modules
   static const String products = "products";
   static const String categories = "categories";
+  static const String searchSuggestions = "products/suggestions";
 
   // Backwards-compatibility aliases
   static const String signUp = register;
