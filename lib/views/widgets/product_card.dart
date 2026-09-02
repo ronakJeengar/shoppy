@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shopp_app/data/models/product_model.dart';
+import 'package:shopp_app/providers/wishlist_provider.dart';
 import 'package:shopp_app/views/product_detail_page.dart';
 
 class ProductCard extends StatelessWidget {
@@ -31,7 +33,7 @@ class ProductCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Product Image with Error/Placeholder Handling
+            // Product Image with Error/Placeholder Handling & Wishlist Button
             Expanded(
               child: Stack(
                 children: [
@@ -72,6 +74,8 @@ class ProductCard extends StatelessWidget {
                             ),
                           ),
                   ),
+
+                  // Rating Badge
                   if (product.productRating > 0)
                     Positioned(
                       top: 8,
@@ -111,6 +115,37 @@ class ProductCard extends StatelessWidget {
                         ),
                       ),
                     ),
+
+                  // Wishlist Toggle Icon
+                  Positioned(
+                    top: 6,
+                    left: 6,
+                    child: Consumer<WishlistProvider>(
+                      builder: (context, wishlistProvider, _) {
+                        final isWishlisted =
+                            wishlistProvider.isInWishlist(product.id);
+                        return CircleAvatar(
+                          radius: 14,
+                          backgroundColor: Colors.white.withValues(alpha: 0.9),
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            icon: Icon(
+                              isWishlisted
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              color: isWishlisted
+                                  ? Colors.red
+                                  : Colors.grey.shade600,
+                              size: 16,
+                            ),
+                            onPressed: () {
+                              wishlistProvider.toggleWishlist(product);
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),

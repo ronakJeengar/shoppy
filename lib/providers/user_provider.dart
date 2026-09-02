@@ -1,11 +1,14 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shopp_app/core/preferences.dart';
 import 'package:shopp_app/data/models/api_response.dart';
 import 'package:shopp_app/data/models/currrent_user_model.dart';
 import 'package:shopp_app/data/models/user_model.dart';
 import 'package:shopp_app/data/repositories/auth_repository.dart';
+import 'package:shopp_app/providers/cart_provider.dart';
+import 'package:shopp_app/providers/wishlist_provider.dart';
 import 'package:shopp_app/views/home_page.dart';
 import 'package:shopp_app/views/login_page.dart';
 
@@ -184,6 +187,11 @@ class UserProvider extends ChangeNotifier {
       notifyListeners();
 
       if (context.mounted) {
+        try {
+          context.read<CartProvider>().clearCartState();
+          context.read<WishlistProvider>().clearWishlistState();
+        } catch (_) {}
+
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (BuildContext context) => const LoginPage()),

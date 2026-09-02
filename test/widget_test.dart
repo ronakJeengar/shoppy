@@ -5,11 +5,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shopp_app/core/preferences.dart';
 import 'package:shopp_app/data/models/product_model.dart';
 import 'package:shopp_app/main.dart';
+import 'package:shopp_app/providers/cart_provider.dart';
 import 'package:shopp_app/providers/catalog_provider.dart';
 import 'package:shopp_app/providers/search_provider.dart';
 import 'package:shopp_app/providers/user_provider.dart';
+import 'package:shopp_app/providers/wishlist_provider.dart';
+import 'package:shopp_app/views/cart_page.dart';
 import 'package:shopp_app/views/product_detail_page.dart';
 import 'package:shopp_app/views/search_page.dart';
+import 'package:shopp_app/views/wishlist_page.dart';
 import 'package:shopp_app/views/widgets/filter_bottom_sheet.dart';
 import 'package:shopp_app/views/widgets/product_card.dart';
 
@@ -21,18 +25,24 @@ void main() {
     await Preferences.init();
   });
 
+  Widget buildTestApp({Widget? home}) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => CatalogProvider()),
+        ChangeNotifierProvider(create: (_) => SearchProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => WishlistProvider()),
+      ],
+      child: home != null
+          ? MaterialApp(home: home)
+          : const MyApp(),
+    );
+  }
+
   testWidgets('App launches and displays Login page when unauthenticated',
       (WidgetTester tester) async {
-    await tester.pumpWidget(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => UserProvider()),
-          ChangeNotifierProvider(create: (_) => CatalogProvider()),
-          ChangeNotifierProvider(create: (_) => SearchProvider()),
-        ],
-        child: const MyApp(),
-      ),
-    );
+    await tester.pumpWidget(buildTestApp());
     await tester.pumpAndSettle();
 
     expect(find.text('Login'), findsWidgets);
@@ -42,16 +52,7 @@ void main() {
 
   testWidgets('Login form triggers validation error when submitted empty',
       (WidgetTester tester) async {
-    await tester.pumpWidget(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => UserProvider()),
-          ChangeNotifierProvider(create: (_) => CatalogProvider()),
-          ChangeNotifierProvider(create: (_) => SearchProvider()),
-        ],
-        child: const MyApp(),
-      ),
-    );
+    await tester.pumpWidget(buildTestApp());
     await tester.pumpAndSettle();
 
     final loginButtonFinder = find.widgetWithText(ElevatedButton, 'Login');
@@ -64,16 +65,7 @@ void main() {
 
   testWidgets('Tapping Register button navigates to Create Account screen',
       (WidgetTester tester) async {
-    await tester.pumpWidget(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => UserProvider()),
-          ChangeNotifierProvider(create: (_) => CatalogProvider()),
-          ChangeNotifierProvider(create: (_) => SearchProvider()),
-        ],
-        child: const MyApp(),
-      ),
-    );
+    await tester.pumpWidget(buildTestApp());
     await tester.pumpAndSettle();
 
     final registerButtonFinder = find.widgetWithText(TextButton, 'Register');
@@ -85,29 +77,24 @@ void main() {
     expect(find.byType(TextFormField), findsNWidgets(4));
   });
 
-  testWidgets('App displays HomePage with Categories and Search when authenticated',
+  testWidgets(
+      'App displays HomePage with Categories, Search, Wishlist, and Cart when authenticated',
       (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({
       Preferences.keyAccessToken: 'mock_access_token_123',
     });
     await Preferences.init();
 
-    await tester.pumpWidget(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => UserProvider()),
-          ChangeNotifierProvider(create: (_) => CatalogProvider()),
-          ChangeNotifierProvider(create: (_) => SearchProvider()),
-        ],
-        child: const MyApp(),
-      ),
-    );
+    await tester.pumpWidget(buildTestApp());
     await tester.pumpAndSettle();
 
     expect(find.text('Shoppy Store'), findsOneWidget);
     expect(find.byIcon(Icons.logout), findsOneWidget);
+    expect(find.byIcon(Icons.favorite_border), findsWidgets);
+    expect(find.byIcon(Icons.shopping_cart_outlined), findsOneWidget);
     expect(find.text('Categories'), findsOneWidget);
-    expect(find.text('Search products, brands and categories...'), findsOneWidget);
+    expect(
+        find.text('Search products, brands and categories...'), findsOneWidget);
 
     // Tap search bar to verify navigation to SearchPage
     await tester.tap(find.text('Search products, brands and categories...'));
@@ -117,7 +104,46 @@ void main() {
     expect(find.byIcon(Icons.tune), findsOneWidget);
   });
 
-  testWidgets('ProductCard displays information and navigates to ProductDetailPage',
+  testWidgets('Tapping Cart icon on HomePage opens CartPage',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({
+      Preferences.keyAccessToken: 'mock_access_token_123',
+    });
+    await Preferences.init();
+
+    await tester.pumpWidget(buildTestApp());
+    await tester.pumpAndSettle();
+
+    // Tap cart icon in AppBar
+    await tester.tap(find.byIcon(Icons.shopping_cart_outlined));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(CartPage), findsOneWidget);
+    expect(find.textContaining('Shopping Cart'), findsOneWidget);
+  });
+
+  testWidgets('Tapping Wishlist icon on HomePage opens WishlistPage',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({
+      Preferences.keyAccessToken: 'mock_access_token_123',
+    });
+    await Preferences.init();
+
+    await tester.pumpWidget(buildTestApp());
+    await tester.pumpAndSettle();
+
+    // Tap wishlist icon in AppBar (the one with tooltip 'Wishlist')
+    final wishlistIconFinder =
+        find.widgetWithIcon(IconButton, Icons.favorite_border);
+    await tester.tap(wishlistIconFinder.first);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(WishlistPage), findsOneWidget);
+    expect(find.text('My Wishlist (0)'), findsOneWidget);
+  });
+
+  testWidgets(
+      'ProductCard displays information, wishlist toggle, and navigates to ProductDetailPage',
       (WidgetTester tester) async {
     final testProduct = Product(
       id: 'prod_123',
@@ -131,7 +157,7 @@ void main() {
     );
 
     await tester.pumpWidget(
-      MaterialApp(
+      buildTestApp(
         home: Scaffold(
           body: SizedBox(
             height: 300,
@@ -149,12 +175,13 @@ void main() {
     expect(find.text('4.8'), findsOneWidget);
 
     // Tap card to navigate
-    await tester.tap(find.byType(ProductCard));
+    await tester.tap(find.text('Mechanical Gaming Keyboard'));
     await tester.pumpAndSettle();
 
     expect(find.byType(ProductDetailPage), findsOneWidget);
     expect(find.text('Sold by KeyCrafters'), findsOneWidget);
     expect(find.text('Add to Cart'), findsOneWidget);
+    expect(find.byIcon(Icons.favorite_border), findsOneWidget);
   });
 
   testWidgets('SearchPage displays recent searches and opens filter sheet',
@@ -165,15 +192,8 @@ void main() {
     await Preferences.init();
 
     await tester.pumpWidget(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => UserProvider()),
-          ChangeNotifierProvider(create: (_) => CatalogProvider()),
-          ChangeNotifierProvider(create: (_) => SearchProvider()),
-        ],
-        child: const MaterialApp(
-          home: SearchPage(),
-        ),
+      buildTestApp(
+        home: const SearchPage(),
       ),
     );
     await tester.pumpAndSettle();

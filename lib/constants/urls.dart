@@ -22,6 +22,12 @@ class Urls {
   static const String categories = "categories";
   static const String searchSuggestions = "products/suggestions";
 
+  // Cart & Wishlist modules
+  static const String cart = "cart";
+  static const String cartItems = "cart/items";
+  static const String wishlist = "wishlist";
+  static const String wishlistToggle = "wishlist/toggle";
+
   // Backwards-compatibility aliases
   static const String signUp = register;
   static const String signIn = login;
