@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shopp_app/core/preferences.dart';
 import 'package:shopp_app/data/models/address_model.dart';
+import 'package:shopp_app/data/models/currrent_user_model.dart';
 import 'package:shopp_app/data/models/order_model.dart';
 import 'package:shopp_app/data/models/product_model.dart';
 import 'package:shopp_app/main.dart';
@@ -11,16 +12,20 @@ import 'package:shopp_app/providers/address_provider.dart';
 import 'package:shopp_app/providers/cart_provider.dart';
 import 'package:shopp_app/providers/catalog_provider.dart';
 import 'package:shopp_app/providers/checkout_provider.dart';
+import 'package:shopp_app/providers/notification_provider.dart';
 import 'package:shopp_app/providers/order_provider.dart';
 import 'package:shopp_app/providers/search_provider.dart';
 import 'package:shopp_app/providers/user_provider.dart';
 import 'package:shopp_app/providers/wishlist_provider.dart';
+import 'package:shopp_app/views/addresses_page.dart';
 import 'package:shopp_app/views/cart_page.dart';
 import 'package:shopp_app/views/checkout_page.dart';
+import 'package:shopp_app/views/notifications_page.dart';
 import 'package:shopp_app/views/order_confirmation_page.dart';
 import 'package:shopp_app/views/order_detail_page.dart';
 import 'package:shopp_app/views/orders_page.dart';
 import 'package:shopp_app/views/product_detail_page.dart';
+import 'package:shopp_app/views/profile_page.dart';
 import 'package:shopp_app/views/search_page.dart';
 import 'package:shopp_app/views/wishlist_page.dart';
 import 'package:shopp_app/views/widgets/address_form_dialog.dart';
@@ -35,10 +40,14 @@ void main() {
     await Preferences.init();
   });
 
-  Widget buildTestApp({Widget? home}) {
+  Widget buildTestApp({Widget? home, CurrentUserModel? user}) {
+    final userProvider = UserProvider();
+    if (user != null) {
+      userProvider.currentUser = user;
+    }
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider.value(value: userProvider),
         ChangeNotifierProvider(create: (_) => CatalogProvider()),
         ChangeNotifierProvider(create: (_) => SearchProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
@@ -46,6 +55,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => AddressProvider()),
         ChangeNotifierProvider(create: (_) => CheckoutProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ],
       child: home != null ? MaterialApp(home: home) : const MyApp(),
     );
@@ -89,7 +99,7 @@ void main() {
   });
 
   testWidgets(
-      'App displays HomePage with Categories, Search, Wishlist, and Cart when authenticated',
+      'App displays HomePage with Categories, Search, Wishlist, Notifications and Cart when authenticated',
       (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({
       Preferences.keyAccessToken: 'mock_access_token_123',
@@ -100,10 +110,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Shoppy Store'), findsOneWidget);
-    expect(find.byIcon(Icons.logout), findsOneWidget);
+    expect(find.byIcon(Icons.person_outline), findsOneWidget);
+    expect(find.byIcon(Icons.notifications_none_outlined), findsOneWidget);
     expect(find.byIcon(Icons.favorite_border), findsWidgets);
     expect(find.byIcon(Icons.shopping_cart_outlined), findsOneWidget);
-    expect(find.byIcon(Icons.receipt_long_outlined), findsOneWidget);
     expect(find.text('Categories'), findsOneWidget);
     expect(
         find.text('Search products, brands and categories...'), findsOneWidget);
@@ -126,7 +136,6 @@ void main() {
     await tester.pumpWidget(buildTestApp());
     await tester.pumpAndSettle();
 
-    // Tap cart icon in AppBar
     await tester.tap(find.byIcon(Icons.shopping_cart_outlined));
     await tester.pumpAndSettle();
 
@@ -153,7 +162,7 @@ void main() {
     expect(find.text('My Wishlist (0)'), findsOneWidget);
   });
 
-  testWidgets('Tapping My Orders icon on HomePage opens OrdersPage',
+  testWidgets('Tapping Notifications icon on HomePage opens NotificationsPage',
       (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({
       Preferences.keyAccessToken: 'mock_access_token_123',
@@ -163,13 +172,39 @@ void main() {
     await tester.pumpWidget(buildTestApp());
     await tester.pumpAndSettle();
 
-    final ordersIconFinder =
-        find.widgetWithIcon(IconButton, Icons.receipt_long_outlined);
-    await tester.tap(ordersIconFinder);
+    final notifFinder =
+        find.widgetWithIcon(IconButton, Icons.notifications_none_outlined);
+    await tester.tap(notifFinder);
     await tester.pumpAndSettle();
 
-    expect(find.byType(OrdersPage), findsOneWidget);
-    expect(find.text('My Orders'), findsOneWidget);
+    expect(find.byType(NotificationsPage), findsOneWidget);
+    expect(find.text('Notifications'), findsOneWidget);
+  });
+
+  testWidgets('Tapping My Account icon on HomePage opens ProfilePage',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({
+      Preferences.keyAccessToken: 'mock_access_token_123',
+    });
+    await Preferences.init();
+
+    final testUser = CurrentUserModel(
+      id: 'usr_101',
+      name: 'Jane Doe',
+      email: 'jane@example.com',
+      phone: '+1 555-0199',
+    );
+
+    await tester.pumpWidget(buildTestApp(user: testUser));
+    await tester.pumpAndSettle();
+
+    final profileFinder =
+        find.widgetWithIcon(IconButton, Icons.person_outline);
+    await tester.tap(profileFinder);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ProfilePage), findsOneWidget);
+    expect(find.text('My Account'), findsOneWidget);
   });
 
   testWidgets(
@@ -204,7 +239,6 @@ void main() {
     expect(find.text('\$89.99'), findsOneWidget);
     expect(find.text('4.8'), findsOneWidget);
 
-    // Tap card to navigate
     await tester.tap(find.text('Mechanical Gaming Keyboard'));
     await tester.pumpAndSettle();
 
@@ -233,7 +267,6 @@ void main() {
     expect(find.text('Keyboard'), findsOneWidget);
     expect(find.text('Clear All'), findsOneWidget);
 
-    // Tap filters button
     await tester.tap(find.byIcon(Icons.tune));
     await tester.pumpAndSettle();
 
@@ -283,7 +316,6 @@ void main() {
     expect(find.text('Add Delivery Address'), findsOneWidget);
     expect(find.text('Save Address'), findsOneWidget);
 
-    // Tap Save with empty fields
     await tester.tap(find.text('Save Address'));
     await tester.pumpAndSettle();
 
@@ -381,5 +413,72 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Order Details'), findsOneWidget);
+  });
+
+  testWidgets('AddressesPage renders addresses list and add address action',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      buildTestApp(
+        home: const AddressesPage(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Delivery Addresses'), findsOneWidget);
+  });
+
+  testWidgets('NotificationsPage renders notifications and header',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      buildTestApp(
+        home: const NotificationsPage(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Notifications'), findsOneWidget);
+  });
+
+  testWidgets('ProfilePage renders account options and logout button',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    final testUser = CurrentUserModel(
+      id: 'usr_101',
+      name: 'Jane Doe',
+      email: 'jane@example.com',
+      phone: '+1 555-0199',
+    );
+
+    await tester.pumpWidget(
+      buildTestApp(
+        home: const ProfilePage(),
+        user: testUser,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('My Account'), findsOneWidget);
+    expect(find.text('Jane Doe'), findsOneWidget);
+    expect(find.text('jane@example.com'), findsOneWidget);
+    expect(find.text('+1 555-0199'), findsOneWidget);
+    expect(find.text('My Orders'), findsOneWidget);
+    expect(find.text('My Wishlist'), findsOneWidget);
+    expect(find.text('Delivery Addresses'), findsOneWidget);
+    expect(find.text('Notifications'), findsOneWidget);
+    expect(find.text('Edit Profile'), findsOneWidget);
+    expect(find.text('Change Password'), findsOneWidget);
+    expect(find.text('Notification Preferences'), findsOneWidget);
+    expect(find.text('Log Out'), findsOneWidget);
   });
 }

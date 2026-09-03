@@ -99,6 +99,70 @@ class AuthRepository {
     }
   }
 
+  Future<ApiResponse> updateProfile({
+    String? fullName,
+    String? phone,
+    String? avatar,
+  }) async {
+    try {
+      final response = await _api.patchRequest(
+        Urls.profile,
+        data: {
+          if (fullName != null) 'fullName': fullName,
+          if (phone != null) 'phone': phone,
+          if (avatar != null) 'avatar': avatar,
+        },
+      );
+      return ApiResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      log('AuthRepository updateProfile error: $e');
+      if (e.response?.data != null && e.response?.data is Map<String, dynamic>) {
+        return ApiResponse.fromJson(e.response!.data);
+      }
+      return ApiResponse(
+        status: false,
+        message: e.response?.data?['message'] ??
+            e.message ??
+            'Failed to update profile',
+        data: null,
+        statusCode: e.response?.statusCode ?? 500,
+      );
+    } catch (e) {
+      return ApiResponse(status: false, message: e.toString(), data: null);
+    }
+  }
+
+  Future<ApiResponse> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final response = await _api.postRequest(
+        Urls.changePassword,
+        data: {
+          'currentPassword': currentPassword,
+          'newPassword': newPassword,
+        },
+      );
+      return ApiResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      log('AuthRepository changePassword error: $e');
+      if (e.response?.data != null && e.response?.data is Map<String, dynamic>) {
+        return ApiResponse.fromJson(e.response!.data);
+      }
+      return ApiResponse(
+        status: false,
+        message: e.response?.data?['message'] ??
+            e.message ??
+            'Failed to change password',
+        data: null,
+        statusCode: e.response?.statusCode ?? 500,
+      );
+    } catch (e) {
+      return ApiResponse(status: false, message: e.toString(), data: null);
+    }
+  }
+
   Future<ApiResponse> logout() async {
     try {
       final response = await _api.postRequest(Urls.logout);

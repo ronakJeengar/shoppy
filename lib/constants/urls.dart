@@ -16,6 +16,8 @@ class Urls {
   static const String refreshToken = "auth/refresh-token";
   static const String logout = "auth/logout";
   static const String me = "auth/me";
+  static const String profile = "auth/profile";
+  static const String changePassword = "auth/change-password";
 
   // Product Catalog & Categories modules
   static const String products = "products";
@@ -35,6 +37,11 @@ class Urls {
   static const String paymentsVerify = "payments/verify";
   static const String paymentsFail = "payments/fail";
   static const String orders = "orders";
+
+  // Notifications module
+  static const String notifications = "notifications";
+  static const String notificationPreferences = "notifications/preferences";
+  static const String notificationDevices = "notifications/devices";
 
   // Backwards-compatibility aliases
   static const String signUp = register;

@@ -10,6 +10,7 @@ import 'package:shopp_app/data/repositories/auth_repository.dart';
 import 'package:shopp_app/providers/address_provider.dart';
 import 'package:shopp_app/providers/cart_provider.dart';
 import 'package:shopp_app/providers/checkout_provider.dart';
+import 'package:shopp_app/providers/notification_provider.dart';
 import 'package:shopp_app/providers/order_provider.dart';
 import 'package:shopp_app/providers/wishlist_provider.dart';
 import 'package:shopp_app/views/home_page.dart';
@@ -178,6 +179,85 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> updateProfile({
+    String? fullName,
+    String? phone,
+    String? avatar,
+  }) async {
+    isLoading = true;
+    errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await authRepository.updateProfile(
+        fullName: fullName,
+        phone: phone,
+        avatar: avatar,
+      );
+
+      if (response.status && response.data is Map<String, dynamic>) {
+        currentUser =
+            CurrentUserModel.fromJson(response.data as Map<String, dynamic>);
+        isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        errorMessage = response.message;
+        isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      log('updateProfile exception: $e');
+      errorMessage = 'Failed to update profile';
+      isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    isLoading = true;
+    errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await authRepository.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      );
+
+      if (response.status) {
+        if (response.data is Map<String, dynamic>) {
+          final data = response.data as Map<String, dynamic>;
+          if (data['accessToken'] != null) {
+            await Preferences.saveTokens(
+              accessToken: data['accessToken'].toString(),
+              refreshToken: data['refreshToken']?.toString(),
+            );
+          }
+        }
+        isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        errorMessage = response.message;
+        isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      log('changePassword exception: $e');
+      errorMessage = 'Failed to change password';
+      isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
   Future<void> logout(BuildContext context) async {
     try {
       await authRepository.logout();
@@ -196,6 +276,7 @@ class UserProvider extends ChangeNotifier {
           context.read<AddressProvider>().clearAddressState();
           context.read<CheckoutProvider>().resetState();
           context.read<OrderProvider>().clearOrderState();
+          context.read<NotificationProvider>().clearNotificationState();
         } catch (_) {}
 
         Navigator.pushAndRemoveUntil(

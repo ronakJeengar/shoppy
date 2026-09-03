@@ -3,10 +3,12 @@ import 'package:provider/provider.dart';
 import 'package:shopp_app/data/models/currrent_user_model.dart';
 import 'package:shopp_app/providers/cart_provider.dart';
 import 'package:shopp_app/providers/catalog_provider.dart';
+import 'package:shopp_app/providers/notification_provider.dart';
 import 'package:shopp_app/providers/user_provider.dart';
 import 'package:shopp_app/providers/wishlist_provider.dart';
 import 'package:shopp_app/views/cart_page.dart';
-import 'package:shopp_app/views/orders_page.dart';
+import 'package:shopp_app/views/notifications_page.dart';
+import 'package:shopp_app/views/profile_page.dart';
 import 'package:shopp_app/views/search_page.dart';
 import 'package:shopp_app/views/wishlist_page.dart';
 import 'package:shopp_app/views/widgets/category_selector.dart';
@@ -53,6 +55,7 @@ class _HomePageState extends State<HomePage> {
     final catalogProvider = context.watch<CatalogProvider>();
     final cartProvider = context.watch<CartProvider>();
     final wishlistProvider = context.watch<WishlistProvider>();
+    final notifProvider = context.watch<NotificationProvider>();
     final CurrentUserModel? currentUser = userProvider.currentUser;
 
     return Scaffold(
@@ -63,6 +66,44 @@ class _HomePageState extends State<HomePage> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
+          // Notifications Action with Unread Badge
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.notifications_none_outlined),
+                tooltip: 'Notifications',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const NotificationsPage(),
+                    ),
+                  );
+                },
+              ),
+              if (notifProvider.unreadCount > 0)
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      '${notifProvider.unreadCount}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
           // Wishlist Action with Badge
           Stack(
             alignment: Alignment.center,
@@ -136,19 +177,14 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           IconButton(
-            icon: const Icon(Icons.receipt_long_outlined),
-            tooltip: 'My Orders',
+            icon: const Icon(Icons.person_outline),
+            tooltip: 'My Account',
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const OrdersPage()),
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
               );
             },
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Log out',
-            onPressed: () => userProvider.logout(context),
           ),
         ],
       ),

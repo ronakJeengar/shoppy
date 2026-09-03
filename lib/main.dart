@@ -5,6 +5,7 @@ import 'package:shopp_app/providers/address_provider.dart';
 import 'package:shopp_app/providers/cart_provider.dart';
 import 'package:shopp_app/providers/catalog_provider.dart';
 import 'package:shopp_app/providers/checkout_provider.dart';
+import 'package:shopp_app/providers/notification_provider.dart';
 import 'package:shopp_app/providers/order_provider.dart';
 import 'package:shopp_app/providers/search_provider.dart';
 import 'package:shopp_app/providers/user_provider.dart';
@@ -26,6 +27,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => AddressProvider()),
         ChangeNotifierProvider(create: (_) => CheckoutProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ],
       child: const MyApp(),
     ),
