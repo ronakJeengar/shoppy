@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shopp_app/providers/cart_provider.dart';
+import 'package:shopp_app/views/checkout_page.dart';
 import 'package:shopp_app/views/widgets/cart_item_tile.dart';
 
 class CartPage extends StatelessWidget {
@@ -289,12 +290,10 @@ class CartPage extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Ready for Phase 06: Checkout & Payment processing',
-                    ),
-                    duration: Duration(seconds: 2),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CheckoutPage(),
                   ),
                 );
               },

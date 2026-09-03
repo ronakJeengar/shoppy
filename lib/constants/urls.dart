@@ -28,6 +28,14 @@ class Urls {
   static const String wishlist = "wishlist";
   static const String wishlistToggle = "wishlist/toggle";
 
+  // Address, Checkout & Payment modules
+  static const String addresses = "addresses";
+  static const String checkoutValidate = "checkout/validate";
+  static const String checkoutCreate = "checkout/create";
+  static const String paymentsVerify = "payments/verify";
+  static const String paymentsFail = "payments/fail";
+  static const String orders = "orders";
+
   // Backwards-compatibility aliases
   static const String signUp = register;
   static const String signIn = login;

@@ -7,7 +7,9 @@ import 'package:shopp_app/data/models/api_response.dart';
 import 'package:shopp_app/data/models/currrent_user_model.dart';
 import 'package:shopp_app/data/models/user_model.dart';
 import 'package:shopp_app/data/repositories/auth_repository.dart';
+import 'package:shopp_app/providers/address_provider.dart';
 import 'package:shopp_app/providers/cart_provider.dart';
+import 'package:shopp_app/providers/checkout_provider.dart';
 import 'package:shopp_app/providers/wishlist_provider.dart';
 import 'package:shopp_app/views/home_page.dart';
 import 'package:shopp_app/views/login_page.dart';
@@ -190,6 +192,8 @@ class UserProvider extends ChangeNotifier {
         try {
           context.read<CartProvider>().clearCartState();
           context.read<WishlistProvider>().clearWishlistState();
+          context.read<AddressProvider>().clearAddressState();
+          context.read<CheckoutProvider>().resetState();
         } catch (_) {}
 
         Navigator.pushAndRemoveUntil(
