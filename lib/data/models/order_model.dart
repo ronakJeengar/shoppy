@@ -1,4 +1,5 @@
 import 'package:shopp_app/data/models/address_model.dart';
+import 'package:shopp_app/data/models/payment_model.dart';
 
 class OrderItemModel {
   final String productId;
@@ -47,6 +48,30 @@ class OrderItemModel {
   }
 }
 
+class OrderStatusHistoryItem {
+  final String status;
+  final DateTime timestamp;
+  final String note;
+
+  OrderStatusHistoryItem({
+    required this.status,
+    required this.timestamp,
+    required this.note,
+  });
+
+  factory OrderStatusHistoryItem.fromJson(Map<String, dynamic> json) {
+    DateTime time = DateTime.now();
+    if (json['timestamp'] != null) {
+      time = DateTime.tryParse(json['timestamp'].toString()) ?? DateTime.now();
+    }
+    return OrderStatusHistoryItem(
+      status: json['status']?.toString() ?? '',
+      timestamp: time,
+      note: json['note']?.toString() ?? '',
+    );
+  }
+}
+
 class OrderModel {
   final String id;
   final String orderNumber;
@@ -59,6 +84,12 @@ class OrderModel {
   final double totalAmount;
   final String currency;
   final String status;
+  final PaymentModel? payment;
+  final String carrier;
+  final String trackingNumber;
+  final String cancellationReason;
+  final bool canCancel;
+  final List<OrderStatusHistoryItem> statusHistory;
   final DateTime createdAt;
 
   OrderModel({
@@ -73,8 +104,37 @@ class OrderModel {
     required this.totalAmount,
     this.currency = 'USD',
     required this.status,
+    this.payment,
+    this.carrier = '',
+    this.trackingNumber = '',
+    this.cancellationReason = '',
+    this.canCancel = false,
+    this.statusHistory = const [],
     required this.createdAt,
   });
+
+  bool get isCancelled => status == 'CANCELLED';
+  bool get isDelivered => status == 'DELIVERED';
+  bool get isShipped => status == 'SHIPPED';
+  bool get isProcessing => status == 'PROCESSING';
+  bool get isConfirmed => status == 'CONFIRMED';
+
+  // Tracking step index: 0: Confirmed, 1: Processing, 2: Shipped, 3: Delivered, -1: Cancelled
+  int get trackingStepIndex {
+    switch (status) {
+      case 'CONFIRMED':
+        return 0;
+      case 'PROCESSING':
+        return 1;
+      case 'SHIPPED':
+        return 2;
+      case 'DELIVERED':
+        return 3;
+      case 'CANCELLED':
+      default:
+        return -1;
+    }
+  }
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
     final rawItems = json['orderItems'];
@@ -94,10 +154,33 @@ class OrderModel {
       );
     }
 
+    PaymentModel? paymentObj;
+    if (json['payment'] is Map<String, dynamic>) {
+      paymentObj = PaymentModel.fromJson(
+        json['payment'] as Map<String, dynamic>,
+      );
+    }
+
+    final rawHistory = json['statusHistory'];
+    final List<OrderStatusHistoryItem> history = [];
+    if (rawHistory is List) {
+      for (final h in rawHistory) {
+        if (h is Map<String, dynamic>) {
+          history.add(OrderStatusHistoryItem.fromJson(h));
+        }
+      }
+    }
+
     DateTime parsedDate = DateTime.now();
     if (json['createdAt'] != null) {
       parsedDate = DateTime.tryParse(json['createdAt'].toString()) ?? DateTime.now();
     }
+
+    final rawStatus = json['status']?.toString() ?? 'PENDING_PAYMENT';
+    final serverCanCancel = json['canCancel'];
+    final computedCanCancel = serverCanCancel != null
+        ? serverCanCancel == true
+        : ['PENDING_PAYMENT', 'CONFIRMED', 'PROCESSING'].contains(rawStatus);
 
     return OrderModel(
       id: json['id']?.toString() ?? json['_id']?.toString() ?? '',
@@ -117,7 +200,13 @@ class OrderModel {
               ? (json['orderPrice'] as num).toDouble()
               : 0.0,
       currency: json['currency']?.toString() ?? 'USD',
-      status: json['status']?.toString() ?? 'PENDING_PAYMENT',
+      status: rawStatus,
+      payment: paymentObj,
+      carrier: json['carrier']?.toString() ?? '',
+      trackingNumber: json['trackingNumber']?.toString() ?? '',
+      cancellationReason: json['cancellationReason']?.toString() ?? '',
+      canCancel: computedCanCancel,
+      statusHistory: history,
       createdAt: parsedDate,
     );
   }

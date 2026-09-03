@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shopp_app/data/models/order_model.dart';
 import 'package:shopp_app/views/home_page.dart';
+import 'package:shopp_app/views/orders_page.dart';
 
 class OrderConfirmationPage extends StatelessWidget {
   final OrderModel order;
@@ -333,6 +334,25 @@ class OrderConfirmationPage extends StatelessWidget {
               },
               child: const Text(
                 'Continue Shopping',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 10),
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const OrdersPage()),
+                );
+              },
+              child: const Text(
+                'View All Orders',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),

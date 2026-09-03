@@ -6,6 +6,7 @@ import 'package:shopp_app/providers/catalog_provider.dart';
 import 'package:shopp_app/providers/user_provider.dart';
 import 'package:shopp_app/providers/wishlist_provider.dart';
 import 'package:shopp_app/views/cart_page.dart';
+import 'package:shopp_app/views/orders_page.dart';
 import 'package:shopp_app/views/search_page.dart';
 import 'package:shopp_app/views/wishlist_page.dart';
 import 'package:shopp_app/views/widgets/category_selector.dart';
@@ -133,6 +134,16 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
             ],
+          ),
+          IconButton(
+            icon: const Icon(Icons.receipt_long_outlined),
+            tooltip: 'My Orders',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const OrdersPage()),
+              );
+            },
           ),
           IconButton(
             icon: const Icon(Icons.logout),

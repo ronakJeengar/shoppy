@@ -11,12 +11,15 @@ import 'package:shopp_app/providers/address_provider.dart';
 import 'package:shopp_app/providers/cart_provider.dart';
 import 'package:shopp_app/providers/catalog_provider.dart';
 import 'package:shopp_app/providers/checkout_provider.dart';
+import 'package:shopp_app/providers/order_provider.dart';
 import 'package:shopp_app/providers/search_provider.dart';
 import 'package:shopp_app/providers/user_provider.dart';
 import 'package:shopp_app/providers/wishlist_provider.dart';
 import 'package:shopp_app/views/cart_page.dart';
 import 'package:shopp_app/views/checkout_page.dart';
 import 'package:shopp_app/views/order_confirmation_page.dart';
+import 'package:shopp_app/views/order_detail_page.dart';
+import 'package:shopp_app/views/orders_page.dart';
 import 'package:shopp_app/views/product_detail_page.dart';
 import 'package:shopp_app/views/search_page.dart';
 import 'package:shopp_app/views/wishlist_page.dart';
@@ -42,6 +45,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => WishlistProvider()),
         ChangeNotifierProvider(create: (_) => AddressProvider()),
         ChangeNotifierProvider(create: (_) => CheckoutProvider()),
+        ChangeNotifierProvider(create: (_) => OrderProvider()),
       ],
       child: home != null ? MaterialApp(home: home) : const MyApp(),
     );
@@ -99,6 +103,7 @@ void main() {
     expect(find.byIcon(Icons.logout), findsOneWidget);
     expect(find.byIcon(Icons.favorite_border), findsWidgets);
     expect(find.byIcon(Icons.shopping_cart_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.receipt_long_outlined), findsOneWidget);
     expect(find.text('Categories'), findsOneWidget);
     expect(
         find.text('Search products, brands and categories...'), findsOneWidget);
@@ -146,6 +151,25 @@ void main() {
 
     expect(find.byType(WishlistPage), findsOneWidget);
     expect(find.text('My Wishlist (0)'), findsOneWidget);
+  });
+
+  testWidgets('Tapping My Orders icon on HomePage opens OrdersPage',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({
+      Preferences.keyAccessToken: 'mock_access_token_123',
+    });
+    await Preferences.init();
+
+    await tester.pumpWidget(buildTestApp());
+    await tester.pumpAndSettle();
+
+    final ordersIconFinder =
+        find.widgetWithIcon(IconButton, Icons.receipt_long_outlined);
+    await tester.tap(ordersIconFinder);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(OrdersPage), findsOneWidget);
+    expect(find.text('My Orders'), findsOneWidget);
   });
 
   testWidgets(
@@ -271,7 +295,7 @@ void main() {
   });
 
   testWidgets(
-      'OrderConfirmationPage renders order receipt, status, items, and continue action',
+      'OrderConfirmationPage renders order receipt, status, items, and action buttons',
       (WidgetTester tester) async {
     tester.view.physicalSize = const Size(800, 1600);
     tester.view.devicePixelRatio = 1.0;
@@ -323,5 +347,39 @@ void main() {
     expect(find.text('Wireless Headphones'), findsOneWidget);
     expect(find.text('\$161.99'), findsOneWidget);
     expect(find.text('Continue Shopping'), findsOneWidget);
+    expect(find.text('View All Orders'), findsOneWidget);
+  });
+
+  testWidgets('OrdersPage renders orders list with status and item info',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      buildTestApp(
+        home: const OrdersPage(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('My Orders'), findsOneWidget);
+  });
+
+  testWidgets(
+      'OrderDetailPage renders tracking timeline, delivery address, items, and cancel button',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      buildTestApp(
+        home: const OrderDetailPage(orderId: '64f1b2c3d4e5f6a7b8c90001'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Order Details'), findsOneWidget);
   });
 }
