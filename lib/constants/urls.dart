@@ -43,6 +43,14 @@ class Urls {
   static const String notificationPreferences = "notifications/preferences";
   static const String notificationDevices = "notifications/devices";
 
+  // Admin module
+  static const String adminDashboard = "admin/dashboard";
+  static const String adminProducts = "admin/products";
+  static const String adminCategories = "admin/categories";
+  static const String adminOrders = "admin/orders";
+  static const String adminUsers = "admin/users";
+  static const String adminAuditLogs = "admin/audit-logs";
+
   // Backwards-compatibility aliases
   static const String signUp = register;
   static const String signIn = login;

@@ -9,6 +9,7 @@ import 'package:shopp_app/data/models/order_model.dart';
 import 'package:shopp_app/data/models/product_model.dart';
 import 'package:shopp_app/main.dart';
 import 'package:shopp_app/providers/address_provider.dart';
+import 'package:shopp_app/providers/admin_provider.dart';
 import 'package:shopp_app/providers/cart_provider.dart';
 import 'package:shopp_app/providers/catalog_provider.dart';
 import 'package:shopp_app/providers/checkout_provider.dart';
@@ -18,6 +19,11 @@ import 'package:shopp_app/providers/search_provider.dart';
 import 'package:shopp_app/providers/user_provider.dart';
 import 'package:shopp_app/providers/wishlist_provider.dart';
 import 'package:shopp_app/views/addresses_page.dart';
+import 'package:shopp_app/views/admin/admin_audit_logs_page.dart';
+import 'package:shopp_app/views/admin/admin_dashboard_page.dart';
+import 'package:shopp_app/views/admin/admin_orders_page.dart';
+import 'package:shopp_app/views/admin/admin_products_page.dart';
+import 'package:shopp_app/views/admin/admin_users_page.dart';
 import 'package:shopp_app/views/cart_page.dart';
 import 'package:shopp_app/views/checkout_page.dart';
 import 'package:shopp_app/views/notifications_page.dart';
@@ -56,6 +62,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => CheckoutProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider(create: (_) => AdminProvider()),
       ],
       child: home != null ? MaterialApp(home: home) : const MyApp(),
     );
@@ -480,5 +487,114 @@ void main() {
     expect(find.text('Change Password'), findsOneWidget);
     expect(find.text('Notification Preferences'), findsOneWidget);
     expect(find.text('Log Out'), findsOneWidget);
+  });
+
+  testWidgets('ProfilePage displays Store Administration section for ADMIN user',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    final adminUser = CurrentUserModel(
+      id: 'usr_admin',
+      name: 'Super Administrator',
+      email: 'admin@shoppy.com',
+      role: 'ADMIN',
+    );
+
+    await tester.pumpWidget(
+      buildTestApp(
+        home: const ProfilePage(),
+        user: adminUser,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Store Administration'), findsOneWidget);
+    expect(find.text('Admin Dashboard'), findsOneWidget);
+  });
+
+  testWidgets('AdminDashboardPage renders KPI grid, navigation hub, and breakdown',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      buildTestApp(
+        home: const AdminDashboardPage(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Admin Dashboard'), findsOneWidget);
+    expect(find.text('Total Revenue'), findsOneWidget);
+    expect(find.text('Total Orders'), findsOneWidget);
+    expect(find.text('Active Products'), findsOneWidget);
+    expect(find.text('Total Users'), findsOneWidget);
+    expect(find.text('Store Administration'), findsOneWidget);
+    expect(find.text('Products'), findsOneWidget);
+    expect(find.text('Orders'), findsOneWidget);
+    expect(find.text('Users'), findsOneWidget);
+    expect(find.text('Audit'), findsOneWidget);
+  });
+
+  testWidgets('AdminProductsPage renders search bar and low stock filter',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      buildTestApp(
+        home: const AdminProductsPage(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Product Management'), findsOneWidget);
+    expect(find.byType(TextField), findsOneWidget);
+    expect(find.text('Low Stock'), findsOneWidget);
+    expect(find.byIcon(Icons.add), findsOneWidget);
+  });
+
+  testWidgets('AdminOrdersPage renders status filter tabs and order list',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      buildTestApp(
+        home: const AdminOrdersPage(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Order Management'), findsOneWidget);
+    expect(find.text('ALL'), findsOneWidget);
+    expect(find.text('CONFIRMED'), findsOneWidget);
+    expect(find.text('PROCESSING'), findsOneWidget);
+    expect(find.text('SHIPPED'), findsOneWidget);
+    expect(find.text('DELIVERED'), findsOneWidget);
+    expect(find.text('CANCELLED'), findsOneWidget);
+  });
+
+  testWidgets('AdminUsersPage renders user management directory and search',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      buildTestApp(
+        home: const AdminUsersPage(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('User Management'), findsOneWidget);
+    expect(find.byType(TextField), findsOneWidget);
+  });
+
+  testWidgets('AdminAuditLogsPage renders security audit trail screen',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      buildTestApp(
+        home: const AdminAuditLogsPage(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Security & Audit Trail'), findsOneWidget);
+    expect(find.byIcon(Icons.refresh), findsOneWidget);
   });
 }

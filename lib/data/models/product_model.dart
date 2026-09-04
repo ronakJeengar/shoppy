@@ -9,6 +9,7 @@ class Product {
   final String productImage;
   final String? categoryId;
   final String? categoryName;
+  final bool isActive;
 
   Product({
     required this.id,
@@ -21,6 +22,7 @@ class Product {
     required this.productImage,
     this.categoryId,
     this.categoryName,
+    this.isActive = true,
   });
 
   // Backwards compatibility getters
@@ -61,6 +63,7 @@ class Product {
       productImage: (json['productImage'] ?? json['imageUrl'] ?? '').toString(),
       categoryId: parsedCategoryId.isNotEmpty ? parsedCategoryId : null,
       categoryName: parsedCategoryName.isNotEmpty ? parsedCategoryName : null,
+      isActive: json['isActive'] != false,
     );
   }
 

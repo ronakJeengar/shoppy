@@ -4,6 +4,7 @@ import 'package:shopp_app/data/models/currrent_user_model.dart';
 import 'package:shopp_app/providers/notification_provider.dart';
 import 'package:shopp_app/providers/user_provider.dart';
 import 'package:shopp_app/views/addresses_page.dart';
+import 'package:shopp_app/views/admin/admin_dashboard_page.dart';
 import 'package:shopp_app/views/notifications_page.dart';
 import 'package:shopp_app/views/orders_page.dart';
 import 'package:shopp_app/views/wishlist_page.dart';
@@ -304,6 +305,43 @@ class _ProfilePageState extends State<ProfilePage> {
                 // 1. Profile Header Card
                 _buildProfileHeader(user),
                 const SizedBox(height: 20),
+
+                // Store Administration (Visible only to ADMIN role)
+                if (user.role == 'ADMIN') ...[
+                  const Text(
+                    'Store Administration',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.purple,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Card(
+                    elevation: 0.5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: Colors.purple.shade200),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildTile(
+                          icon: Icons.dashboard_outlined,
+                          iconColor: Colors.purple,
+                          title: 'Admin Dashboard',
+                          subtitle: 'Store overview, products, orders & audit',
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const AdminDashboardPage(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
 
                 // 2. Quick Navigation Section
                 const Text(
