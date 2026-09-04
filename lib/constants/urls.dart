@@ -43,6 +43,12 @@ class Urls {
   static const String notificationPreferences = "notifications/preferences";
   static const String notificationDevices = "notifications/devices";
 
+  // Reviews & Ratings module
+  static const String reviews = "reviews";
+  static String productReviews(String productId) => "products/$productId/reviews";
+  static String reviewEligibility(String productId) =>
+      "products/$productId/reviews/eligibility";
+
   // Admin module
   static const String adminDashboard = "admin/dashboard";
   static const String adminProducts = "admin/products";
@@ -50,6 +56,7 @@ class Urls {
   static const String adminOrders = "admin/orders";
   static const String adminUsers = "admin/users";
   static const String adminAuditLogs = "admin/audit-logs";
+  static const String adminReviews = "admin/reviews";
 
   // Backwards-compatibility aliases
   static const String signUp = register;

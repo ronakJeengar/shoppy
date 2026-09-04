@@ -5,6 +5,7 @@ import 'package:shopp_app/providers/admin_provider.dart';
 import 'package:shopp_app/views/admin/admin_audit_logs_page.dart';
 import 'package:shopp_app/views/admin/admin_orders_page.dart';
 import 'package:shopp_app/views/admin/admin_products_page.dart';
+import 'package:shopp_app/views/admin/admin_reviews_page.dart';
 import 'package:shopp_app/views/admin/admin_users_page.dart';
 
 class AdminDashboardPage extends StatefulWidget {
@@ -296,58 +297,79 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   }
 
   Widget _buildQuickNavHub(BuildContext context) {
-    return Row(
+    return Column(
       children: [
-        Expanded(
-          child: _buildNavButton(
-            context,
-            icon: Icons.inventory_2_outlined,
-            label: 'Products',
-            color: Colors.blue,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AdminProductsPage()),
+        Row(
+          children: [
+            Expanded(
+              child: _buildNavButton(
+                context,
+                icon: Icons.inventory_2_outlined,
+                label: 'Products',
+                color: Colors.blue,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AdminProductsPage()),
+                ),
+              ),
             ),
-          ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _buildNavButton(
+                context,
+                icon: Icons.receipt_long_outlined,
+                label: 'Orders',
+                color: Colors.indigo,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AdminOrdersPage()),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _buildNavButton(
+                context,
+                icon: Icons.people_outline,
+                label: 'Users',
+                color: Colors.teal,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AdminUsersPage()),
+                ),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _buildNavButton(
-            context,
-            icon: Icons.receipt_long_outlined,
-            label: 'Orders',
-            color: Colors.indigo,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AdminOrdersPage()),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: _buildNavButton(
+                context,
+                icon: Icons.rate_review_outlined,
+                label: 'Reviews',
+                color: Colors.orange,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AdminReviewsPage()),
+                ),
+              ),
             ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _buildNavButton(
-            context,
-            icon: Icons.people_outline,
-            label: 'Users',
-            color: Colors.teal,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AdminUsersPage()),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _buildNavButton(
+                context,
+                icon: Icons.history_edu_outlined,
+                label: 'Audit',
+                color: Colors.deepPurple,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AdminAuditLogsPage()),
+                ),
+              ),
             ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _buildNavButton(
-            context,
-            icon: Icons.history_edu_outlined,
-            label: 'Audit',
-            color: Colors.deepPurple,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AdminAuditLogsPage()),
-            ),
-          ),
+          ],
         ),
       ],
     );

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shopp_app/data/models/order_model.dart';
 import 'package:shopp_app/providers/order_provider.dart';
+import 'package:shopp_app/views/widgets/write_review_dialog.dart';
 
 class OrderDetailPage extends StatefulWidget {
   final String orderId;
@@ -561,11 +562,13 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
             ...order.orderItems.map((item) {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Row(
+                child: Column(
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Container(
+                    Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
                         width: 50,
                         height: 50,
                         color: Colors.grey.shade100,
@@ -624,8 +627,34 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     ),
                   ],
                 ),
-              );
-            }),
+                if (order.status == 'DELIVERED')
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      style: TextButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                        foregroundColor: Colors.amber.shade800,
+                      ),
+                      icon: const Icon(Icons.star_outline, size: 16),
+                      label: const Text(
+                        'Review Item',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (_) => WriteReviewDialog(
+                            productId: item.productId,
+                            productName: item.productName,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
           ],
         ),
       ),

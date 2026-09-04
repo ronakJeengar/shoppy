@@ -7,6 +7,7 @@ import 'package:shopp_app/data/models/address_model.dart';
 import 'package:shopp_app/data/models/currrent_user_model.dart';
 import 'package:shopp_app/data/models/order_model.dart';
 import 'package:shopp_app/data/models/product_model.dart';
+import 'package:shopp_app/data/models/review_model.dart';
 import 'package:shopp_app/main.dart';
 import 'package:shopp_app/providers/address_provider.dart';
 import 'package:shopp_app/providers/admin_provider.dart';
@@ -15,6 +16,7 @@ import 'package:shopp_app/providers/catalog_provider.dart';
 import 'package:shopp_app/providers/checkout_provider.dart';
 import 'package:shopp_app/providers/notification_provider.dart';
 import 'package:shopp_app/providers/order_provider.dart';
+import 'package:shopp_app/providers/review_provider.dart';
 import 'package:shopp_app/providers/search_provider.dart';
 import 'package:shopp_app/providers/user_provider.dart';
 import 'package:shopp_app/providers/wishlist_provider.dart';
@@ -23,6 +25,7 @@ import 'package:shopp_app/views/admin/admin_audit_logs_page.dart';
 import 'package:shopp_app/views/admin/admin_dashboard_page.dart';
 import 'package:shopp_app/views/admin/admin_orders_page.dart';
 import 'package:shopp_app/views/admin/admin_products_page.dart';
+import 'package:shopp_app/views/admin/admin_reviews_page.dart';
 import 'package:shopp_app/views/admin/admin_users_page.dart';
 import 'package:shopp_app/views/cart_page.dart';
 import 'package:shopp_app/views/checkout_page.dart';
@@ -37,6 +40,7 @@ import 'package:shopp_app/views/wishlist_page.dart';
 import 'package:shopp_app/views/widgets/address_form_dialog.dart';
 import 'package:shopp_app/views/widgets/filter_bottom_sheet.dart';
 import 'package:shopp_app/views/widgets/product_card.dart';
+import 'package:shopp_app/views/widgets/write_review_dialog.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -63,6 +67,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => OrderProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ChangeNotifierProvider(create: (_) => AdminProvider()),
+        ChangeNotifierProvider(create: (_) => ReviewProvider()),
       ],
       child: home != null ? MaterialApp(home: home) : const MyApp(),
     );
@@ -596,5 +601,111 @@ void main() {
 
     expect(find.text('Security & Audit Trail'), findsOneWidget);
     expect(find.byIcon(Icons.refresh), findsOneWidget);
+  });
+
+  testWidgets(
+      'ProductDetailPage renders customer reviews section and rating summary',
+      (WidgetTester tester) async {
+    final testProduct = Product(
+      id: 'prod_999',
+      productName: 'Noise Cancelling Headphones',
+      sellerName: 'AudioMaster',
+      description: 'Superior sound experience',
+      price: 149.99,
+      stock: 20,
+      productRating: 4.5,
+      productImage: '',
+    );
+
+    final reviewProvider = ReviewProvider();
+    reviewProvider.setReviewsForTesting(
+      summary: ReviewSummaryModel(
+        averageRating: 4.5,
+        totalReviews: 2,
+        ratingDistribution: {1: 0, 2: 0, 3: 0, 4: 1, 5: 1},
+      ),
+      reviews: [
+        ReviewModel(
+          id: 'rev_1',
+          rating: 5,
+          title: 'Amazing sound',
+          comment: 'Best headphones I have ever owned.',
+          verifiedPurchase: true,
+          authorName: 'David K.',
+          createdAt: DateTime.now(),
+        ),
+      ],
+      eligibility: ReviewEligibilityModel(
+        canReview: true,
+        hasReviewed: false,
+        isVerifiedPurchase: true,
+      ),
+    );
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => UserProvider()),
+          ChangeNotifierProvider(create: (_) => CartProvider()),
+          ChangeNotifierProvider(create: (_) => WishlistProvider()),
+          ChangeNotifierProvider.value(value: reviewProvider),
+        ],
+        child: MaterialApp(
+          home: ProductDetailPage(product: testProduct),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Customer Reviews'), findsOneWidget);
+    expect(find.text('4.5'), findsWidgets);
+    expect(find.text('David K.'), findsOneWidget);
+    expect(find.text('✓ Verified'), findsOneWidget);
+    expect(find.text('Amazing sound'), findsOneWidget);
+    expect(find.text('Best headphones I have ever owned.'), findsOneWidget);
+  });
+
+  testWidgets(
+      'WriteReviewDialog renders star rating picker and validates empty comment',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      buildTestApp(
+        home: const Scaffold(
+          body: WriteReviewDialog(
+            productId: 'prod_999',
+            productName: 'Noise Cancelling Headphones',
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Write a Review'), findsOneWidget);
+    expect(find.text('Noise Cancelling Headphones'), findsOneWidget);
+    expect(find.text('Excellent (5/5)'), findsOneWidget);
+    expect(find.text('Submit Review'), findsOneWidget);
+
+    // Tap Submit Review without entering comment -> validation error
+    await tester.tap(find.text('Submit Review'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Review must be at least 3 characters'), findsOneWidget);
+  });
+
+  testWidgets(
+      'AdminReviewsPage renders review moderation interface with filter chips',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      buildTestApp(
+        home: const AdminReviewsPage(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Review Moderation'), findsOneWidget);
+    expect(find.text('ALL'), findsOneWidget);
+    expect(find.text('PUBLISHED'), findsOneWidget);
+    expect(find.text('HIDDEN'), findsOneWidget);
+    expect(find.byType(TextField), findsOneWidget);
   });
 }
