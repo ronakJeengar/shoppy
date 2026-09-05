@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shopp_app/core/preferences.dart';
 import 'package:shopp_app/providers/address_provider.dart';
 import 'package:shopp_app/providers/admin_provider.dart';
+import 'package:shopp_app/providers/assistant_provider.dart';
 import 'package:shopp_app/providers/cart_provider.dart';
 import 'package:shopp_app/providers/catalog_provider.dart';
 import 'package:shopp_app/providers/checkout_provider.dart';
@@ -32,6 +33,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ChangeNotifierProvider(create: (_) => AdminProvider()),
         ChangeNotifierProvider(create: (_) => ReviewProvider()),
+        ChangeNotifierProvider(create: (_) => AssistantProvider()),
       ],
       child: const MyApp(),
     ),

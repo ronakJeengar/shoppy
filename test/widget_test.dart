@@ -39,6 +39,9 @@ import 'package:shopp_app/views/product_detail_page.dart';
 import 'package:shopp_app/views/profile_page.dart';
 import 'package:shopp_app/views/search_page.dart';
 import 'package:shopp_app/views/wishlist_page.dart';
+import 'package:shopp_app/data/models/assistant_message_model.dart';
+import 'package:shopp_app/providers/assistant_provider.dart';
+import 'package:shopp_app/views/assistant_page.dart';
 import 'package:shopp_app/views/widgets/address_form_dialog.dart';
 import 'package:shopp_app/views/widgets/filter_bottom_sheet.dart';
 import 'package:shopp_app/views/widgets/product_card.dart';
@@ -70,6 +73,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ChangeNotifierProvider(create: (_) => AdminProvider()),
         ChangeNotifierProvider(create: (_) => ReviewProvider()),
+        ChangeNotifierProvider(create: (_) => AssistantProvider()),
       ],
       child: home != null ? MaterialApp(home: home) : const MyApp(),
     );
@@ -810,4 +814,116 @@ void main() {
     expect(provider.inStockOnly, isFalse);
     expect(provider.activeFilterCount, equals(0));
   });
+
+  test('AssistantMessageModel and AssistantChatResponseModel serialize and deserialize accurately', () {
+    final rawJson = {
+      'conversationId': 'conv_123',
+      'message': 'Here are top recommendations:',
+      'answer': 'Here are top recommendations:',
+      'products': [
+        {
+          'id': 'p_101',
+          'name': 'Wireless Noise-Cancelling Headphones',
+          'price': 149.99,
+          'inStock': true,
+          'stockCount': 10,
+          'rating': 4.7,
+          'seller': 'SoundPro',
+          'productImage': '',
+          'description': 'High clarity sound',
+        }
+      ],
+      'sources': [
+        {
+          'chunkId': 'chk_1',
+          'title': 'Store Policy',
+          'section': 'Returns',
+          'sourceType': 'POLICY',
+          'content': '30-day return window',
+        }
+      ],
+      'actions': [
+        {
+          'type': 'OPEN_PRODUCT',
+          'label': 'View Product',
+          'payload': {'productId': 'p_101'},
+        }
+      ],
+      'requestId': 'req_777',
+    };
+
+    final resp = AssistantChatResponseModel.fromJson(rawJson);
+    expect(resp.conversationId, equals('conv_123'));
+    expect(resp.products.length, equals(1));
+    expect(resp.products.first.name, equals('Wireless Noise-Cancelling Headphones'));
+    expect(resp.sources.length, equals(1));
+    expect(resp.sources.first.title, equals('Store Policy'));
+    expect(resp.actions.length, equals(1));
+    expect(resp.actions.first.type, equals('OPEN_PRODUCT'));
+
+    final msg = AssistantMessageModel(
+      id: 'm_1',
+      role: 'assistant',
+      content: resp.message,
+      products: resp.products,
+      sources: resp.sources,
+      actions: resp.actions,
+    );
+
+    expect(msg.isUser, isFalse);
+    expect(msg.hasProducts, isTrue);
+    expect(msg.hasSources, isTrue);
+    expect(msg.hasActions, isTrue);
+  });
+
+  test('AssistantProvider maintains conversation state and provides suggested prompts', () {
+    final provider = AssistantProvider();
+    expect(provider.messages.isEmpty, isTrue);
+    expect(provider.isLoading, isFalse);
+    expect(provider.suggestedPrompts.isNotEmpty, isTrue);
+    expect(provider.suggestedPrompts.any((p) => p.contains('headphones')), isTrue);
+
+    provider.startNewConversation();
+    expect(provider.messages.isEmpty, isTrue);
+    expect(provider.activeConversationId, isNull);
+  });
+
+  testWidgets('HomePage renders AI Assistant AppBar action button and navigates to AssistantPage',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({
+      Preferences.keyAccessToken: 'mock_access_token_123',
+    });
+    await Preferences.init();
+
+    await tester.pumpWidget(buildTestApp());
+    await tester.pumpAndSettle();
+
+    final assistantButtonFinder = find.byIcon(Icons.auto_awesome);
+    expect(assistantButtonFinder, findsOneWidget);
+
+    await tester.tap(assistantButtonFinder);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AssistantPage), findsOneWidget);
+    expect(find.text('Shoppy Assistant'), findsOneWidget);
+    expect(find.text('AI Shopping Companion'), findsOneWidget);
+    expect(find.text('How can I help you shop today?'), findsOneWidget);
+  });
+
+  testWidgets('AssistantPage renders empty state with prompt chips and input field',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      buildTestApp(
+        home: const AssistantPage(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Shoppy Assistant'), findsOneWidget);
+    expect(find.text('How can I help you shop today?'), findsOneWidget);
+    expect(find.text('Try asking:'), findsOneWidget);
+    expect(find.byType(TextField), findsOneWidget);
+    expect(find.byIcon(Icons.send), findsOneWidget);
+  });
 }
+

@@ -6,6 +6,7 @@ import 'package:shopp_app/providers/catalog_provider.dart';
 import 'package:shopp_app/providers/notification_provider.dart';
 import 'package:shopp_app/providers/user_provider.dart';
 import 'package:shopp_app/providers/wishlist_provider.dart';
+import 'package:shopp_app/views/assistant_page.dart';
 import 'package:shopp_app/views/cart_page.dart';
 import 'package:shopp_app/views/notifications_page.dart';
 import 'package:shopp_app/views/profile_page.dart';
@@ -175,6 +176,18 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
             ],
+          ),
+          // AI Shopping Assistant Action
+          IconButton(
+            icon: const Icon(Icons.auto_awesome),
+            tooltip: 'AI Shopping Assistant',
+            color: Colors.deepPurpleAccent,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AssistantPage()),
+              );
+            },
           ),
           IconButton(
             icon: const Icon(Icons.person_outline),
