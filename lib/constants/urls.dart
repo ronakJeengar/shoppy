@@ -68,6 +68,10 @@ class Urls {
   static const String aiConfirmAction = "ai/assistant/confirm";
   static const String aiCancelAction = "ai/assistant/cancel-action";
 
+  // AI Recommendations & Personalization module
+  static const String recommendations = "recommendations";
+  static const String recommendationEvents = "recommendations/events";
+
   // Backwards-compatibility aliases
   static const String signUp = register;
   static const String signIn = login;

@@ -4,11 +4,13 @@ import 'package:shopp_app/data/models/product_model.dart';
 import 'package:shopp_app/data/models/review_model.dart';
 import 'package:shopp_app/data/repositories/catalog_repository.dart';
 import 'package:shopp_app/providers/cart_provider.dart';
+import 'package:shopp_app/providers/recommendation_provider.dart';
 import 'package:shopp_app/providers/review_provider.dart';
 import 'package:shopp_app/providers/user_provider.dart';
 import 'package:shopp_app/providers/wishlist_provider.dart';
 import 'package:shopp_app/views/cart_page.dart';
 import 'package:shopp_app/views/login_page.dart';
+import 'package:shopp_app/views/widgets/recommendation_carousel.dart';
 import 'package:shopp_app/views/widgets/write_review_dialog.dart';
 
 class ProductDetailPage extends StatefulWidget {
@@ -44,6 +46,18 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           if (user != null) {
             reviewProvider.checkEligibility(_currentProduct.id);
           }
+        }
+
+        final recProvider =
+            Provider.of<RecommendationProvider?>(context, listen: false);
+        if (recProvider != null) {
+          recProvider.fetchSimilarProducts(_currentProduct.id);
+          recProvider.fetchFrequentlyBoughtTogether(_currentProduct.id);
+          recProvider.recordInteraction(
+            eventType: 'VIEW_PRODUCT',
+            productId: _currentProduct.id,
+            categoryId: _currentProduct.categoryId,
+          );
         }
       } catch (_) {}
     });
@@ -85,6 +99,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       });
 
       if (success) {
+        try {
+          context.read<RecommendationProvider>().recordInteraction(
+            eventType: 'ADD_TO_CART',
+            productId: _currentProduct.id,
+            categoryId: _currentProduct.categoryId,
+          );
+        } catch (_) {}
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${_currentProduct.productName} added to cart!'),
@@ -144,9 +166,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               isWishlisted ? Icons.favorite : Icons.favorite_border,
               color: isWishlisted ? Colors.red : null,
             ),
-            tooltip: 'Wishlist',
             onPressed: () {
+              final wasWishlisted = isWishlisted;
               wishlistProvider.toggleWishlist(_currentProduct);
+              try {
+                context.read<RecommendationProvider>().recordInteraction(
+                  eventType: wasWishlisted ? 'WISHLIST_REMOVE' : 'WISHLIST_ADD',
+                  productId: _currentProduct.id,
+                  categoryId: _currentProduct.categoryId,
+                );
+              } catch (_) {}
             },
           ),
           // Cart Action with Live Count Badge
@@ -368,9 +397,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     ),
                   ),
 
-                  const SizedBox(height: 24),
-                  const Divider(),
-                  const SizedBox(height: 16),
+                  // Frequently Bought Together Carousel
+                  _buildFrequentlyBoughtTogether(context),
+
+                  // Similar Products Carousel
+                  _buildSimilarProducts(context),
 
                   // Customer Reviews & Ratings
                   _buildReviewsSection(context),
@@ -751,6 +782,66 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildFrequentlyBoughtTogether(BuildContext context) {
+    RecommendationProvider? recProv;
+    try {
+      recProv = Provider.of<RecommendationProvider?>(context, listen: true);
+    } catch (_) {}
+
+    if (recProv == null) return const SizedBox.shrink();
+
+    final fbtItems = recProv.getFbtForProduct(_currentProduct.id);
+    if (fbtItems.isEmpty && !recProv.isLoadingFbt) {
+      return const SizedBox.shrink();
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        RecommendationCarousel(
+          title: 'Frequently Bought Together',
+          subtitle: recProv.getFbtReason(_currentProduct.id),
+          items: fbtItems,
+          isLoading: recProv.isLoadingFbt,
+          onRefresh: () =>
+              recProv!.fetchFrequentlyBoughtTogether(_currentProduct.id),
+        ),
+        const SizedBox(height: 16),
+        const Divider(),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  Widget _buildSimilarProducts(BuildContext context) {
+    RecommendationProvider? recProv;
+    try {
+      recProv = Provider.of<RecommendationProvider?>(context, listen: true);
+    } catch (_) {}
+
+    if (recProv == null) return const SizedBox.shrink();
+
+    final similarItems = recProv.getSimilarForProduct(_currentProduct.id);
+    if (similarItems.isEmpty && !recProv.isLoadingSimilar) {
+      return const SizedBox.shrink();
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        RecommendationCarousel(
+          title: 'Similar Products',
+          subtitle: recProv.getSimilarReason(_currentProduct.id),
+          items: similarItems,
+          isLoading: recProv.isLoadingSimilar,
+          onRefresh: () =>
+              recProv!.fetchSimilarProducts(_currentProduct.id),
+        ),
+        const SizedBox(height: 16),
+        const Divider(),
+        const SizedBox(height: 16),
+      ],
     );
   }
 

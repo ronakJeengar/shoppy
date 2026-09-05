@@ -42,6 +42,9 @@ import 'package:shopp_app/views/wishlist_page.dart';
 import 'package:shopp_app/data/models/assistant_message_model.dart';
 import 'package:shopp_app/providers/assistant_provider.dart';
 import 'package:shopp_app/views/assistant_page.dart';
+import 'package:shopp_app/data/models/recommendation_model.dart';
+import 'package:shopp_app/providers/recommendation_provider.dart';
+import 'package:shopp_app/views/widgets/recommendation_carousel.dart';
 import 'package:shopp_app/views/widgets/address_form_dialog.dart';
 import 'package:shopp_app/views/widgets/filter_bottom_sheet.dart';
 import 'package:shopp_app/views/widgets/product_card.dart';
@@ -74,6 +77,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => AdminProvider()),
         ChangeNotifierProvider(create: (_) => ReviewProvider()),
         ChangeNotifierProvider(create: (_) => AssistantProvider()),
+        ChangeNotifierProvider(create: (_) => RecommendationProvider()),
       ],
       child: home != null ? MaterialApp(home: home) : const MyApp(),
     );
@@ -655,6 +659,7 @@ void main() {
           ChangeNotifierProvider(create: (_) => CartProvider()),
           ChangeNotifierProvider(create: (_) => WishlistProvider()),
           ChangeNotifierProvider.value(value: reviewProvider),
+          ChangeNotifierProvider(create: (_) => RecommendationProvider()),
         ],
         child: MaterialApp(
           home: ProductDetailPage(product: testProduct),
@@ -998,6 +1003,7 @@ void main() {
           ChangeNotifierProvider(create: (_) => NotificationProvider()),
           ChangeNotifierProvider(create: (_) => AdminProvider()),
           ChangeNotifierProvider(create: (_) => ReviewProvider()),
+          ChangeNotifierProvider(create: (_) => RecommendationProvider()),
         ],
         child: const MaterialApp(
           home: AssistantPage(),
@@ -1011,6 +1017,153 @@ void main() {
     expect(find.text('This action cannot be undone automatically.'), findsOneWidget);
     expect(find.widgetWithText(OutlinedButton, 'Cancel'), findsOneWidget);
     expect(find.widgetWithText(ElevatedButton, 'Confirm'), findsOneWidget);
+  });
+
+  // ==========================================
+  // PHASE 16: AI RECOMMENDATIONS & PERSONALIZATION
+  // ==========================================
+
+  test('RecommendationResponseModel parses and serializes recommendation envelope', () {
+    final rawJson = {
+      'recommendationType': 'PERSONALIZED',
+      'reason': 'Because you viewed Wireless Headphones',
+      'count': 2,
+      'products': [
+        {
+          'id': 'rec_p1',
+          'productName': 'Noise Cancelling Headphones',
+          'price': 199.99,
+          'stock': 15,
+          'productRating': 4.7,
+          'productImage': 'https://example.com/headphones.jpg',
+          'recommendationReason': 'High semantic similarity',
+          'score': 0.88,
+          'source': 'SEMANTIC',
+        },
+        {
+          'id': 'rec_p2',
+          'productName': 'Wireless Earbuds Pro',
+          'price': 99.99,
+          'stock': 25,
+          'productRating': 4.5,
+          'productImage': 'https://example.com/earbuds.jpg',
+          'recommendationReason': 'Frequently bought together',
+          'score': 0.76,
+          'source': 'COOCCURRENCE',
+        },
+      ],
+      'metadata': {
+        'strategy': 'PERSONALIZED_HYBRID',
+        'candidateCount': 10,
+        'rankedCount': 2,
+      },
+    };
+
+    final model = RecommendationResponseModel.fromJson(rawJson);
+    expect(model.recommendationType, equals('PERSONALIZED'));
+    expect(model.reason, equals('Because you viewed Wireless Headphones'));
+    expect(model.count, equals(2));
+    expect(model.items.length, equals(2));
+    expect(model.products.length, equals(2));
+
+    expect(model.items[0].product.productName, equals('Noise Cancelling Headphones'));
+    expect(model.items[0].recommendationReason, equals('High semantic similarity'));
+    expect(model.items[0].score, equals(0.88));
+    expect(model.items[0].source, equals('SEMANTIC'));
+
+    expect(model.items[1].product.productName, equals('Wireless Earbuds Pro'));
+    expect(model.items[1].recommendationReason, equals('Frequently bought together'));
+
+    final serialized = model.toJson();
+    expect(serialized['recommendationType'], equals('PERSONALIZED'));
+    expect(serialized['reason'], equals('Because you viewed Wireless Headphones'));
+    expect(serialized['count'], equals(2));
+    expect((serialized['products'] as List).length, equals(2));
+  });
+
+  testWidgets('RecommendationCarousel renders header, subtitle, and items correctly',
+      (WidgetTester tester) async {
+    final testProducts = [
+      RecommendedProduct(
+        product: Product(
+          id: 'rec_widget_1',
+          productName: 'Mechanical Keyboard RGB',
+          price: 89.99,
+          stock: 12,
+          productRating: 4.8,
+          productImage: '',
+        ),
+        recommendationReason: 'Trending in Electronics',
+        score: 0.91,
+      ),
+      RecommendedProduct(
+        product: Product(
+          id: 'rec_widget_2',
+          productName: 'Wireless Gaming Mouse',
+          price: 49.99,
+          stock: 30,
+          productRating: 4.6,
+          productImage: '',
+        ),
+        recommendationReason: 'Similar to recent views',
+        score: 0.85,
+      ),
+    ];
+
+    await tester.pumpWidget(
+      buildTestApp(
+        home: Scaffold(
+          body: RecommendationCarousel(
+            title: 'Recommended For You',
+            subtitle: 'Based on your recent interest in Gaming',
+            items: testProducts,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Recommended For You'), findsOneWidget);
+    expect(find.text('Based on your recent interest in Gaming'), findsOneWidget);
+    expect(find.text('Mechanical Keyboard RGB'), findsOneWidget);
+    expect(find.text('Wireless Gaming Mouse'), findsOneWidget);
+  });
+
+  testWidgets('RecommendationCarousel renders loading placeholder when isLoading is true',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: RecommendationCarousel(
+            title: 'Loading Items',
+            items: [],
+            isLoading: true,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    // Verifies the horizontal shimmer list view is mounted
+    expect(find.byType(ListView), findsOneWidget);
+  });
+
+  testWidgets('RecommendationCarousel returns empty SizedBox when items are empty and not loading',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: RecommendationCarousel(
+            title: 'Empty Recs',
+            items: [],
+            isLoading: false,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Empty Recs'), findsNothing);
   });
 }
 

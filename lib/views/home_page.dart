@@ -4,6 +4,7 @@ import 'package:shopp_app/data/models/currrent_user_model.dart';
 import 'package:shopp_app/providers/cart_provider.dart';
 import 'package:shopp_app/providers/catalog_provider.dart';
 import 'package:shopp_app/providers/notification_provider.dart';
+import 'package:shopp_app/providers/recommendation_provider.dart';
 import 'package:shopp_app/providers/user_provider.dart';
 import 'package:shopp_app/providers/wishlist_provider.dart';
 import 'package:shopp_app/views/assistant_page.dart';
@@ -14,6 +15,7 @@ import 'package:shopp_app/views/search_page.dart';
 import 'package:shopp_app/views/wishlist_page.dart';
 import 'package:shopp_app/views/widgets/category_selector.dart';
 import 'package:shopp_app/views/widgets/product_card.dart';
+import 'package:shopp_app/views/widgets/recommendation_carousel.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -31,6 +33,8 @@ class _HomePageState extends State<HomePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<UserProvider>().getCurrentUser();
       context.read<CatalogProvider>().loadInitialData();
+      context.read<RecommendationProvider>().fetchPersonalized();
+      context.read<RecommendationProvider>().fetchTrending();
     });
 
     _scrollController.addListener(_onScroll);
@@ -57,6 +61,7 @@ class _HomePageState extends State<HomePage> {
     final cartProvider = context.watch<CartProvider>();
     final wishlistProvider = context.watch<WishlistProvider>();
     final notifProvider = context.watch<NotificationProvider>();
+    final recProvider = context.watch<RecommendationProvider>();
     final CurrentUserModel? currentUser = userProvider.currentUser;
 
     return Scaffold(
@@ -203,7 +208,11 @@ class _HomePageState extends State<HomePage> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          await catalogProvider.refreshCatalog();
+          await Future.wait([
+            catalogProvider.refreshCatalog(),
+            context.read<RecommendationProvider>().fetchPersonalized(force: true),
+            context.read<RecommendationProvider>().fetchTrending(force: true),
+          ]);
         },
         child: CustomScrollView(
           controller: _scrollController,
@@ -346,6 +355,33 @@ class _HomePageState extends State<HomePage> {
                 child: CategorySelector(),
               ),
             ),
+
+            // AI Recommendations: Recommended For You
+            if (recProvider.personalized.isNotEmpty ||
+                recProvider.isLoadingPersonalized)
+              SliverToBoxAdapter(
+                child: RecommendationCarousel(
+                  title: 'Recommended For You',
+                  subtitle: recProvider.personalizedReason,
+                  items: recProvider.personalized,
+                  isLoading: recProvider.isLoadingPersonalized,
+                  onRefresh: () =>
+                      recProvider.fetchPersonalized(force: true),
+                ),
+              ),
+
+            // AI Recommendations: Trending Now
+            if (recProvider.trending.isNotEmpty ||
+                recProvider.isLoadingTrending)
+              SliverToBoxAdapter(
+                child: RecommendationCarousel(
+                  title: 'Trending Now',
+                  subtitle: recProvider.trendingReason,
+                  items: recProvider.trending,
+                  isLoading: recProvider.isLoadingTrending,
+                  onRefresh: () => recProvider.fetchTrending(force: true),
+                ),
+              ),
 
             // Catalog Header & Sort Options
             SliverToBoxAdapter(

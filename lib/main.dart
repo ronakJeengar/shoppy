@@ -9,6 +9,7 @@ import 'package:shopp_app/providers/catalog_provider.dart';
 import 'package:shopp_app/providers/checkout_provider.dart';
 import 'package:shopp_app/providers/notification_provider.dart';
 import 'package:shopp_app/providers/order_provider.dart';
+import 'package:shopp_app/providers/recommendation_provider.dart';
 import 'package:shopp_app/providers/review_provider.dart';
 import 'package:shopp_app/providers/search_provider.dart';
 import 'package:shopp_app/providers/user_provider.dart';
@@ -34,6 +35,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => AdminProvider()),
         ChangeNotifierProvider(create: (_) => ReviewProvider()),
         ChangeNotifierProvider(create: (_) => AssistantProvider()),
+        ChangeNotifierProvider(create: (_) => RecommendationProvider()),
       ],
       child: const MyApp(),
     ),
