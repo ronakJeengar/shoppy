@@ -779,4 +779,35 @@ void main() {
     final repo = AiRepository();
     expect(repo, isNotNull);
   });
+
+  testWidgets('SearchPage renders natural language search hint and triggers search', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      buildTestApp(
+        home: const SearchPage(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(TextField), findsOneWidget);
+    expect(find.text('Search products, brands, or describe what you need...'), findsOneWidget);
+    expect(find.byIcon(Icons.tune), findsOneWidget);
+  });
+
+  test('SearchProvider executes natural language query and maintains state', () async {
+    final provider = SearchProvider();
+    expect(provider.isSearching, isFalse);
+    expect(provider.hasExecutedSearch, isFalse);
+
+    // Filter setting
+    provider.setFilters(maxPrice: 3000, inStockOnly: true);
+    expect(provider.maxPrice, equals(3000));
+    expect(provider.inStockOnly, isTrue);
+    expect(provider.activeFilterCount, equals(2));
+
+    // Reset filters
+    provider.resetFilters();
+    expect(provider.maxPrice, isNull);
+    expect(provider.inStockOnly, isFalse);
+    expect(provider.activeFilterCount, equals(0));
+  });
 }

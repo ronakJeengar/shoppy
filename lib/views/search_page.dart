@@ -70,8 +70,8 @@ class _SearchPageState extends State<SearchPage> {
           focusNode: _searchFocusNode,
           textInputAction: TextInputAction.search,
           decoration: InputDecoration(
-            hintText: 'Search products, brands...',
-            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15),
+            hintText: 'Search products, brands, or describe what you need...',
+            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
             border: InputBorder.none,
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
