@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shopp_app/core/theme/app_colors.dart';
+import 'package:shopp_app/core/theme/app_radius.dart';
+import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/providers/user_provider.dart';
 import 'package:shopp_app/views/sign_up_page.dart';
+import 'package:shopp_app/views/widgets/app_button.dart';
+import 'package:shopp_app/views/widgets/app_text_field.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -35,54 +40,94 @@ class _LoginPageState extends State<LoginPage> {
     await userProvider.userSignIn(context: context, data: credentials);
   }
 
+  void _fillDemoCredentials(String email, String password) {
+    setState(() {
+      _emailController.text = email;
+      _passwordController.text = password;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final userProvider = context.watch<UserProvider>();
 
     return Scaffold(
+      backgroundColor: AppColors.white,
       appBar: AppBar(
-        title: const Text('Login'),
-        centerTitle: true,
+        backgroundColor: AppColors.white,
+        elevation: 0,
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
           child: Form(
             key: _formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Icon(
-                  Icons.shopping_bag_outlined,
-                  size: 64,
-                  color: Colors.blue,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Welcome Back to Shoppy',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Sign in with your email and password',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey.shade600),
-                ),
-                const SizedBox(height: 32),
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: const Icon(Icons.email_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
+                // Logo & Header
+                Center(
+                  child: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: const BoxDecoration(
+                      color: AppColors.primary50,
+                      borderRadius: AppRadius.borderLg,
+                    ),
+                    child: const Icon(
+                      Icons.shopping_bag_rounded,
+                      size: 24,
+                      color: AppColors.primary,
                     ),
                   ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Shoppy Login',
+                  textAlign: TextAlign.center,
+                  style: AppTypography.displayMedium,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Sign in to access your cart, orders, and saved items',
+                  textAlign: TextAlign.center,
+                  style: AppTypography.bodySmall.copyWith(color: AppColors.slate500),
+                ),
+                const SizedBox(height: 14),
+
+                // Error Banner
+                if (userProvider.errorMessage != null) ...[
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.errorLight,
+                      borderRadius: AppRadius.borderMd,
+                      border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.error_outline_rounded, size: 18, color: AppColors.error),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            userProvider.errorMessage!,
+                            style: AppTypography.bodySmall.copyWith(color: AppColors.error),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
+                // Email Input
+                AppTextField(
+                  label: 'Email',
+                  hintText: 'Enter your email address',
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  prefixIcon: Icons.email_outlined,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Please enter your email';
@@ -94,82 +139,124 @@ class _LoginPageState extends State<LoginPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
-                TextFormField(
+                const SizedBox(height: 12),
+
+                // Password Input
+                AppTextField(
+                  label: 'Password',
+                  hintText: 'Enter your password',
                   controller: _passwordController,
                   obscureText: _obscurePassword,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
+                  prefixIcon: Icons.lock_outline_rounded,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                      size: 20,
+                      color: AppColors.slate500,
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your password';
                     }
-                    if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
-                    }
                     return null;
                   },
                 ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
+                const SizedBox(height: 14),
+
+                // Submit Button
+                AppButton(
+                  label: 'Login',
+                  icon: Icons.login_rounded,
+                  isLoading: userProvider.isLoading,
+                  isFullWidth: true,
                   onPressed: userProvider.isLoading ? null : _submitLogin,
-                  child: userProvider.isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text(
-                          'Login',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 10),
+
+                // Demo Credentials Helper Box
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.slate50,
+                    borderRadius: AppRadius.borderMd,
+                    border: Border.all(color: AppColors.slate200),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'QUICK DEMO ACCOUNTS',
+                        style: AppTypography.label.copyWith(color: AppColors.slate500),
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 6),
+                                side: const BorderSide(color: AppColors.slate300),
+                                shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderSm),
+                              ),
+                              onPressed: () => _fillDemoCredentials(
+                                'customer@shoppy.com',
+                                'Customer@12345',
+                              ),
+                              child: const Text('Customer', style: TextStyle(fontSize: 12)),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 6),
+                                side: const BorderSide(color: AppColors.slate300),
+                                shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderSm),
+                              ),
+                              onPressed: () => _fillDemoCredentials(
+                                'admin@shoppy.com',
+                                'Admin@12345',
+                              ),
+                              child: const Text('Admin', style: TextStyle(fontSize: 12)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                // Sign Up Link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Don't have an account?"),
+                    Text(
+                      'Don\'t have an account?',
+                      style: AppTypography.bodySmall.copyWith(color: AppColors.slate600),
+                    ),
                     TextButton(
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (BuildContext context) => const SignUpPage(),
+                            builder: (context) => const SignUpPage(),
                           ),
                         );
                       },
-                      child: const Text('Register'),
+                      child: Text(
+                        'Register',
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ],
                 ),

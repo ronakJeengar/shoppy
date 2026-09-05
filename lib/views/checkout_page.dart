@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shopp_app/data/models/address_model.dart';
+import 'package:shopp_app/core/theme/app_colors.dart';
+import 'package:shopp_app/core/theme/app_radius.dart';
+import 'package:shopp_app/core/theme/app_shadows.dart';
+import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/providers/address_provider.dart';
 import 'package:shopp_app/providers/cart_provider.dart';
 import 'package:shopp_app/providers/checkout_provider.dart';
 import 'package:shopp_app/views/order_confirmation_page.dart';
 import 'package:shopp_app/views/widgets/address_form_dialog.dart';
+import 'package:shopp_app/views/widgets/app_button.dart';
 
 class CheckoutPage extends StatefulWidget {
   const CheckoutPage({super.key});
@@ -34,6 +38,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: AppColors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -51,13 +56,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     children: [
                       const Text(
                         'Select Delivery Address',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: AppTypography.headingSmall,
                       ),
                       TextButton.icon(
-                        icon: const Icon(Icons.add, size: 18),
+                        icon: const Icon(Icons.add_rounded, size: 18),
                         label: const Text('New'),
                         onPressed: () {
                           Navigator.pop(ctx);
@@ -66,12 +68,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
                   if (addrProv.addresses.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 24),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 24),
                       child: Center(
-                        child: Text('No saved addresses. Tap New to add one.'),
+                        child: Text(
+                          'No saved addresses. Tap New to add one.',
+                          style: AppTypography.bodySmall.copyWith(color: AppColors.slate500),
+                        ),
                       ),
                     )
                   else
@@ -99,108 +104,59 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
-  void _openAddressForm(BuildContext context, {AddressModel? address}) async {
-    final result = await showModalBottomSheet<bool>(
+  void _openAddressForm(BuildContext context) {
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) => AddressFormBottomSheet(existingAddress: address),
-    );
-
-    if (!context.mounted) return;
-
-    if (result == true) {
+      builder: (_) => const AddressFormBottomSheet(),
+    ).then((_) {
+      if (!context.mounted) return;
       final addrProv = context.read<AddressProvider>();
       if (addrProv.selectedAddress != null) {
         context
             .read<CheckoutProvider>()
             .validateCheckout(addrProv.selectedAddress!.id);
       }
-    }
-  }
-
-  void _handlePlaceOrder() async {
-    final addressProvider = context.read<AddressProvider>();
-    final checkoutProvider = context.read<CheckoutProvider>();
-    final cartProvider = context.read<CartProvider>();
-
-    if (addressProvider.selectedAddress == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select or add a delivery address'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-      return;
-    }
-
-    final order = await checkoutProvider.placeOrderAndPay(
-      addressId: addressProvider.selectedAddress!.id,
-      cartProvider: cartProvider,
-    );
-
-    if (mounted) {
-      if (order != null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => OrderConfirmationPage(order: order),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              checkoutProvider.errorMessage ?? 'Failed to place order.',
-            ),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 3),
-          ),
-        );
-      }
-    }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final addressProvider = context.watch<AddressProvider>();
     final checkoutProvider = context.watch<CheckoutProvider>();
-    final theme = Theme.of(context);
+    final addressProvider = context.watch<AddressProvider>();
+    final cartProvider = context.watch<CartProvider>();
 
     return Scaffold(
+      backgroundColor: AppColors.slate50,
       appBar: AppBar(
-        title: const Text(
-          'Checkout',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        backgroundColor: AppColors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.slate800),
+          onPressed: () => Navigator.pop(context),
         ),
+        title: const Text('Checkout', style: AppTypography.headingSmall),
       ),
-      body: ListView(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        children: [
-          // 1. Delivery Address Card
-          _buildAddressSection(addressProvider, checkoutProvider),
-          const SizedBox(height: 16),
-
-          // 2. Shipping Method Selection
-          _buildShippingMethodSection(checkoutProvider, addressProvider),
-          const SizedBox(height: 16),
-
-          // 3. Payment Method Selection
-          _buildPaymentMethodSection(checkoutProvider),
-          const SizedBox(height: 16),
-
-          // 4. Order Summary Card
-          _buildOrderSummarySection(checkoutProvider, theme),
-          const SizedBox(height: 80),
-        ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildAddressSection(addressProvider, checkoutProvider),
+            const SizedBox(height: 16),
+            _buildShippingMethodSection(checkoutProvider, addressProvider),
+            const SizedBox(height: 16),
+            _buildPaymentMethodSection(checkoutProvider),
+            const SizedBox(height: 16),
+            _buildOrderReviewSection(cartProvider, checkoutProvider),
+            const SizedBox(height: 32),
+          ],
+        ),
       ),
       bottomNavigationBar: _buildBottomBar(
         context,
-        checkoutProvider,
         addressProvider,
-        theme,
+        cartProvider,
+        checkoutProvider,
       ),
     );
   }
@@ -211,72 +167,73 @@ class _CheckoutPageState extends State<CheckoutPage> {
   ) {
     final selected = addressProvider.selectedAddress;
 
-    return Card(
-      elevation: 0.5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade200),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: AppRadius.borderMd,
+        border: Border.all(color: AppColors.slate200),
+        boxShadow: AppShadows.card,
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Row(
-                  children: [
-                    Icon(Icons.location_on, color: Colors.blue, size: 20),
-                    SizedBox(width: 8),
-                    Text(
-                      'Delivery Address',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: const BoxDecoration(
+                      color: AppColors.primary50,
+                      borderRadius: AppRadius.borderSm,
                     ),
-                  ],
-                ),
-                if (selected != null)
-                  TextButton(
-                    onPressed: () => _showAddressSelector(context),
-                    child: const Text('Change'),
+                    child: const Icon(Icons.location_on_rounded, color: AppColors.primary, size: 18),
                   ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            if (selected == null)
-              OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 44),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                  const SizedBox(width: 10),
+                  const Text('Delivery Address', style: AppTypography.headingSmall),
+                ],
+              ),
+              if (selected != null)
+                TextButton(
+                  onPressed: () => _showAddressSelector(context),
+                  child: Text(
+                    'Change',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-                icon: const Icon(Icons.add_location_alt),
-                label: const Text('Add Delivery Address'),
-                onPressed: () => _openAddressForm(context),
-              )
-            else ...[
-              Text(
-                selected.fullName,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                selected.formattedAddress,
-                style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                'Phone: ${selected.phone}',
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-              ),
             ],
+          ),
+          const SizedBox(height: 12),
+          if (selected == null)
+            AppButton(
+              label: 'Add Delivery Address',
+              icon: Icons.add_location_alt_rounded,
+              variant: AppButtonVariant.outline,
+              isFullWidth: true,
+              onPressed: () => _openAddressForm(context),
+            )
+          else ...[
+            Text(
+              selected.fullName,
+              style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              selected.formattedAddress,
+              style: AppTypography.bodyMedium.copyWith(color: AppColors.slate600),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              'Phone: ${selected.phone}',
+              style: AppTypography.caption.copyWith(color: AppColors.slate500),
+            ),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -287,52 +244,55 @@ class _CheckoutPageState extends State<CheckoutPage> {
   ) {
     final isStandard = checkoutProvider.shippingMethod == 'STANDARD';
 
-    return Card(
-      elevation: 0.5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade200),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: AppRadius.borderMd,
+        border: Border.all(color: AppColors.slate200),
+        boxShadow: AppShadows.card,
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Row(
-              children: [
-                Icon(Icons.local_shipping, color: Colors.blue, size: 20),
-                SizedBox(width: 8),
-                Text(
-                  'Shipping Method',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: const BoxDecoration(
+                  color: AppColors.primary50,
+                  borderRadius: AppRadius.borderSm,
                 ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            _buildSelectionTile(
-              title: 'Standard Delivery (3-5 Days)',
-              subtitle: 'Free on orders over \$50.00, otherwise \$4.99',
-              isSelected: isStandard,
-              onTap: () {
-                checkoutProvider.setShippingMethod(
-                  'STANDARD',
-                  addressProvider.selectedAddress?.id ?? '',
-                );
-              },
-            ),
-            _buildSelectionTile(
-              title: 'Express Delivery (1-2 Days)',
-              subtitle: 'Flat rate \$9.99 with priority dispatch',
-              isSelected: !isStandard,
-              onTap: () {
-                checkoutProvider.setShippingMethod(
-                  'EXPRESS',
-                  addressProvider.selectedAddress?.id ?? '',
-                );
-              },
-            ),
-          ],
-        ),
+                child: const Icon(Icons.local_shipping_rounded, color: AppColors.primary, size: 18),
+              ),
+              const SizedBox(width: 10),
+              const Text('Shipping Method', style: AppTypography.headingSmall),
+            ],
+          ),
+          const SizedBox(height: 14),
+          _buildSelectionTile(
+            title: 'Standard Delivery (3-5 Days)',
+            subtitle: 'Free on orders over \$100.00, otherwise \$15.00',
+            isSelected: isStandard,
+            onTap: () {
+              checkoutProvider.setShippingMethod(
+                'STANDARD',
+                addressProvider.selectedAddress?.id ?? '',
+              );
+            },
+          ),
+          _buildSelectionTile(
+            title: 'Express Delivery (1-2 Days)',
+            subtitle: 'Flat rate \$25.00 with priority fulfillment',
+            isSelected: !isStandard,
+            onTap: () {
+              checkoutProvider.setShippingMethod(
+                'EXPRESS',
+                addressProvider.selectedAddress?.id ?? '',
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -340,111 +300,102 @@ class _CheckoutPageState extends State<CheckoutPage> {
   Widget _buildPaymentMethodSection(CheckoutProvider checkoutProvider) {
     final currentMethod = checkoutProvider.paymentMethod;
 
-    return Card(
-      elevation: 0.5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade200),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: AppRadius.borderMd,
+        border: Border.all(color: AppColors.slate200),
+        boxShadow: AppShadows.card,
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Row(
-              children: [
-                Icon(Icons.payment, color: Colors.blue, size: 20),
-                SizedBox(width: 8),
-                Text(
-                  'Payment Method',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: const BoxDecoration(
+                  color: AppColors.primary50,
+                  borderRadius: AppRadius.borderSm,
                 ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            _buildSelectionTile(
-              title: 'Credit / Debit Card',
-              subtitle: 'Visa, Mastercard, American Express',
-              isSelected: currentMethod == 'CARD',
-              trailing: const Icon(Icons.credit_card, size: 20),
-              onTap: () => checkoutProvider.setPaymentMethod('CARD'),
-            ),
-            _buildSelectionTile(
-              title: 'UPI / Instant Bank Pay',
-              subtitle: 'Google Pay, PhonePe, Paytm, NetBanking',
-              isSelected: currentMethod == 'UPI',
-              trailing: const Icon(Icons.account_balance, size: 20),
-              onTap: () => checkoutProvider.setPaymentMethod('UPI'),
-            ),
-            _buildSelectionTile(
-              title: 'Cash on Delivery (COD)',
-              subtitle: 'Pay upon doorstep delivery',
-              isSelected: currentMethod == 'COD',
-              trailing: const Icon(Icons.local_atm, size: 20),
-              onTap: () => checkoutProvider.setPaymentMethod('COD'),
-            ),
-          ],
-        ),
+                child: const Icon(Icons.payment_rounded, color: AppColors.primary, size: 18),
+              ),
+              const SizedBox(width: 10),
+              const Text('Payment Method', style: AppTypography.headingSmall),
+            ],
+          ),
+          const SizedBox(height: 14),
+          _buildSelectionTile(
+            title: 'Credit / Debit Card',
+            subtitle: 'Instant secure checkout via Stripe',
+            isSelected: currentMethod == 'CARD',
+            icon: Icons.credit_card_rounded,
+            onTap: () => checkoutProvider.setPaymentMethod('CARD'),
+          ),
+          _buildSelectionTile(
+            title: 'Cash on Delivery (COD)',
+            subtitle: 'Pay with cash upon receipt of order',
+            isSelected: currentMethod == 'COD',
+            icon: Icons.money_rounded,
+            onTap: () => checkoutProvider.setPaymentMethod('COD'),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildOrderSummarySection(
+  Widget _buildOrderReviewSection(
+    CartProvider cartProvider,
     CheckoutProvider checkoutProvider,
-    ThemeData theme,
   ) {
-    return Card(
-      elevation: 0.5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade200),
+    final subtotal = checkoutProvider.subtotal > 0 ? checkoutProvider.subtotal : cartProvider.subtotal;
+    final shipping = checkoutProvider.shippingFee;
+    final tax = checkoutProvider.tax > 0 ? checkoutProvider.tax : cartProvider.tax;
+    final total = checkoutProvider.grandTotal > 0 ? checkoutProvider.grandTotal : cartProvider.totalAmount;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: AppRadius.borderMd,
+        border: Border.all(color: AppColors.slate200),
+        boxShadow: AppShadows.card,
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Order Summary',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            if (checkoutProvider.isValidating)
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(12),
-                  child: CircularProgressIndicator(strokeWidth: 2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: const BoxDecoration(
+                  color: AppColors.primary50,
+                  borderRadius: AppRadius.borderSm,
                 ),
-              )
-            else ...[
-              _summaryRow(
-                'Subtotal',
-                '\$${checkoutProvider.subtotal.toStringAsFixed(2)}',
+                child: const Icon(Icons.receipt_long_rounded, color: AppColors.primary, size: 18),
               ),
-              const SizedBox(height: 8),
-              _summaryRow(
-                'Shipping',
-                checkoutProvider.shippingFee == 0
-                    ? 'FREE'
-                    : '\$${checkoutProvider.shippingFee.toStringAsFixed(2)}',
-                valueColor:
-                    checkoutProvider.shippingFee == 0 ? Colors.green : null,
-              ),
-              const SizedBox(height: 8),
-              _summaryRow(
-                'Estimated Tax (8%)',
-                '\$${checkoutProvider.tax.toStringAsFixed(2)}',
-              ),
-              const Divider(height: 20),
-              _summaryRow(
-                'Total Amount',
-                '\$${checkoutProvider.grandTotal.toStringAsFixed(2)}',
-                isTotal: true,
-                valueColor: theme.primaryColor,
-              ),
+              const SizedBox(width: 10),
+              const Text('Order Summary', style: AppTypography.headingSmall),
             ],
-          ],
-        ),
+          ),
+          const SizedBox(height: 14),
+          _summaryRow('Items Subtotal', '\$${subtotal.toStringAsFixed(2)}'),
+          const SizedBox(height: 8),
+          _summaryRow(
+            'Shipping Fee',
+            shipping == 0 ? 'FREE' : '\$${shipping.toStringAsFixed(2)}',
+            valueColor: shipping == 0 ? AppColors.success : null,
+          ),
+          const SizedBox(height: 8),
+          _summaryRow('Estimated Tax (8%)', '\$${tax.toStringAsFixed(2)}'),
+          const Divider(height: 24, color: AppColors.slate200),
+          _summaryRow(
+            'Order Total',
+            '\$${total.toStringAsFixed(2)}',
+            isBold: true,
+          ),
+        ],
       ),
     );
   }
@@ -454,89 +405,95 @@ class _CheckoutPageState extends State<CheckoutPage> {
     required String subtitle,
     required bool isSelected,
     required VoidCallback onTap,
-    Widget? trailing,
+    IconData? icon,
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: AppRadius.borderMd,
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isSelected
-              ? Colors.blue.shade50.withValues(alpha: 0.5)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
+          color: isSelected ? AppColors.primary50.withValues(alpha: 0.5) : AppColors.slate50,
+          borderRadius: AppRadius.borderMd,
           border: Border.all(
-            color: isSelected ? Colors.blue : Colors.grey.shade300,
+            color: isSelected ? AppColors.primary : AppColors.slate200,
             width: isSelected ? 1.5 : 1,
           ),
         ),
         child: Row(
           children: [
-            Icon(
-              isSelected
-                  ? Icons.radio_button_checked
-                  : Icons.radio_button_off,
-              color: isSelected ? Colors.blue : Colors.grey,
-              size: 20,
+            Container(
+              width: 20,
+              height: 20,
+              margin: const EdgeInsets.only(right: 12),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? AppColors.primary : AppColors.slate400,
+                  width: 2,
+                ),
+              ),
+              child: isSelected
+                  ? Center(
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    )
+                  : null,
             ),
-            const SizedBox(width: 12),
+            if (icon != null) ...[
+              Icon(icon, size: 20, color: isSelected ? AppColors.primary : AppColors.slate600),
+              const SizedBox(width: 10),
+            ],
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
+                    style: AppTypography.bodySmall.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.slate900,
                     ),
                   ),
-                  if (subtitle.isNotEmpty) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ],
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: AppTypography.caption.copyWith(color: AppColors.slate500),
+                  ),
                 ],
               ),
             ),
-            if (trailing != null) trailing,
           ],
         ),
       ),
     );
   }
 
-  Widget _summaryRow(
-    String label,
-    String value, {
-    bool isTotal = false,
-    Color? valueColor,
-  }) {
+  Widget _summaryRow(String label, String value, {bool isBold = false, Color? valueColor}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
-          style: TextStyle(
-            fontSize: isTotal ? 15 : 13,
-            fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-            color: isTotal ? Colors.black87 : Colors.grey.shade700,
-          ),
+          style: isBold
+              ? AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: AppColors.slate900)
+              : AppTypography.bodyMedium.copyWith(color: AppColors.slate600),
         ),
         Text(
           value,
-          style: TextStyle(
-            fontSize: isTotal ? 17 : 13,
-            fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
-            color: valueColor ?? (isTotal ? Colors.black : Colors.black87),
-          ),
+          style: isBold
+              ? AppTypography.headingSmall.copyWith(color: AppColors.primary)
+              : AppTypography.bodyMedium.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: valueColor ?? AppColors.slate900,
+                ),
         ),
       ],
     );
@@ -544,76 +501,72 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Widget _buildBottomBar(
     BuildContext context,
-    CheckoutProvider checkoutProvider,
     AddressProvider addressProvider,
-    ThemeData theme,
+    CartProvider cartProvider,
+    CheckoutProvider checkoutProvider,
   ) {
+    final displayTotal = checkoutProvider.grandTotal > 0 ? checkoutProvider.grandTotal : cartProvider.totalAmount;
+    final canPlace = addressProvider.selectedAddress != null && !checkoutProvider.isProcessingOrder;
+
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            offset: const Offset(0, -2),
-            blurRadius: 10,
-          ),
-        ],
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      decoration: const BoxDecoration(
+        color: AppColors.white,
+        boxShadow: AppShadows.bottomBar,
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
+      child: SafeArea(
+        top: false,
+        child: Row(
+          children: [
+            Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Final Amount',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                Text(
+                  'Total Payable',
+                  style: AppTypography.caption.copyWith(color: AppColors.slate500),
                 ),
                 Text(
-                  '\$${checkoutProvider.grandTotal.toStringAsFixed(2)}',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: theme.primaryColor,
-                  ),
+                  '\$${displayTotal.toStringAsFixed(2)}',
+                  style: AppTypography.priceCard.copyWith(fontSize: 20),
                 ),
               ],
             ),
-          ),
-          Expanded(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: AppButton(
+                label: checkoutProvider.isProcessingOrder ? 'Processing...' : 'Place Order',
+                icon: Icons.lock_outline_rounded,
+                isLoading: checkoutProvider.isProcessingOrder,
+                isFullWidth: true,
+                onPressed: canPlace
+                    ? () async {
+                        final order = await checkoutProvider.placeOrderAndPay(
+                          addressId: addressProvider.selectedAddress!.id,
+                          cartProvider: context.read<CartProvider>(),
+                        );
+                        if (order != null && context.mounted) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => OrderConfirmationPage(order: order),
+                            ),
+                          );
+                        } else if (context.mounted && checkoutProvider.errorMessage != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(checkoutProvider.errorMessage!),
+                              backgroundColor: AppColors.error,
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
+                      }
+                    : null,
               ),
-              onPressed: checkoutProvider.isProcessingOrder
-                  ? null
-                  : _handlePlaceOrder,
-              child: checkoutProvider.isProcessingOrder
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Text(
-                      'Place Order',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

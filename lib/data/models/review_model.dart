@@ -19,6 +19,8 @@ class ReviewModel {
     required this.createdAt,
   });
 
+  String get userName => authorName;
+
   factory ReviewModel.fromJson(Map<String, dynamic> json) {
     return ReviewModel(
       id: json['id']?.toString() ?? json['_id']?.toString() ?? '',

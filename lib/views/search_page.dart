@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shopp_app/core/theme/app_colors.dart';
+import 'package:shopp_app/core/theme/app_radius.dart';
+import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/providers/catalog_provider.dart';
 import 'package:shopp_app/providers/search_provider.dart';
+import 'package:shopp_app/views/widgets/empty_state.dart';
+import 'package:shopp_app/views/widgets/error_state.dart';
 import 'package:shopp_app/views/widgets/filter_bottom_sheet.dart';
 import 'package:shopp_app/views/widgets/product_card.dart';
+import 'package:shopp_app/views/widgets/skeleton_loader.dart';
 
 class SearchPage extends StatefulWidget {
   final String? initialQuery;
@@ -57,64 +63,85 @@ class _SearchPageState extends State<SearchPage> {
     final filterCount = searchProvider.activeFilterCount;
 
     return Scaffold(
+      backgroundColor: AppColors.slate50,
       appBar: AppBar(
         titleSpacing: 0,
+        backgroundColor: AppColors.white,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.slate800),
+          onPressed: () => Navigator.pop(context),
         ),
-        title: TextField(
-          controller: _searchController,
-          focusNode: _searchFocusNode,
-          textInputAction: TextInputAction.search,
-          decoration: InputDecoration(
-            hintText: 'Search products, brands, or describe what you need...',
-            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-            border: InputBorder.none,
-            suffixIcon: _searchController.text.isNotEmpty
-                ? IconButton(
-                    icon: const Icon(Icons.clear, size: 20),
-                    onPressed: () {
-                      _searchController.clear();
-                      searchProvider.clearSearch();
-                    },
-                  )
-                : null,
+        title: Container(
+          height: 42,
+          margin: const EdgeInsets.only(right: 8),
+          decoration: const BoxDecoration(
+            color: AppColors.slate100,
+            borderRadius: AppRadius.borderFull,
           ),
-          onChanged: (val) {
-            setState(() {});
-            searchProvider.onQueryChanged(val);
-          },
-          onSubmitted: (val) {
-            searchProvider.executeSearch(val);
-          },
+          child: TextField(
+            controller: _searchController,
+            focusNode: _searchFocusNode,
+            textInputAction: TextInputAction.search,
+            style: AppTypography.bodyLarge.copyWith(color: AppColors.slate900),
+            decoration: InputDecoration(
+              hintText: 'Search products, brands, or describe what you need...',
+              hintStyle: AppTypography.bodyMedium.copyWith(
+                color: AppColors.slate400,
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              prefixIcon: const Icon(
+                Icons.search_rounded,
+                size: 20,
+                color: AppColors.slate500,
+              ),
+              suffixIcon: _searchController.text.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.close_rounded, size: 18, color: AppColors.slate500),
+                      onPressed: () {
+                        _searchController.clear();
+                        searchProvider.clearSearch();
+                        setState(() {});
+                      },
+                    )
+                  : null,
+            ),
+            onChanged: (val) {
+              setState(() {});
+              searchProvider.onQueryChanged(val);
+            },
+            onSubmitted: (val) {
+              searchProvider.executeSearch(val);
+            },
+          ),
         ),
         actions: [
           Stack(
             alignment: Alignment.center,
             children: [
               IconButton(
-                icon: const Icon(Icons.tune),
+                icon: const Icon(Icons.tune, color: AppColors.slate800),
                 tooltip: 'Filters',
                 onPressed: _openFilters,
               ),
               if (filterCount > 0)
                 Positioned(
-                  top: 8,
-                  right: 8,
+                  top: 10,
+                  right: 10,
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: const BoxDecoration(
-                      color: Colors.red,
+                      color: AppColors.primary,
                       shape: BoxShape.circle,
                     ),
                     child: Text(
                       '$filterCount',
                       style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
+                        color: AppColors.white,
+                        fontSize: 9,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -122,7 +149,7 @@ class _SearchPageState extends State<SearchPage> {
                 ),
             ],
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: 6),
         ],
       ),
       body: _buildBody(context, searchProvider, catalogProvider),
@@ -134,125 +161,78 @@ class _SearchPageState extends State<SearchPage> {
     SearchProvider searchProvider,
     CatalogProvider catalogProvider,
   ) {
-    // 1. Loading State
+    // 1. Loading State with Product Skeletons
     if (searchProvider.isSearching) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Searching products...'),
-          ],
+      return GridView.builder(
+        padding: const EdgeInsets.all(16),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.64,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
         ),
+        itemCount: 6,
+        itemBuilder: (context, index) => const ProductCardSkeleton(),
       );
     }
 
     // 2. Error State
     if (searchProvider.errorMessage != null &&
         searchProvider.searchResults.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline, size: 48, color: Colors.red.shade400),
-              const SizedBox(height: 12),
-              Text(
-                searchProvider.errorMessage!,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 15),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: () {
-                  searchProvider.executeSearch(_searchController.text);
-                },
-                icon: const Icon(Icons.refresh),
-                label: const Text('Retry'),
-              ),
-            ],
-          ),
-        ),
+      return ErrorStateView(
+        message: searchProvider.errorMessage!,
+        onRetry: () => searchProvider.executeSearch(_searchController.text),
       );
     }
 
     // 3. Search Results View
     if (searchProvider.hasExecutedSearch) {
       if (searchProvider.searchResults.isEmpty) {
-        return Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.search_off,
-                  size: 64,
-                  color: Colors.grey.shade400,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'No products found matching "${searchProvider.currentQuery}"',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Try checking your spelling, using more general search terms, or clearing filters.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                if (searchProvider.activeFilterCount > 0)
-                  OutlinedButton.icon(
-                    onPressed: () {
-                      searchProvider.resetFilters();
-                    },
-                    icon: const Icon(Icons.filter_alt_off),
-                    label: const Text('Clear All Filters'),
-                  ),
-              ],
-            ),
-          ),
+        return EmptyStateView(
+          icon: Icons.search_off_rounded,
+          title: 'No results found',
+          description:
+              'No products matched "${searchProvider.currentQuery}". Try different keywords or clear filters.',
+          buttonText: searchProvider.activeFilterCount > 0 ? 'Clear Filters' : null,
+          onButtonPressed: () {
+            searchProvider.resetFilters();
+          },
         );
       }
 
       return Column(
         children: [
-          // Results Header & Sort
+          // Results Header & Sort Pill
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade50,
-              border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            color: AppColors.white,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${searchProvider.searchResults.length} results',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                  '${searchProvider.searchResults.length} Products Found',
+                  style: AppTypography.caption.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.slate700,
                   ),
                 ),
                 PopupMenuButton<String>(
                   initialValue: searchProvider.selectedSort,
-                  icon: const Row(
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: AppRadius.borderMd,
+                  ),
+                  icon: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.sort, size: 16),
-                      SizedBox(width: 4),
-                      Text('Sort', style: TextStyle(fontSize: 13)),
+                      const Icon(Icons.sort_rounded, size: 16, color: AppColors.slate700),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Sort',
+                        style: AppTypography.bodySmall.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.slate700,
+                        ),
+                      ),
                     ],
                   ),
                   onSelected: (sort) {
@@ -280,13 +260,14 @@ class _SearchPageState extends State<SearchPage> {
               ],
             ),
           ),
+          const Divider(height: 1, color: AppColors.slate200),
           // Product Grid
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.all(16),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 0.68,
+                childAspectRatio: 0.64,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
               ),
@@ -306,7 +287,7 @@ class _SearchPageState extends State<SearchPage> {
         searchProvider.suggestions.isNotEmpty) {
       return ListView.separated(
         itemCount: searchProvider.suggestions.length,
-        separatorBuilder: (_, __) => const Divider(height: 1),
+        separatorBuilder: (_, __) => const Divider(height: 1, color: AppColors.slate200),
         itemBuilder: (context, index) {
           final item = searchProvider.suggestions[index];
           final text = item['text']?.toString() ?? '';
@@ -314,18 +295,18 @@ class _SearchPageState extends State<SearchPage> {
 
           return ListTile(
             leading: Icon(
-              type == 'category' ? Icons.category_outlined : Icons.search,
+              type == 'category' ? Icons.category_rounded : Icons.search_rounded,
               size: 20,
-              color: Colors.grey,
+              color: AppColors.slate400,
             ),
             title: Text(
               text,
-              style: const TextStyle(fontSize: 14),
+              style: AppTypography.bodyMedium.copyWith(color: AppColors.slate800),
             ),
             trailing: const Icon(
-              Icons.north_west,
+              Icons.north_west_rounded,
               size: 16,
-              color: Colors.grey,
+              color: AppColors.slate400,
             ),
             onTap: () {
               _searchController.text = text;
@@ -351,16 +332,17 @@ class _SearchPageState extends State<SearchPage> {
               children: [
                 const Text(
                   'Recent Searches',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTypography.headingSmall,
                 ),
                 TextButton(
-                  onPressed: () {
-                    searchProvider.clearRecentSearches();
-                  },
-                  child: const Text('Clear All'),
+                  onPressed: () => searchProvider.clearRecentSearches(),
+                  child: Text(
+                    'Clear All',
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -369,15 +351,15 @@ class _SearchPageState extends State<SearchPage> {
               spacing: 8,
               runSpacing: 8,
               children: recents.map((term) {
-                return InputChip(
-                  label: Text(term),
-                  onPressed: () {
-                    _searchController.text = term;
-                    searchProvider.executeSearch(term);
-                  },
-                  onDeleted: () {
-                    searchProvider.removeRecentSearch(term);
-                  },
+                return Chip(
+                  backgroundColor: AppColors.white,
+                  side: const BorderSide(color: AppColors.slate200),
+                  label: Text(
+                    term,
+                    style: AppTypography.bodySmall.copyWith(color: AppColors.slate800),
+                  ),
+                  deleteIcon: const Icon(Icons.close_rounded, size: 14, color: AppColors.slate400),
+                  onDeleted: () => searchProvider.removeRecentSearch(term),
                 );
               }).toList(),
             ),
@@ -387,10 +369,7 @@ class _SearchPageState extends State<SearchPage> {
           // Popular Categories Section
           const Text(
             'Explore Categories',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-            ),
+            style: AppTypography.headingSmall,
           ),
           const SizedBox(height: 12),
           Wrap(
@@ -398,8 +377,16 @@ class _SearchPageState extends State<SearchPage> {
             runSpacing: 8,
             children: catalogProvider.categories.map((cat) {
               return ActionChip(
-                avatar: const Icon(Icons.category, size: 16),
-                label: Text(cat.displayName),
+                backgroundColor: AppColors.white,
+                side: const BorderSide(color: AppColors.slate200),
+                avatar: const Icon(Icons.category_rounded, size: 16, color: AppColors.primary),
+                label: Text(
+                  cat.displayName,
+                  style: AppTypography.bodySmall.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.slate800,
+                  ),
+                ),
                 onPressed: () {
                   _searchController.text = cat.displayName;
                   searchProvider.setFilters(categoryId: cat.id);

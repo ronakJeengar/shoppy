@@ -6,6 +6,7 @@ class Product {
   final double price;
   final int stock;
   final double productRating;
+  final int totalReviews;
   final String productImage;
   final String? categoryId;
   final String? categoryName;
@@ -19,6 +20,7 @@ class Product {
     required this.price,
     this.stock = 0,
     this.productRating = 0.0,
+    this.totalReviews = 0,
     required this.productImage,
     this.categoryId,
     this.categoryName,
@@ -50,6 +52,9 @@ class Product {
     final int parsedStock = json['stock'] is int
         ? json['stock'] as int
         : (int.tryParse(json['stock']?.toString() ?? '0') ?? 0);
+    final int parsedTotalReviews = json['totalReviews'] is int
+        ? json['totalReviews'] as int
+        : (int.tryParse(json['totalReviews']?.toString() ?? '0') ?? 0);
 
     return Product(
       id: (json['id'] ?? json['_id'] ?? '').toString(),
@@ -60,6 +65,7 @@ class Product {
       price: rawPrice.toDouble(),
       stock: parsedStock,
       productRating: rawRating.toDouble(),
+      totalReviews: parsedTotalReviews,
       productImage: (json['productImage'] ?? json['imageUrl'] ?? '').toString(),
       categoryId: parsedCategoryId.isNotEmpty ? parsedCategoryId : null,
       categoryName: parsedCategoryName.isNotEmpty ? parsedCategoryName : null,
@@ -78,6 +84,7 @@ class Product {
       'price': price,
       'stock': stock,
       'productRating': productRating,
+      'totalReviews': totalReviews,
       'productImage': productImage,
       'imageUrl': productImage,
       if (categoryId != null)

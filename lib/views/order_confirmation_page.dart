@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shopp_app/core/theme/app_colors.dart';
+import 'package:shopp_app/core/theme/app_radius.dart';
+import 'package:shopp_app/core/theme/app_shadows.dart';
+import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/data/models/order_model.dart';
 import 'package:shopp_app/views/home_page.dart';
 import 'package:shopp_app/views/orders_page.dart';
+import 'package:shopp_app/views/widgets/app_button.dart';
 
 class OrderConfirmationPage extends StatelessWidget {
   final OrderModel order;
@@ -11,8 +16,6 @@ class OrderConfirmationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
@@ -25,9 +28,12 @@ class OrderConfirmationPage extends StatelessWidget {
         }
       },
       child: Scaffold(
+        backgroundColor: AppColors.slate50,
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          title: const Text('Order Confirmed'),
+          backgroundColor: AppColors.white,
+          elevation: 0,
+          title: const Text('Order Confirmation', style: AppTypography.headingSmall),
           centerTitle: true,
         ),
         body: ListView(
@@ -37,20 +43,30 @@ class OrderConfirmationPage extends StatelessWidget {
             Center(
               child: Column(
                 children: [
-                  const CircleAvatar(
-                    radius: 36,
-                    backgroundColor: Colors.green,
-                    child: Icon(Icons.check, size: 40, color: Colors.white),
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: const BoxDecoration(
+                      color: AppColors.successLight,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.check_circle_rounded,
+                      size: 44,
+                      color: AppColors.success,
+                    ),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
                   const Text(
-                    'Thank you for your order!',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    'Order Confirmed',
+                    style: AppTypography.headingLarge,
+                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    'Your order has been placed and confirmed.',
-                    style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                  const Text(
+                    'Thank you for your order!',
+                    style: AppTypography.bodySmall,
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
@@ -58,273 +74,218 @@ class OrderConfirmationPage extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Order Number & Status Card
-            Card(
-              elevation: 0.5,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: Colors.grey.shade200),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: AppRadius.borderMd,
+                border: Border.all(color: AppColors.slate200),
+                boxShadow: AppShadows.card,
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Order Number',
-                          style: TextStyle(fontSize: 13, color: Colors.grey),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            Clipboard.setData(
-                              ClipboardData(text: order.orderNumber),
-                            );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Order number copied!'),
-                                duration: Duration(seconds: 1),
-                              ),
-                            );
-                          },
-                          child: Row(
-                            children: [
-                              Text(
-                                order.orderNumber,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Icon(Icons.copy, size: 14, color: Colors.blue),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Divider(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Status',
-                          style: TextStyle(fontSize: 13, color: Colors.grey),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.green.shade50,
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: Colors.green.shade200),
-                          ),
-                          child: Text(
-                            order.status,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green.shade800,
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Order Reference',
+                        style: AppTypography.caption.copyWith(color: AppColors.slate500),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          Clipboard.setData(ClipboardData(text: order.orderNumber));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Order number copied!'),
+                              duration: Duration(seconds: 1),
                             ),
-                          ),
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            Text(
+                              order.orderNumber,
+                              style: AppTypography.bodyMedium.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.slate900,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            const Icon(Icons.copy_rounded, size: 14, color: AppColors.primary),
+                          ],
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Shipping Method',
-                          style: TextStyle(fontSize: 13, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 20, color: AppColors.slate200),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Order Status',
+                        style: AppTypography.caption.copyWith(color: AppColors.slate500),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: const BoxDecoration(
+                          color: AppColors.successLight,
+                          borderRadius: AppRadius.borderFull,
                         ),
-                        Text(
-                          order.shippingMethod == 'EXPRESS'
-                              ? 'Express Delivery (1-2 Days)'
-                              : 'Standard Delivery (3-5 Days)',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        child: Text(
+                          order.status,
+                          style: AppTypography.label.copyWith(color: AppColors.success),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Delivery Method',
+                        style: AppTypography.caption.copyWith(color: AppColors.slate500),
+                      ),
+                      Text(
+                        order.shippingMethod == 'EXPRESS'
+                            ? 'Express (1-2 Days)'
+                            : 'Standard (3-5 Days)',
+                        style: AppTypography.bodySmall.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.slate800,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 16),
 
             // Delivery Address Snapshot Card
             if (order.shippingAddress != null)
-              Card(
-                elevation: 0.5,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.grey.shade200),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Row(
-                        children: [
-                          Icon(Icons.location_on_outlined,
-                              size: 18, color: Colors.blue),
-                          SizedBox(width: 6),
-                          Text(
-                            'Delivery Address',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        order.shippingAddress!.fullName,
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        order.shippingAddress!.formattedAddress,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey.shade700,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Phone: ${order.shippingAddress!.phone}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            const SizedBox(height: 16),
-
-            // Order Items Card
-            Card(
-              elevation: 0.5,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: Colors.grey.shade200),
-              ),
-              child: Padding(
+              Container(
                 padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: AppRadius.borderMd,
+                  border: Border.all(color: AppColors.slate200),
+                  boxShadow: AppShadows.card,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Items (${order.orderItems.length})',
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ...order.orderItems.map((item) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 6),
-                        child: Row(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(6),
-                              child: Container(
-                                width: 45,
-                                height: 45,
-                                color: Colors.grey.shade100,
-                                child: item.productImage.isNotEmpty
-                                    ? Image.network(
-                                        item.productImage,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) =>
-                                            const Icon(Icons.shopping_bag,
-                                                size: 20, color: Colors.grey),
-                                      )
-                                    : const Icon(Icons.shopping_bag,
-                                        size: 20, color: Colors.grey),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    item.productName,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Qty: ${item.quantity} × \$${item.unitPrice.toStringAsFixed(2)}',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey.shade600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Text(
-                              '\$${item.lineTotal.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
+                    Row(
+                      children: [
+                        const Icon(Icons.location_on_rounded, size: 18, color: AppColors.primary),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Shipping Address',
+                          style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold),
                         ),
-                      );
-                    }),
-                    const Divider(height: 24),
-                    _summaryRow(
-                        'Subtotal', '\$${order.subtotal.toStringAsFixed(2)}'),
-                    const SizedBox(height: 6),
-                    _summaryRow(
-                      'Shipping',
-                      order.shippingFee == 0
-                          ? 'FREE'
-                          : '\$${order.shippingFee.toStringAsFixed(2)}',
+                      ],
                     ),
-                    const SizedBox(height: 6),
-                    _summaryRow(
-                        'Estimated Tax', '\$${order.tax.toStringAsFixed(2)}'),
-                    const Divider(height: 18),
-                    _summaryRow(
-                      'Total Paid',
-                      '\$${order.totalAmount.toStringAsFixed(2)}',
-                      isTotal: true,
-                      color: theme.primaryColor,
+                    const SizedBox(height: 8),
+                    Text(
+                      order.shippingAddress!.fullName,
+                      style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      order.shippingAddress!.formattedAddress,
+                      style: AppTypography.caption.copyWith(color: AppColors.slate600),
                     ),
                   ],
                 ),
               ),
+            const SizedBox(height: 16),
+
+            // Order Items & Pricing Breakdown Card
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: AppRadius.borderMd,
+                border: Border.all(color: AppColors.slate200),
+                boxShadow: AppShadows.card,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Ordered Items (${order.orderItems.length})',
+                    style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  ...order.orderItems.map((item) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: AppRadius.borderSm,
+                            child: Container(
+                              width: 44,
+                              height: 44,
+                              color: AppColors.slate100,
+                              child: item.productImage.isNotEmpty
+                                  ? Image.network(item.productImage, fit: BoxFit.cover)
+                                  : const Icon(Icons.shopping_bag_outlined, color: AppColors.slate400),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.productName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
+                                ),
+                                Text(
+                                  'Qty: ${item.quantity} × \$${item.unitPrice.toStringAsFixed(2)}',
+                                  style: AppTypography.caption.copyWith(color: AppColors.slate500),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            '\$${item.lineTotal.toStringAsFixed(2)}',
+                            style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                  const Divider(height: 20, color: AppColors.slate200),
+                  _summaryRow('Subtotal', '\$${order.subtotal.toStringAsFixed(2)}'),
+                  const SizedBox(height: 6),
+                  _summaryRow(
+                    'Shipping',
+                    order.shippingFee == 0 ? 'FREE' : '\$${order.shippingFee.toStringAsFixed(2)}',
+                    color: order.shippingFee == 0 ? AppColors.success : null,
+                  ),
+                  const SizedBox(height: 6),
+                  _summaryRow('Tax', '\$${order.tax.toStringAsFixed(2)}'),
+                  const Divider(height: 20, color: AppColors.slate200),
+                  _summaryRow(
+                    'Total Paid',
+                    '\$${order.totalAmount.toStringAsFixed(2)}',
+                    isTotal: true,
+                    color: AppColors.primary,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 24),
 
-            // Continue Shopping Button
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
+            // Actions
+            AppButton(
+              label: 'Continue Shopping',
+              icon: Icons.store_rounded,
+              isFullWidth: true,
               onPressed: () {
                 Navigator.pushAndRemoveUntil(
                   context,
@@ -332,57 +293,45 @@ class OrderConfirmationPage extends StatelessWidget {
                   (route) => false,
                 );
               },
-              child: const Text(
-                'Continue Shopping',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
             ),
             const SizedBox(height: 10),
-            OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
+            AppButton(
+              label: 'View All Orders',
+              icon: Icons.receipt_long_rounded,
+              variant: AppButtonVariant.outline,
+              isFullWidth: true,
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (_) => const OrdersPage()),
                 );
               },
-              child: const Text(
-                'View All Orders',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
           ],
         ),
       ),
     );
   }
 
-  Widget _summaryRow(String label, String value,
-      {bool isTotal = false, Color? color}) {
+  Widget _summaryRow(String label, String value, {bool isTotal = false, Color? color}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
-          style: TextStyle(
-            fontSize: isTotal ? 15 : 13,
-            fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-            color: isTotal ? Colors.black87 : Colors.grey.shade700,
-          ),
+          style: isTotal
+              ? AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold)
+              : AppTypography.bodySmall.copyWith(color: AppColors.slate600),
         ),
         Text(
           value,
-          style: TextStyle(
-            fontSize: isTotal ? 16 : 13,
-            fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
-            color: color ?? Colors.black87,
-          ),
+          style: isTotal
+              ? AppTypography.headingSmall.copyWith(color: color ?? AppColors.primary)
+              : AppTypography.bodySmall.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: color ?? AppColors.slate900,
+                ),
         ),
       ],
     );

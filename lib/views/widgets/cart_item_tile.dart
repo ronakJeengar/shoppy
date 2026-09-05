@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:shopp_app/core/theme/app_colors.dart';
+import 'package:shopp_app/core/theme/app_radius.dart';
+import 'package:shopp_app/core/theme/app_shadows.dart';
+import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/data/models/cart_model.dart';
 
 class CartItemTile extends StatelessWidget {
@@ -15,15 +19,15 @@ class CartItemTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final canIncrement = item.quantity < item.stock;
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      elevation: 0.5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade200),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: AppRadius.borderMd,
+        border: Border.all(color: AppColors.slate200, width: 1),
+        boxShadow: AppShadows.card,
       ),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -32,24 +36,24 @@ class CartItemTile extends StatelessWidget {
           children: [
             // Product Thumbnail
             ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppRadius.borderSm,
               child: Container(
-                width: 75,
-                height: 75,
-                color: Colors.grey.shade100,
+                width: 80,
+                height: 80,
+                color: AppColors.slate100,
                 child: item.productImage.isNotEmpty
                     ? Image.network(
                         item.productImage,
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) => const Icon(
-                          Icons.image_not_supported,
-                          color: Colors.grey,
+                          Icons.image_not_supported_outlined,
+                          color: AppColors.slate400,
                         ),
                       )
-                    : const Icon(Icons.shopping_bag, color: Colors.grey),
+                    : const Icon(Icons.shopping_bag_outlined, color: AppColors.slate400),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 14),
 
             // Product Information
             Expanded(
@@ -64,37 +68,36 @@ class CartItemTile extends StatelessWidget {
                           item.productName,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 14,
+                          style: AppTypography.bodySmall.copyWith(
                             fontWeight: FontWeight.w600,
+                            color: AppColors.slate900,
                           ),
                         ),
                       ),
                       IconButton(
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
-                        icon: const Icon(Icons.close, size: 18, color: Colors.grey),
+                        icon: const Icon(Icons.close_rounded, size: 18, color: AppColors.slate400),
                         onPressed: onRemove,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 3),
                   Text(
                     'Sold by ${item.sellerName}',
-                    style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                    style: AppTypography.caption.copyWith(color: AppColors.slate500),
                   ),
                   if (!item.isAvailable) ...[
                     const SizedBox(height: 4),
-                    const Text(
+                    Text(
                       'Out of Stock',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.red,
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.error,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
 
                   // Price & Stepper Row
                   Row(
@@ -102,22 +105,19 @@ class CartItemTile extends StatelessWidget {
                     children: [
                       Text(
                         '\$${item.price.toStringAsFixed(2)}',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: theme.primaryColor,
-                        ),
+                        style: AppTypography.priceCard,
                       ),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.grey.shade300),
+                          color: AppColors.slate100,
+                          borderRadius: AppRadius.borderSm,
+                          border: Border.all(color: AppColors.slate200),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             InkWell(
+                              borderRadius: const BorderRadius.horizontal(left: Radius.circular(6)),
                               onTap: () {
                                 if (item.quantity > 1) {
                                   onQuantityChanged(item.quantity - 1);
@@ -129,36 +129,34 @@ class CartItemTile extends StatelessWidget {
                                 padding: const EdgeInsets.all(6.0),
                                 child: Icon(
                                   item.quantity > 1
-                                      ? Icons.remove
-                                      : Icons.delete_outline,
+                                      ? Icons.remove_rounded
+                                      : Icons.delete_outline_rounded,
                                   size: 16,
-                                  color: Colors.grey.shade700,
+                                  color: item.quantity > 1 ? AppColors.slate700 : AppColors.error,
                                 ),
                               ),
                             ),
                             Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
                               child: Text(
                                 '${item.quantity}',
-                                style: const TextStyle(
-                                  fontSize: 13,
+                                style: AppTypography.bodySmall.copyWith(
                                   fontWeight: FontWeight.bold,
+                                  color: AppColors.slate900,
                                 ),
                               ),
                             ),
                             InkWell(
+                              borderRadius: const BorderRadius.horizontal(right: Radius.circular(6)),
                               onTap: canIncrement
                                   ? () => onQuantityChanged(item.quantity + 1)
                                   : null,
                               child: Padding(
                                 padding: const EdgeInsets.all(6.0),
                                 child: Icon(
-                                  Icons.add,
+                                  Icons.add_rounded,
                                   size: 16,
-                                  color: canIncrement
-                                      ? Colors.grey.shade700
-                                      : Colors.grey.shade300,
+                                  color: canIncrement ? AppColors.slate700 : AppColors.slate300,
                                 ),
                               ),
                             ),

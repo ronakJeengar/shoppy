@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:shopp_app/core/theme/app_colors.dart';
+import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/data/models/recommendation_model.dart';
 import 'package:shopp_app/views/widgets/product_card.dart';
+import 'package:shopp_app/views/widgets/skeleton_loader.dart';
 
 class RecommendationCarousel extends StatelessWidget {
   final String title;
@@ -26,32 +29,22 @@ class RecommendationCarousel extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Container(
-                width: 180,
-                height: 20,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: SkeletonLoader(width: 180, height: 20),
             ),
             const SizedBox(height: 12),
             SizedBox(
-              height: 260,
+              height: 270,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 itemCount: 3,
                 separatorBuilder: (_, __) => const SizedBox(width: 12),
                 itemBuilder: (context, index) {
-                  return Container(
-                    width: 160,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                  return const SizedBox(
+                    width: 164,
+                    child: ProductCardSkeleton(),
                   );
                 },
               ),
@@ -64,8 +57,6 @@ class RecommendationCarousel extends StatelessWidget {
     if (items.isEmpty) {
       return const SizedBox.shrink();
     }
-
-    final theme = Theme.of(context);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12.0),
@@ -83,30 +74,24 @@ class RecommendationCarousel extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.auto_awesome,
                             size: 18,
-                            color: theme.colorScheme.primary,
+                            color: AppColors.violet,
                           ),
                           const SizedBox(width: 6),
                           Text(
                             title,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: -0.3,
-                            ),
+                            style: AppTypography.headingSmall,
                           ),
                         ],
                       ),
                       if (subtitle != null && subtitle!.isNotEmpty) ...[
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 3),
                         Text(
                           subtitle!,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade600,
-                            fontStyle: FontStyle.italic,
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.slate500,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -117,7 +102,7 @@ class RecommendationCarousel extends StatelessWidget {
                 ),
                 if (onRefresh != null)
                   IconButton(
-                    icon: const Icon(Icons.refresh, size: 18),
+                    icon: const Icon(Icons.refresh_rounded, size: 18, color: AppColors.slate500),
                     onPressed: onRefresh,
                     tooltip: 'Refresh',
                   ),
@@ -127,7 +112,7 @@ class RecommendationCarousel extends StatelessWidget {
           const SizedBox(height: 12),
           // Product List Carousel
           SizedBox(
-            height: 260,
+            height: 270,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -136,7 +121,7 @@ class RecommendationCarousel extends StatelessWidget {
               itemBuilder: (context, index) {
                 final recItem = items[index];
                 return SizedBox(
-                  width: 160,
+                  width: 164,
                   child: ProductCard(product: recItem.product),
                 );
               },

@@ -14,6 +14,7 @@ import 'package:shopp_app/providers/review_provider.dart';
 import 'package:shopp_app/providers/search_provider.dart';
 import 'package:shopp_app/providers/user_provider.dart';
 import 'package:shopp_app/providers/wishlist_provider.dart';
+import 'package:shopp_app/core/theme/app_theme.dart';
 import 'package:shopp_app/views/home_page.dart';
 import 'package:shopp_app/views/login_page.dart';
 
@@ -70,10 +71,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Shoppy',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.lightTheme,
       home: (token != null && token!.isNotEmpty)
           ? const HomePage()
           : const LoginPage(),

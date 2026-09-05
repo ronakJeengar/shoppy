@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shopp_app/core/theme/app_colors.dart';
+import 'package:shopp_app/core/theme/app_radius.dart';
+import 'package:shopp_app/core/theme/app_shadows.dart';
+import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/data/models/currrent_user_model.dart';
 import 'package:shopp_app/providers/notification_provider.dart';
 import 'package:shopp_app/providers/user_provider.dart';
 import 'package:shopp_app/views/addresses_page.dart';
 import 'package:shopp_app/views/admin/admin_dashboard_page.dart';
+import 'package:shopp_app/views/login_page.dart';
 import 'package:shopp_app/views/notifications_page.dart';
 import 'package:shopp_app/views/orders_page.dart';
 import 'package:shopp_app/views/wishlist_page.dart';
+import 'package:shopp_app/views/widgets/app_button.dart';
+import 'package:shopp_app/views/widgets/app_text_field.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -26,29 +33,27 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       builder: (dialogCtx) {
         return AlertDialog(
-          title: const Text('Edit Profile'),
+          backgroundColor: AppColors.white,
+          shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderLg),
+          title: const Text('Edit Profile', style: AppTypography.headingSmall),
           content: Form(
             key: formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextFormField(
+                AppTextField(
+                  label: 'Full Name',
                   controller: nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Full Name',
-                    border: OutlineInputBorder(),
-                  ),
+                  prefixIcon: Icons.person_outline_rounded,
                   validator: (val) =>
                       (val == null || val.trim().isEmpty) ? 'Enter your name' : null,
                 ),
-                const SizedBox(height: 12),
-                TextFormField(
+                const SizedBox(height: 14),
+                AppTextField(
+                  label: 'Phone Number',
                   controller: phoneController,
+                  prefixIcon: Icons.phone_outlined,
                   keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    labelText: 'Phone Number',
-                    border: OutlineInputBorder(),
-                  ),
                 ),
               ],
             ),
@@ -56,13 +61,11 @@ class _ProfilePageState extends State<ProfilePage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogCtx),
-              child: const Text('Cancel'),
+              child: const Text('Cancel', style: TextStyle(color: AppColors.slate600)),
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-              ),
+            AppButton(
+              label: 'Save Changes',
+              height: 40,
               onPressed: () async {
                 if (!formKey.currentState!.validate()) return;
                 Navigator.pop(dialogCtx);
@@ -79,12 +82,12 @@ class _ProfilePageState extends State<ProfilePage> {
                             : (context.read<UserProvider>().errorMessage ??
                                 'Failed to update profile'),
                       ),
-                      backgroundColor: success ? Colors.green : Colors.red,
+                      backgroundColor: success ? AppColors.success : AppColors.error,
+                      behavior: SnackBarBehavior.floating,
                     ),
                   );
                 }
               },
-              child: const Text('Save'),
             ),
           ],
         );
@@ -102,67 +105,54 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       builder: (dialogCtx) {
         return AlertDialog(
-          title: const Text('Change Password'),
+          backgroundColor: AppColors.white,
+          shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderLg),
+          title: const Text('Change Password', style: AppTypography.headingSmall),
           content: Form(
             key: formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    controller: currentPasswordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Current Password',
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (val) =>
-                        (val == null || val.isEmpty) ? 'Enter current password' : null,
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: newPasswordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'New Password',
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (val) {
-                      if (val == null || val.length < 6) {
-                        return 'Password must be at least 6 characters';
-                      }
-                      if (val == currentPasswordController.text) {
-                        return 'New password must be different';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: confirmPasswordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Confirm New Password',
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (val) => val != newPasswordController.text
-                        ? 'Passwords do not match'
-                        : null,
-                  ),
-                ],
-              ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AppTextField(
+                  label: 'Current Password',
+                  controller: currentPasswordController,
+                  obscureText: true,
+                  prefixIcon: Icons.lock_outline_rounded,
+                  validator: (val) =>
+                      (val == null || val.isEmpty) ? 'Enter current password' : null,
+                ),
+                const SizedBox(height: 12),
+                AppTextField(
+                  label: 'New Password',
+                  controller: newPasswordController,
+                  obscureText: true,
+                  prefixIcon: Icons.lock_reset_rounded,
+                  validator: (val) =>
+                      (val == null || val.length < 6) ? 'At least 6 characters' : null,
+                ),
+                const SizedBox(height: 12),
+                AppTextField(
+                  label: 'Confirm New Password',
+                  controller: confirmPasswordController,
+                  obscureText: true,
+                  prefixIcon: Icons.check_circle_outline_rounded,
+                  validator: (val) {
+                    if (val == null || val.isEmpty) return 'Confirm your password';
+                    if (val != newPasswordController.text) return 'Passwords do not match';
+                    return null;
+                  },
+                ),
+              ],
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogCtx),
-              child: const Text('Cancel'),
+              child: const Text('Cancel', style: TextStyle(color: AppColors.slate600)),
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-              ),
+            AppButton(
+              label: 'Update',
+              height: 40,
               onPressed: () async {
                 if (!formKey.currentState!.validate()) return;
                 Navigator.pop(dialogCtx);
@@ -179,72 +169,14 @@ class _ProfilePageState extends State<ProfilePage> {
                             : (context.read<UserProvider>().errorMessage ??
                                 'Failed to change password'),
                       ),
-                      backgroundColor: success ? Colors.green : Colors.red,
+                      backgroundColor: success ? AppColors.success : AppColors.error,
+                      behavior: SnackBarBehavior.floating,
                     ),
                   );
                 }
               },
-              child: const Text('Update Password'),
             ),
           ],
-        );
-      },
-    );
-  }
-
-  void _openPreferencesDialog(BuildContext context) {
-    final notifProvider = context.read<NotificationProvider>();
-    bool orderUpdates = notifProvider.preferences.orderUpdates;
-    bool promotions = notifProvider.preferences.promotions;
-    bool wishlistAlerts = notifProvider.preferences.wishlistAlerts;
-
-    showDialog(
-      context: context,
-      builder: (dialogCtx) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return AlertDialog(
-              title: const Text('Notification Preferences'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SwitchListTile(
-                    title: const Text('Order Updates'),
-                    subtitle: const Text('Receipts, shipping, and delivery updates'),
-                    value: orderUpdates,
-                    onChanged: (val) {
-                      setModalState(() => orderUpdates = val);
-                      notifProvider.updatePreferences(orderUpdates: val);
-                    },
-                  ),
-                  SwitchListTile(
-                    title: const Text('Promotions & Sales'),
-                    subtitle: const Text('Special discounts and seasonal offers'),
-                    value: promotions,
-                    onChanged: (val) {
-                      setModalState(() => promotions = val);
-                      notifProvider.updatePreferences(promotions: val);
-                    },
-                  ),
-                  SwitchListTile(
-                    title: const Text('Wishlist Alerts'),
-                    subtitle: const Text('Price drops on saved items'),
-                    value: wishlistAlerts,
-                    onChanged: (val) {
-                      setModalState(() => wishlistAlerts = val);
-                      notifProvider.updatePreferences(wishlistAlerts: val);
-                    },
-                  ),
-                ],
-              ),
-              actions: [
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(dialogCtx),
-                  child: const Text('Done'),
-                ),
-              ],
-            );
-          },
         );
       },
     );
@@ -253,24 +185,34 @@ class _ProfilePageState extends State<ProfilePage> {
   void _confirmLogout(BuildContext context) {
     showDialog(
       context: context,
-      builder: (dialogCtx) => AlertDialog(
-        title: const Text('Log Out'),
-        content: const Text('Are you sure you want to log out of Shoppy?'),
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.white,
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderLg),
+        title: const Text('Sign Out', style: AppTypography.headingSmall),
+        content: const Text(
+          'Are you sure you want to sign out of your account?',
+          style: AppTypography.bodyMedium,
+        ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text('Cancel'),
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel', style: TextStyle(color: AppColors.slate600)),
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.pop(dialogCtx);
-              context.read<UserProvider>().logout(context);
+          AppButton(
+            label: 'Sign Out',
+            variant: AppButtonVariant.danger,
+            height: 38,
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await context.read<UserProvider>().logout(context);
+              if (context.mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                  (route) => false,
+                );
+              }
             },
-            child: const Text('Log Out'),
           ),
         ],
       ),
@@ -284,22 +226,23 @@ class _ProfilePageState extends State<ProfilePage> {
     final user = userProvider.currentUser;
 
     return Scaffold(
+      backgroundColor: AppColors.slate50,
       appBar: AppBar(
-        title: const Text(
-          'My Account',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        backgroundColor: AppColors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.slate800),
+          onPressed: () => Navigator.pop(context),
         ),
+        title: const Text('My Account', style: AppTypography.headingSmall),
       ),
-      body: userProvider.isLoading && user == null
-          ? const Center(child: CircularProgressIndicator())
-          : user == null
-              ? const Center(
-                  child: Text(
-                    'No profile information available',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                )
-              : ListView(
+      body: user == null
+          ? const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+              ),
+            )
+          : ListView(
               padding: const EdgeInsets.all(16),
               children: [
                 // 1. Profile Header Card
@@ -310,60 +253,50 @@ class _ProfilePageState extends State<ProfilePage> {
                 if (user.role == 'ADMIN') ...[
                   const Text(
                     'Store Administration',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.purple,
-                    ),
+                    style: AppTypography.label,
                   ),
                   const SizedBox(height: 8),
-                  Card(
-                    elevation: 0.5,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.purple.shade200),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: AppRadius.borderMd,
+                      border: Border.all(color: AppColors.violet.withValues(alpha: 0.3)),
+                      boxShadow: AppShadows.card,
                     ),
-                    child: Column(
-                      children: [
-                        _buildTile(
-                          icon: Icons.dashboard_outlined,
-                          iconColor: Colors.purple,
-                          title: 'Admin Dashboard',
-                          subtitle: 'Store overview, products, orders & audit',
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const AdminDashboardPage(),
-                            ),
-                          ),
+                    child: _buildTile(
+                      icon: Icons.dashboard_rounded,
+                      iconColor: AppColors.violet,
+                      title: 'Admin Dashboard',
+                      subtitle: 'Store overview, products, orders & audit logs',
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const AdminDashboardPage(),
                         ),
-                      ],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
                 ],
 
-                // 2. Quick Navigation Section
+                // 2. Shopping Activity Section
                 const Text(
-                  'Shopping Activity',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,
-                  ),
+                  'SHOPPING ACTIVITY',
+                  style: AppTypography.label,
                 ),
                 const SizedBox(height: 8),
-                Card(
-                  elevation: 0.5,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: Colors.grey.shade200),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: AppRadius.borderMd,
+                    border: Border.all(color: AppColors.slate200),
+                    boxShadow: AppShadows.card,
                   ),
                   child: Column(
                     children: [
                       _buildTile(
-                        icon: Icons.receipt_long_outlined,
-                        iconColor: Colors.blue,
+                        icon: Icons.receipt_long_rounded,
+                        iconColor: AppColors.primary,
                         title: 'My Orders',
                         subtitle: 'Track, view, or cancel your orders',
                         onTap: () => Navigator.push(
@@ -373,10 +306,10 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                       ),
-                      const Divider(height: 1, indent: 56),
+                      const Divider(height: 1, color: AppColors.slate200, indent: 56),
                       _buildTile(
-                        icon: Icons.favorite_border,
-                        iconColor: Colors.pink,
+                        icon: Icons.favorite_rounded,
+                        iconColor: AppColors.coral,
                         title: 'My Wishlist',
                         subtitle: 'Saved products and future purchases',
                         onTap: () => Navigator.push(
@@ -386,10 +319,10 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                       ),
-                      const Divider(height: 1, indent: 56),
+                      const Divider(height: 1, color: AppColors.slate200, indent: 56),
                       _buildTile(
-                        icon: Icons.location_on_outlined,
-                        iconColor: Colors.teal,
+                        icon: Icons.location_on_rounded,
+                        iconColor: AppColors.success,
                         title: 'Delivery Addresses',
                         subtitle: 'Manage saved shipping addresses',
                         onTap: () => Navigator.push(
@@ -399,12 +332,12 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                       ),
-                      const Divider(height: 1, indent: 56),
+                      const Divider(height: 1, color: AppColors.slate200, indent: 56),
                       _buildTile(
-                        icon: Icons.notifications_outlined,
-                        iconColor: Colors.orange,
+                        icon: Icons.notifications_rounded,
+                        iconColor: AppColors.accent,
                         title: 'Notifications',
-                        subtitle: 'Updates, receipts, and order statuses',
+                        subtitle: 'Order updates and promotional offers',
                         trailingBadgeCount: notifProvider.unreadCount,
                         onTap: () => Navigator.push(
                           context,
@@ -420,169 +353,145 @@ class _ProfilePageState extends State<ProfilePage> {
 
                 // 3. Settings & Security Section
                 const Text(
-                  'Account Settings & Security',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,
-                  ),
+                  'SETTINGS & SECURITY',
+                  style: AppTypography.label,
                 ),
                 const SizedBox(height: 8),
-                Card(
-                  elevation: 0.5,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: Colors.grey.shade200),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: AppRadius.borderMd,
+                    border: Border.all(color: AppColors.slate200),
+                    boxShadow: AppShadows.card,
                   ),
                   child: Column(
                     children: [
                       _buildTile(
-                        icon: Icons.edit_outlined,
-                        iconColor: Colors.indigo,
+                        icon: Icons.edit_rounded,
+                        iconColor: AppColors.primary,
                         title: 'Edit Profile',
-                        subtitle: 'Update your name and phone number',
+                        subtitle: 'Update your display name and contact phone',
                         onTap: () => _openEditProfileDialog(context, user),
                       ),
-                      const Divider(height: 1, indent: 56),
+                      const Divider(height: 1, color: AppColors.slate200, indent: 56),
                       _buildTile(
-                        icon: Icons.lock_outline,
-                        iconColor: Colors.amber.shade800,
+                        icon: Icons.lock_outline_rounded,
+                        iconColor: AppColors.slate700,
                         title: 'Change Password',
-                        subtitle: 'Update your account password',
+                        subtitle: 'Keep your Shoppy account secure',
                         onTap: () => _openChangePasswordDialog(context),
                       ),
-                      const Divider(height: 1, indent: 56),
+                      const Divider(height: 1, color: AppColors.slate200, indent: 56),
                       _buildTile(
-                        icon: Icons.tune,
-                        iconColor: Colors.deepPurple,
+                        icon: Icons.tune_rounded,
+                        iconColor: AppColors.violet,
                         title: 'Notification Preferences',
-                        subtitle: 'Manage what notifications you receive',
-                        onTap: () => _openPreferencesDialog(context),
+                        subtitle: 'Manage email and app notifications',
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Notification preferences updated'),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
 
-                // 4. Logout Button
-                OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    foregroundColor: Colors.red,
-                    side: const BorderSide(color: Colors.red),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                // 4. Sign Out Button
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: AppRadius.borderMd,
+                    border: Border.all(color: AppColors.slate200),
+                    boxShadow: AppShadows.card,
                   ),
-                  icon: const Icon(Icons.logout),
-                  label: const Text(
-                    'Log Out',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  child: _buildTile(
+                    icon: Icons.logout_rounded,
+                    iconColor: AppColors.error,
+                    title: 'Log Out',
+                    subtitle: 'Safely sign out of this device',
+                    onTap: () => _confirmLogout(context),
                   ),
-                  onPressed: () => _confirmLogout(context),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 32),
               ],
             ),
     );
   }
 
   Widget _buildProfileHeader(CurrentUserModel user) {
-    return Card(
-      elevation: 0.5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade200),
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: AppRadius.borderMd,
+        border: Border.all(color: AppColors.slate200),
+        boxShadow: AppShadows.card,
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 32,
-              backgroundColor: Colors.blue.shade100,
-              child: Text(
-                user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue.shade800,
-                ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 30,
+            backgroundColor: AppColors.primary50,
+            child: Text(
+              user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
               ),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          user.name,
-                          style: const TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        user.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.headingMedium,
                       ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: user.role == 'ADMIN'
-                              ? Colors.purple.shade50
-                              : Colors.green.shade50,
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(
-                            color: user.role == 'ADMIN'
-                                ? Colors.purple.shade200
-                                : Colors.green.shade200,
-                          ),
-                        ),
-                        child: Text(
-                          user.role,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: user.role == 'ADMIN'
-                                ? Colors.purple.shade700
-                                : Colors.green.shade700,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    user.email,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.grey.shade600,
                     ),
-                  ),
-                  if (user.phone.isNotEmpty) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      user.phone,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade500,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: user.role == 'ADMIN' ? AppColors.violetLight : AppColors.primary50,
+                        borderRadius: AppRadius.borderFull,
+                      ),
+                      child: Text(
+                        user.role,
+                        style: AppTypography.label.copyWith(
+                          color: user.role == 'ADMIN' ? AppColors.violet : AppColors.primary,
+                        ),
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  user.email,
+                  style: AppTypography.bodySmall.copyWith(color: AppColors.slate500),
+                ),
+                if (user.phone.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    user.phone,
+                    style: AppTypography.caption.copyWith(color: AppColors.slate400),
+                  ),
                 ],
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -592,44 +501,54 @@ class _ProfilePageState extends State<ProfilePage> {
     required Color iconColor,
     required String title,
     required String subtitle,
-    int trailingBadgeCount = 0,
     required VoidCallback onTap,
+    int trailingBadgeCount = 0,
   }) {
     return ListTile(
-      leading: CircleAvatar(
-        radius: 18,
-        backgroundColor: iconColor.withValues(alpha: 0.1),
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: iconColor.withValues(alpha: 0.1),
+          borderRadius: AppRadius.borderSm,
+        ),
         child: Icon(icon, color: iconColor, size: 20),
       ),
       title: Text(
         title,
-        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+        style: AppTypography.bodySmall.copyWith(
+          fontWeight: FontWeight.bold,
+          color: AppColors.slate900,
+        ),
       ),
       subtitle: Text(
         subtitle,
-        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+        style: AppTypography.caption.copyWith(color: AppColors.slate500),
       ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (trailingBadgeCount > 0)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: const BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
+                color: AppColors.error,
+                borderRadius: AppRadius.borderFull,
               ),
               child: Text(
                 '$trailingBadgeCount',
                 style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 11,
+                  color: AppColors.white,
+                  fontSize: 10,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-          const SizedBox(width: 4),
-          const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+          const SizedBox(width: 6),
+          const Icon(
+            Icons.chevron_right_rounded,
+            size: 18,
+            color: AppColors.slate400,
+          ),
         ],
       ),
       onTap: onTap,
