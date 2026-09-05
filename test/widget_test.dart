@@ -8,6 +8,8 @@ import 'package:shopp_app/data/models/currrent_user_model.dart';
 import 'package:shopp_app/data/models/order_model.dart';
 import 'package:shopp_app/data/models/product_model.dart';
 import 'package:shopp_app/data/models/review_model.dart';
+import 'package:shopp_app/data/models/ai_config_model.dart';
+import 'package:shopp_app/data/repositories/ai_repository.dart';
 import 'package:shopp_app/main.dart';
 import 'package:shopp_app/providers/address_provider.dart';
 import 'package:shopp_app/providers/admin_provider.dart';
@@ -707,5 +709,74 @@ void main() {
     expect(find.text('PUBLISHED'), findsOneWidget);
     expect(find.text('HIDDEN'), findsOneWidget);
     expect(find.byType(TextField), findsOneWidget);
+  });
+
+  test('AiHealthModel correctly serializes and deserializes backend AI health payload', () {
+    final Map<String, dynamic> sampleJson = {
+      'enabled': true,
+      'provider': 'mock',
+      'model': 'gemini-1.5-flash',
+      'healthy': true,
+      'features': {
+        'assistantEnabled': true,
+        'semanticSearchEnabled': true,
+        'toolCallingEnabled': true,
+      },
+      'allowlistedTools': [
+        'search_products',
+        'get_product_details',
+        'get_user_order_status',
+        'check_store_policy',
+      ],
+      'vectorStore': {
+        'ready': true,
+      },
+    };
+
+    final health = AiHealthModel.fromJson(sampleJson);
+    expect(health.enabled, isTrue);
+    expect(health.provider, equals('mock'));
+    expect(health.model, equals('gemini-1.5-flash'));
+    expect(health.healthy, isTrue);
+    expect(health.features.assistantEnabled, isTrue);
+    expect(health.features.semanticSearchEnabled, isTrue);
+    expect(health.allowlistedTools.length, equals(4));
+    expect(health.allowlistedTools.contains('search_products'), isTrue);
+    expect(health.vectorStoreReady, isTrue);
+
+    final serialized = health.toJson();
+    expect(serialized['enabled'], isTrue);
+    expect(serialized['provider'], equals('mock'));
+  });
+
+  test('AiQueryResultModel correctly parses query response with metadata', () {
+    final Map<String, dynamic> queryJson = {
+      'requestId': 'ai_req_test_123',
+      'answer': 'We offer a 30-day return policy for all eligible items.',
+      'toolResults': [
+        {
+          'toolName': 'check_store_policy',
+          'result': {'policy': 'returns', 'days': 30},
+        },
+      ],
+      'metadata': {
+        'provider': 'mock',
+        'model': 'mock-model-v1',
+        'durationMs': 35,
+      },
+    };
+
+    final result = AiQueryResultModel.fromJson(queryJson);
+    expect(result.requestId, equals('ai_req_test_123'));
+    expect(result.answer, contains('30-day return policy'));
+    expect(result.provider, equals('mock'));
+    expect(result.model, equals('mock-model-v1'));
+    expect(result.durationMs, equals(35));
+    expect(result.toolResults.length, equals(1));
+  });
+
+  test('AiRepository instantiates cleanly with default dependencies', () {
+    final repo = AiRepository();
+    expect(repo, isNotNull);
   });
 }

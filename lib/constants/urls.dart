@@ -58,6 +58,10 @@ class Urls {
   static const String adminAuditLogs = "admin/audit-logs";
   static const String adminReviews = "admin/reviews";
 
+  // AI Foundation module
+  static const String aiHealth = "ai/health";
+  static const String aiQuery = "ai/query";
+
   // Backwards-compatibility aliases
   static const String signUp = register;
   static const String signIn = login;
