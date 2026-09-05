@@ -311,6 +311,12 @@ class _AssistantPageState extends State<AssistantPage> {
             ],
           ),
 
+          // Pending Consequential Action Confirmation Card
+          if (message.hasPendingConfirmation) ...[
+            const SizedBox(height: 10),
+            _buildConfirmationCard(message.pendingConfirmation!, provider, theme),
+          ],
+
           // Embedded Product Cards
           if (message.hasProducts) ...[
             const SizedBox(height: 10),
@@ -328,6 +334,95 @@ class _AssistantPageState extends State<AssistantPage> {
             const SizedBox(height: 8),
             _buildActionButtons(message.actions, provider),
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildConfirmationCard(
+    AssistantConfirmationModel confirmation,
+    AssistantProvider provider,
+    ThemeData theme,
+  ) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(left: 32, top: 4),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.amber.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.amber.shade300, width: 1.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.warning_amber_rounded, color: Colors.amber.shade900, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                'Confirmation Required',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.amber.shade900,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            confirmation.summary,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'This action cannot be undone automatically.',
+            style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red.shade700,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                onPressed: provider.isLoading
+                    ? null
+                    : () {
+                        provider.confirmPendingAction(
+                          confirmation.confirmationId,
+                          context: context,
+                        );
+                      },
+                icon: const Icon(Icons.check_circle_outline, size: 16),
+                label: const Text('Confirm', style: TextStyle(fontSize: 13)),
+              ),
+              const SizedBox(width: 10),
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                onPressed: provider.isLoading
+                    ? null
+                    : () {
+                        provider.cancelPendingAction(
+                          confirmation.confirmationId,
+                          context: context,
+                        );
+                      },
+                child: const Text('Cancel', style: TextStyle(fontSize: 13)),
+              ),
+            ],
+          ),
         ],
       ),
     );

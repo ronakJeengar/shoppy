@@ -65,6 +65,8 @@ class Urls {
   static const String aiConversations = "ai/conversations";
   static String aiConversation(String id) => "ai/conversations/$id";
   static String aiClearConversation(String id) => "ai/conversations/$id/clear";
+  static const String aiConfirmAction = "ai/assistant/confirm";
+  static const String aiCancelAction = "ai/assistant/cancel-action";
 
   // Backwards-compatibility aliases
   static const String signUp = register;

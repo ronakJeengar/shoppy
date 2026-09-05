@@ -925,5 +925,92 @@ void main() {
     expect(find.byType(TextField), findsOneWidget);
     expect(find.byIcon(Icons.send), findsOneWidget);
   });
+
+  test('AssistantConfirmationModel serializes and deserializes accurately', () {
+    final confJson = {
+      'confirmationId': 'conf_xyz_123',
+      'action': 'cancel_order',
+      'summary': 'Cancel order #ORD-999 containing 2 items',
+      'orderId': 'ord_999',
+      'orderNumber': 'ORD-999',
+      'totalAmount': 89.99,
+      'currency': 'USD',
+      'details': {'reason': 'Changed mind'},
+    };
+
+    final confModel = AssistantConfirmationModel.fromJson(confJson);
+    expect(confModel.confirmationId, equals('conf_xyz_123'));
+    expect(confModel.action, equals('cancel_order'));
+    expect(confModel.summary, equals('Cancel order #ORD-999 containing 2 items'));
+    expect(confModel.orderId, equals('ord_999'));
+    expect(confModel.orderNumber, equals('ORD-999'));
+    expect(confModel.totalAmount, equals(89.99));
+    expect(confModel.currency, equals('USD'));
+    expect(confModel.details['reason'], equals('Changed mind'));
+
+    final serialized = confModel.toJson();
+    expect(serialized['confirmationId'], equals('conf_xyz_123'));
+    expect(serialized['action'], equals('cancel_order'));
+    expect(serialized['summary'], equals('Cancel order #ORD-999 containing 2 items'));
+    expect(serialized['orderId'], equals('ord_999'));
+
+    final msg = AssistantMessageModel(
+      id: 'm_conf_1',
+      role: 'assistant',
+      content: 'Please confirm order cancellation',
+      pendingConfirmation: confModel,
+    );
+    expect(msg.hasPendingConfirmation, isTrue);
+    expect(msg.pendingConfirmation?.confirmationId, equals('conf_xyz_123'));
+  });
+
+  testWidgets('AssistantPage renders ConfirmationCard when pendingConfirmation is present',
+      (WidgetTester tester) async {
+    final assistantProvider = AssistantProvider();
+    const confModel = AssistantConfirmationModel(
+      confirmationId: 'conf_test_77',
+      action: 'cancel_order',
+      summary: 'Cancel order #ORD-2026-A10 (Total: \$89.99)',
+      orderId: 'ORD-2026-A10',
+      totalAmount: 89.99,
+    );
+
+    final msg = AssistantMessageModel(
+      id: 'm_test_1',
+      role: 'assistant',
+      content: 'I have prepared your order cancellation request. Please confirm below:',
+      pendingConfirmation: confModel,
+    );
+    assistantProvider.addMessage(msg);
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<AssistantProvider>.value(value: assistantProvider),
+          ChangeNotifierProvider(create: (_) => UserProvider()),
+          ChangeNotifierProvider(create: (_) => CatalogProvider()),
+          ChangeNotifierProvider(create: (_) => SearchProvider()),
+          ChangeNotifierProvider(create: (_) => CartProvider()),
+          ChangeNotifierProvider(create: (_) => WishlistProvider()),
+          ChangeNotifierProvider(create: (_) => AddressProvider()),
+          ChangeNotifierProvider(create: (_) => CheckoutProvider()),
+          ChangeNotifierProvider(create: (_) => OrderProvider()),
+          ChangeNotifierProvider(create: (_) => NotificationProvider()),
+          ChangeNotifierProvider(create: (_) => AdminProvider()),
+          ChangeNotifierProvider(create: (_) => ReviewProvider()),
+        ],
+        child: const MaterialApp(
+          home: AssistantPage(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Confirmation Required'), findsOneWidget);
+    expect(find.text('Cancel order #ORD-2026-A10 (Total: \$89.99)'), findsOneWidget);
+    expect(find.text('This action cannot be undone automatically.'), findsOneWidget);
+    expect(find.widgetWithText(OutlinedButton, 'Cancel'), findsOneWidget);
+    expect(find.widgetWithText(ElevatedButton, 'Confirm'), findsOneWidget);
+  });
 }
 

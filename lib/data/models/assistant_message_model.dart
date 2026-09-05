@@ -144,10 +144,62 @@ class AssistantActionModel {
   }
 }
 
+class AssistantConfirmationModel {
+  final String confirmationId;
+  final String action;
+  final String summary;
+  final String? orderId;
+  final String? orderNumber;
+  final double? totalAmount;
+  final String currency;
+  final Map<String, dynamic> details;
+
+  const AssistantConfirmationModel({
+    required this.confirmationId,
+    required this.action,
+    required this.summary,
+    this.orderId,
+    this.orderNumber,
+    this.totalAmount,
+    this.currency = 'USD',
+    this.details = const {},
+  });
+
+  factory AssistantConfirmationModel.fromJson(Map<String, dynamic> json) {
+    final num? rawTotal = json['totalAmount'] is num ? json['totalAmount'] as num : null;
+    return AssistantConfirmationModel(
+      confirmationId: (json['confirmationId'] ?? '').toString(),
+      action: (json['action'] ?? 'CONSEQUENTIAL_ACTION').toString(),
+      summary: (json['summary'] ?? 'Confirm Action').toString(),
+      orderId: json['orderId']?.toString(),
+      orderNumber: json['orderNumber']?.toString(),
+      totalAmount: rawTotal?.toDouble(),
+      currency: (json['currency'] ?? 'USD').toString(),
+      details: json['details'] is Map<String, dynamic>
+          ? Map<String, dynamic>.from(json['details'] as Map)
+          : {},
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'confirmationId': confirmationId,
+      'action': action,
+      'summary': summary,
+      'orderId': orderId,
+      'orderNumber': orderNumber,
+      'totalAmount': totalAmount,
+      'currency': currency,
+      'details': details,
+    };
+  }
+}
+
 class AssistantMessageModel {
   final String id;
   final String role; // 'user' or 'assistant'
   final String content;
+  final AssistantConfirmationModel? pendingConfirmation;
   final List<AssistantProductCardModel> products;
   final List<AssistantSourceModel> sources;
   final List<AssistantActionModel> actions;
@@ -157,11 +209,13 @@ class AssistantMessageModel {
   bool get hasProducts => products.isNotEmpty;
   bool get hasSources => sources.isNotEmpty;
   bool get hasActions => actions.isNotEmpty;
+  bool get hasPendingConfirmation => pendingConfirmation != null;
 
   AssistantMessageModel({
     required this.id,
     required this.role,
     required this.content,
+    this.pendingConfirmation,
     this.products = const [],
     this.sources = const [],
     this.actions = const [],
@@ -193,6 +247,12 @@ class AssistantMessageModel {
             .toList()
         : [];
 
+    final rawConfirmation = json['pendingConfirmation'];
+    final AssistantConfirmationModel? conf =
+        rawConfirmation is Map<String, dynamic>
+            ? AssistantConfirmationModel.fromJson(rawConfirmation)
+            : null;
+
     DateTime ts = DateTime.now();
     if (json['timestamp'] != null) {
       try {
@@ -204,6 +264,7 @@ class AssistantMessageModel {
       id: (json['id'] ?? 'msg_${DateTime.now().millisecondsSinceEpoch}').toString(),
       role: (json['role'] ?? 'assistant').toString(),
       content: (json['content'] ?? json['message'] ?? '').toString(),
+      pendingConfirmation: conf,
       products: prods,
       sources: srcs,
       actions: acts,
@@ -216,6 +277,7 @@ class AssistantMessageModel {
       'id': id,
       'role': role,
       'content': content,
+      'pendingConfirmation': pendingConfirmation?.toJson(),
       'products': products.map((p) => p.toJson()).toList(),
       'sources': sources.map((s) => s.toJson()).toList(),
       'actions': actions.map((a) => a.toJson()).toList(),
@@ -228,6 +290,7 @@ class AssistantChatResponseModel {
   final String conversationId;
   final String message;
   final String answer;
+  final AssistantConfirmationModel? pendingConfirmation;
   final List<AssistantProductCardModel> products;
   final List<AssistantSourceModel> sources;
   final List<AssistantActionModel> actions;
@@ -237,6 +300,7 @@ class AssistantChatResponseModel {
     required this.conversationId,
     required this.message,
     required this.answer,
+    this.pendingConfirmation,
     required this.products,
     required this.sources,
     required this.actions,
@@ -268,10 +332,17 @@ class AssistantChatResponseModel {
             .toList()
         : [];
 
+    final rawConfirmation = json['pendingConfirmation'];
+    final AssistantConfirmationModel? conf =
+        rawConfirmation is Map<String, dynamic>
+            ? AssistantConfirmationModel.fromJson(rawConfirmation)
+            : null;
+
     return AssistantChatResponseModel(
       conversationId: (json['conversationId'] ?? '').toString(),
       message: (json['message'] ?? json['answer'] ?? '').toString(),
       answer: (json['answer'] ?? json['message'] ?? '').toString(),
+      pendingConfirmation: conf,
       products: prods,
       sources: srcs,
       actions: acts,

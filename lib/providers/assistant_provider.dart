@@ -5,7 +5,9 @@ import 'package:shopp_app/views/cart_page.dart';
 import 'package:shopp_app/views/order_detail_page.dart';
 import 'package:shopp_app/views/orders_page.dart';
 import 'package:shopp_app/views/product_detail_page.dart';
+import 'package:shopp_app/views/profile_page.dart';
 import 'package:shopp_app/views/search_page.dart';
+import 'package:shopp_app/views/wishlist_page.dart';
 
 class AssistantProvider extends ChangeNotifier {
   final AiRepository _aiRepository;
@@ -44,6 +46,11 @@ class AssistantProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void addMessage(AssistantMessageModel message) {
+    _messages.add(message);
+    notifyListeners();
+  }
+
   Future<void> sendMessage(String text, {BuildContext? context}) async {
     final trimmed = text.trim();
     if (trimmed.isEmpty || _isLoading) return;
@@ -74,6 +81,7 @@ class AssistantProvider extends ChangeNotifier {
         id: 'ast_${DateTime.now().millisecondsSinceEpoch}',
         role: 'assistant',
         content: chatData.message,
+        pendingConfirmation: chatData.pendingConfirmation,
         products: chatData.products,
         sources: chatData.sources,
         actions: chatData.actions,
@@ -87,6 +95,83 @@ class AssistantProvider extends ChangeNotifier {
         content: "Sorry, I encountered an issue: ${response.message}. Please try again.",
       );
       _messages.add(fallbackErrorMsg);
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> confirmPendingAction(String confirmationId, {BuildContext? context}) async {
+    if (_isLoading || confirmationId.isEmpty) return;
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    final response = await _aiRepository.confirmAction(
+      confirmationId: confirmationId,
+      conversationId: _activeConversationId,
+    );
+
+    if (response.status) {
+      final successMsg = AssistantMessageModel(
+        id: 'ast_cf_${DateTime.now().millisecondsSinceEpoch}',
+        role: 'assistant',
+        content: response.message.isNotEmpty
+            ? response.message
+            : "Action confirmed and successfully executed.",
+      );
+      _messages.add(successMsg);
+      if (context != null && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response.message.isNotEmpty
+                ? response.message
+                : "Action confirmed successfully"),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } else {
+      _errorMessage = response.message;
+      if (context != null && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response.message),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> cancelPendingAction(String confirmationId, {BuildContext? context}) async {
+    if (_isLoading || confirmationId.isEmpty) return;
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    final response = await _aiRepository.cancelAction(
+      confirmationId: confirmationId,
+      conversationId: _activeConversationId,
+    );
+
+    if (response.status) {
+      final cancelMsg = AssistantMessageModel(
+        id: 'ast_cn_${DateTime.now().millisecondsSinceEpoch}',
+        role: 'assistant',
+        content: "The action proposal has been cancelled.",
+      );
+      _messages.add(cancelMsg);
+      if (context != null && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Action cancelled")),
+        );
+      }
+    } else {
+      _errorMessage = response.message;
     }
 
     _isLoading = false;
@@ -115,6 +200,20 @@ class AssistantProvider extends ChangeNotifier {
     final payload = action.payload;
 
     switch (action.type) {
+      case 'CONFIRM_ACTION':
+        final confId = payload['confirmationId']?.toString() ?? '';
+        if (confId.isNotEmpty) {
+          confirmPendingAction(confId, context: context);
+        }
+        break;
+
+      case 'CANCEL_ACTION':
+        final confId = payload['confirmationId']?.toString() ?? '';
+        if (confId.isNotEmpty) {
+          cancelPendingAction(confId, context: context);
+        }
+        break;
+
       case 'OPEN_PRODUCT':
         final productId = payload['productId']?.toString() ?? '';
         final prod = AssistantProductCardModel(
@@ -147,6 +246,24 @@ class AssistantProvider extends ChangeNotifier {
           context,
           MaterialPageRoute(
             builder: (_) => const CartPage(),
+          ),
+        );
+        break;
+
+      case 'OPEN_WISHLIST':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const WishlistPage(),
+          ),
+        );
+        break;
+
+      case 'OPEN_PROFILE':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const ProfilePage(),
           ),
         );
         break;

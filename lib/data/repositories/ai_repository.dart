@@ -268,4 +268,76 @@ class AiRepository {
       );
     }
   }
+
+  /// Confirm and execute a pending consequential action.
+  Future<ApiResponse> confirmAction({
+    required String confirmationId,
+    String? conversationId,
+  }) async {
+    try {
+      final Map<String, dynamic> body = {
+        'confirmationId': confirmationId,
+      };
+      if (conversationId != null && conversationId.isNotEmpty) {
+        body['conversationId'] = conversationId;
+      }
+
+      final response = await _api.postRequest(Urls.aiConfirmAction, data: body);
+      return ApiResponse.fromJson(response.data);
+    } on DioException catch (dioError) {
+      log("AiRepository.confirmAction DioException: ${dioError.message}");
+      return ApiResponse(
+        status: false,
+        message: dioError.response?.data?['message']?.toString() ??
+            dioError.message ??
+            "Failed to confirm action",
+        data: null,
+        statusCode: dioError.response?.statusCode ?? 500,
+      );
+    } catch (e) {
+      log("AiRepository.confirmAction generic error: $e");
+      return ApiResponse(
+        status: false,
+        message: "Failed to confirm action: $e",
+        data: null,
+        statusCode: 500,
+      );
+    }
+  }
+
+  /// Cancel a pending action proposal.
+  Future<ApiResponse> cancelAction({
+    required String confirmationId,
+    String? conversationId,
+  }) async {
+    try {
+      final Map<String, dynamic> body = {
+        'confirmationId': confirmationId,
+      };
+      if (conversationId != null && conversationId.isNotEmpty) {
+        body['conversationId'] = conversationId;
+      }
+
+      final response = await _api.postRequest(Urls.aiCancelAction, data: body);
+      return ApiResponse.fromJson(response.data);
+    } on DioException catch (dioError) {
+      log("AiRepository.cancelAction DioException: ${dioError.message}");
+      return ApiResponse(
+        status: false,
+        message: dioError.response?.data?['message']?.toString() ??
+            dioError.message ??
+            "Failed to cancel action",
+        data: null,
+        statusCode: dioError.response?.statusCode ?? 500,
+      );
+    } catch (e) {
+      log("AiRepository.cancelAction generic error: $e");
+      return ApiResponse(
+        status: false,
+        message: "Failed to cancel action: $e",
+        data: null,
+        statusCode: 500,
+      );
+    }
+  }
 }
