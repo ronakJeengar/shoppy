@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
+import 'package:shopp_app/core/theme/app_dimensions.dart';
+import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 
@@ -12,6 +14,7 @@ enum AppButtonVariant {
 }
 
 /// A modern, versatile button component with loading state, icons, and variants.
+/// Built on centralized tokens for seamless system-wide design changes.
 class AppButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -30,7 +33,7 @@ class AppButton extends StatelessWidget {
     this.isLoading = false,
     this.icon,
     this.isFullWidth = false,
-    this.height = 48.0,
+    this.height = AppDimensions.buttonHeight,
     this.padding,
   });
 
@@ -47,12 +50,12 @@ class AppButton extends StatelessWidget {
         break;
       case AppButtonVariant.secondary:
         bgColor = AppColors.slate100;
-        fgColor = AppColors.slate900;
+        fgColor = AppColors.textPrimary;
         break;
       case AppButtonVariant.outline:
         bgColor = Colors.transparent;
         fgColor = AppColors.slate800;
-        borderSide = const BorderSide(color: AppColors.slate300, width: 1.2);
+        borderSide = const BorderSide(color: AppColors.border, width: 1.2);
         break;
       case AppButtonVariant.danger:
         bgColor = AppColors.error;
@@ -72,8 +75,8 @@ class AppButton extends StatelessWidget {
     Widget content;
     if (isLoading) {
       content = SizedBox(
-        width: 20,
-        height: 20,
+        width: AppIconSizes.md,
+        height: AppIconSizes.md,
         child: CircularProgressIndicator(
           strokeWidth: 2.2,
           valueColor: AlwaysStoppedAnimation<Color>(fgColor),
@@ -85,16 +88,19 @@ class AppButton extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 18, color: fgColor),
-            const SizedBox(width: 8),
+            Icon(icon, size: AppIconSizes.md, color: fgColor),
+            const SizedBox(width: AppDimensions.sm),
           ],
           Text(
             label,
-            style: AppTypography.buttonText.copyWith(color: fgColor),
+            style: AppTypography.button.copyWith(color: fgColor),
           ),
         ],
       );
     }
+
+    final effectiveHeight = height ?? AppDimensions.buttonHeight;
+    final minWidth = isFullWidth ? double.infinity : AppDimensions.giant;
 
     Widget buttonWidget;
     if (variant == AppButtonVariant.outline) {
@@ -103,8 +109,8 @@ class AppButton extends StatelessWidget {
           foregroundColor: fgColor,
           side: borderSide,
           shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderMd),
-          padding: padding ?? const EdgeInsets.symmetric(horizontal: 20),
-          minimumSize: Size(isFullWidth ? double.infinity : 64, height ?? 48),
+          padding: padding ?? AppDimensions.buttonPadding,
+          minimumSize: Size(minWidth, effectiveHeight),
         ),
         onPressed: isDisabled ? null : onPressed,
         child: content,
@@ -113,8 +119,8 @@ class AppButton extends StatelessWidget {
       buttonWidget = TextButton(
         style: TextButton.styleFrom(
           foregroundColor: fgColor,
-          padding: padding ?? const EdgeInsets.symmetric(horizontal: 16),
-          minimumSize: Size(isFullWidth ? double.infinity : 64, height ?? 48),
+          padding: padding ?? AppDimensions.paddingHorizontalLg,
+          minimumSize: Size(minWidth, effectiveHeight),
         ),
         onPressed: isDisabled ? null : onPressed,
         child: content,
@@ -131,8 +137,8 @@ class AppButton extends StatelessWidget {
             borderRadius: AppRadius.borderMd,
             side: borderSide,
           ),
-          padding: padding ?? const EdgeInsets.symmetric(horizontal: 20),
-          minimumSize: Size(isFullWidth ? double.infinity : 64, height ?? 48),
+          padding: padding ?? AppDimensions.buttonPadding,
+          minimumSize: Size(minWidth, effectiveHeight),
         ),
         onPressed: isDisabled ? null : onPressed,
         child: content,

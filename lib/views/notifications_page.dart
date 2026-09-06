@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shopp_app/core/constants/app_strings.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
+import 'package:shopp_app/core/theme/app_dimensions.dart';
+import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/data/models/notification_model.dart';
@@ -78,21 +81,21 @@ class _NotificationsPageState extends State<NotificationsPage> {
     final notifProvider = context.watch<NotificationProvider>();
 
     return Scaffold(
-      backgroundColor: AppColors.slate50,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.white,
+        backgroundColor: AppColors.surface,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, color: AppColors.slate800),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Notifications', style: AppTypography.headingSmall),
+        title: Text(AppStrings.notifications.title, style: AppTypography.headingSmall),
         actions: [
           if (notifProvider.unreadCount > 0)
             TextButton(
               onPressed: () => notifProvider.markAllAsRead(),
               child: Text(
-                'Mark all as read',
+                AppStrings.notifications.markAllAsRead,
                 style: AppTypography.caption.copyWith(
                   color: AppColors.primary,
                   fontWeight: FontWeight.bold,
@@ -108,27 +111,26 @@ class _NotificationsPageState extends State<NotificationsPage> {
               ),
             )
           : notifProvider.notifications.isEmpty
-              ? const EmptyStateView(
+              ? EmptyStateView(
                   icon: Icons.notifications_off_outlined,
-                  title: 'No notifications yet',
-                  description:
-                      "You're all caught up! Order status updates and special offers will appear here.",
+                  title: AppStrings.notifications.empty,
+                  description: AppStrings.notifications.emptySubtitle,
                 )
               : RefreshIndicator(
                   color: AppColors.primary,
                   onRefresh: () => notifProvider.refreshNotifications(),
                   child: ListView.separated(
                     controller: _scrollController,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    padding: AppDimensions.paddingVerticalSm,
                     itemCount: notifProvider.notifications.length +
                         (notifProvider.isLoadingMore ? 1 : 0),
                     separatorBuilder: (_, __) =>
-                        const Divider(height: 1, color: AppColors.slate200, indent: 68),
+                        const Divider(height: 1, color: AppColors.divider, indent: 68),
                     itemBuilder: (context, index) {
                       if (index == notifProvider.notifications.length) {
                         return const Center(
                           child: Padding(
-                            padding: EdgeInsets.all(16),
+                            padding: AppDimensions.paddingLg,
                             child: CircularProgressIndicator(
                               strokeWidth: 2.2,
                               valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
@@ -167,17 +169,17 @@ class _NotificationsPageState extends State<NotificationsPage> {
         color: notif.isRead
             ? Colors.transparent
             : AppColors.primary50.withValues(alpha: 0.5),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: AppDimensions.inputPadding,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: AppDimensions.paddingSm,
               decoration: BoxDecoration(
                 color: typeColor.withValues(alpha: 0.1),
                 borderRadius: AppRadius.borderSm,
               ),
-              child: Icon(typeIcon, color: typeColor, size: 20),
+              child: Icon(typeIcon, color: typeColor, size: AppIconSizes.md),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -192,14 +194,14 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           notif.title,
                           style: AppTypography.bodySmall.copyWith(
                             fontWeight: notif.isRead ? FontWeight.w600 : FontWeight.bold,
-                            color: AppColors.slate900,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ),
                       if (!notif.isRead)
                         Container(
-                          width: 8,
-                          height: 8,
+                          width: AppDimensions.sm,
+                          height: AppDimensions.sm,
                           decoration: const BoxDecoration(
                             color: AppColors.primary,
                             shape: BoxShape.circle,
@@ -207,10 +209,10 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         ),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppDimensions.xs),
                   Text(
                     notif.body,
-                    style: AppTypography.bodySmall.copyWith(color: AppColors.slate600),
+                    style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
                   ),
                   const SizedBox(height: 6),
                   Row(
@@ -218,11 +220,11 @@ class _NotificationsPageState extends State<NotificationsPage> {
                     children: [
                       Text(
                         _formatTimestamp(notif.createdAt),
-                        style: AppTypography.caption.copyWith(color: AppColors.slate400),
+                        style: AppTypography.caption.copyWith(color: AppColors.textMuted),
                       ),
                       if (notif.orderId != null)
                         Text(
-                          'View Order →',
+                          AppStrings.notifications.viewOrder,
                           style: AppTypography.caption.copyWith(
                             fontWeight: FontWeight.bold,
                             color: AppColors.primary,
@@ -242,7 +244,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
   String _formatTimestamp(DateTime dt) {
     final now = DateTime.now();
     final diff = now.difference(dt);
-    if (diff.inMinutes < 1) return 'Just now';
+    if (diff.inMinutes < 1) return AppStrings.notifications.justNow;
     if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
     if (diff.inHours < 24) return '${diff.inHours}h ago';
     return '${dt.day}/${dt.month}/${dt.year}';

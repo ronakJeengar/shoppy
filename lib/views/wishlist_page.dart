@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shopp_app/core/constants/app_strings.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
+import 'package:shopp_app/core/theme/app_dimensions.dart';
+import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
@@ -21,16 +24,16 @@ class WishlistPage extends StatelessWidget {
     final cartProvider = context.read<CartProvider>();
 
     return Scaffold(
-      backgroundColor: AppColors.slate50,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.white,
+        backgroundColor: AppColors.surface,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, color: AppColors.slate800),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'My Wishlist (${wishlistProvider.itemCount})',
+          '${AppStrings.wishlist.title} (${wishlistProvider.itemCount})',
           style: AppTypography.headingSmall,
         ),
       ),
@@ -55,10 +58,9 @@ class WishlistPage extends StatelessWidget {
       return EmptyStateView(
         icon: Icons.favorite_border_rounded,
         iconColor: AppColors.coral,
-        title: 'Your wishlist is empty',
-        description:
-            'Explore products and tap the heart icon to save your favorites for later.',
-        buttonText: 'Explore Products',
+        title: AppStrings.wishlist.empty,
+        description: AppStrings.wishlist.emptySubtitle,
+        buttonText: AppStrings.cart.startShopping,
         onButtonPressed: () {
           Navigator.pushAndRemoveUntil(
             context,
@@ -73,12 +75,12 @@ class WishlistPage extends StatelessWidget {
       color: AppColors.primary,
       onRefresh: () => wishlistProvider.loadWishlist(),
       child: GridView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.cardPadding,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           childAspectRatio: 0.62,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
+          crossAxisSpacing: AppDimensions.md,
+          mainAxisSpacing: AppDimensions.md,
         ),
         itemCount: wishlistProvider.items.length,
         itemBuilder: (context, index) {
@@ -86,9 +88,9 @@ class WishlistPage extends StatelessWidget {
 
           return Container(
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppColors.surface,
               borderRadius: AppRadius.borderMd,
-              border: Border.all(color: AppColors.slate200),
+              border: Border.all(color: AppColors.border),
               boxShadow: AppShadows.card,
             ),
             child: Material(
@@ -117,15 +119,15 @@ class WishlistPage extends StatelessWidget {
                             child: AppNetworkImage(
                               imageUrl: product.imageUrl,
                               borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(12),
+                                top: Radius.circular(AppRadius.md),
                               ),
                               fit: BoxFit.cover,
                               memCacheWidth: 350,
                             ),
                           ),
                           Positioned(
-                            top: 8,
-                            right: 8,
+                            top: AppDimensions.sm,
+                            right: AppDimensions.sm,
                             child: Material(
                               color: AppColors.white.withValues(alpha: 0.92),
                               shape: const CircleBorder(),
@@ -140,7 +142,7 @@ class WishlistPage extends StatelessWidget {
                                   child: Icon(
                                     Icons.favorite_rounded,
                                     color: AppColors.coral,
-                                    size: 16,
+                                    size: AppIconSizes.sm,
                                   ),
                                 ),
                               ),
@@ -162,19 +164,19 @@ class WishlistPage extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: AppTypography.bodySmall.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: AppColors.slate900,
+                              color: AppColors.textPrimary,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppDimensions.xs),
                           Text(
                             '\$${product.price.toStringAsFixed(2)}',
                             style: AppTypography.priceCard,
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: AppDimensions.sm),
                           AppButton(
-                            label: 'Move to Cart',
+                            label: AppStrings.wishlist.moveToCart,
                             icon: Icons.add_shopping_cart_rounded,
-                            height: 34,
+                            height: AppDimensions.buttonHeightSm,
                             variant: AppButtonVariant.outline,
                             isFullWidth: true,
                             onPressed: () async {
@@ -185,7 +187,7 @@ class WishlistPage extends StatelessWidget {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
-                                      '${product.productName} moved to cart!',
+                                      AppStrings.wishlist.movedToCart(product.productName),
                                     ),
                                     duration: const Duration(seconds: 2),
                                     backgroundColor: AppColors.slate900,

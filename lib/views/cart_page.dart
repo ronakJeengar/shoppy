@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shopp_app/core/constants/app_strings.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
+import 'package:shopp_app/core/theme/app_dimensions.dart';
+import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
@@ -18,22 +21,22 @@ class CartPage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Clear Cart', style: AppTypography.headingSmall),
-        content: const Text(
-          'Are you sure you want to remove all items from your cart?',
+        title: Text(AppStrings.cart.clearCart, style: AppTypography.headingSmall),
+        content: Text(
+          AppStrings.cart.clearCartConfirm,
           style: AppTypography.bodyMedium,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: AppColors.slate600)),
+            child: Text(AppStrings.common.cancel, style: const TextStyle(color: AppColors.textSecondary)),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
               context.read<CartProvider>().clearCart();
             },
-            child: const Text('Clear All', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.bold)),
+            child: Text(AppStrings.common.delete, style: const TextStyle(color: AppColors.error, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -45,23 +48,23 @@ class CartPage extends StatelessWidget {
     final cartProvider = context.watch<CartProvider>();
 
     return Scaffold(
-      backgroundColor: AppColors.slate50,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.white,
+        backgroundColor: AppColors.surface,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, color: AppColors.slate800),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Shopping Cart (${cartProvider.totalItemCount})',
+          '${AppStrings.cart.title} (${cartProvider.totalItemCount})',
           style: AppTypography.headingSmall,
         ),
         actions: [
           if (cartProvider.items.isNotEmpty)
             IconButton(
-              icon: const Icon(Icons.delete_sweep_outlined, color: AppColors.slate600),
-              tooltip: 'Clear Cart',
+              icon: const Icon(Icons.delete_sweep_outlined, color: AppColors.textSecondary),
+              tooltip: AppStrings.cart.clearCart,
               onPressed: () => _confirmClearCart(context),
             ),
         ],
@@ -92,9 +95,9 @@ class CartPage extends StatelessWidget {
     if (cartProvider.items.isEmpty) {
       return EmptyStateView(
         icon: Icons.shopping_cart_outlined,
-        title: 'Your cart is empty',
-        description: 'Looks like you haven\'t added any items yet. Discover trending products today!',
-        buttonText: 'Start Shopping',
+        title: AppStrings.cart.empty,
+        description: AppStrings.cart.emptySubtitle,
+        buttonText: AppStrings.cart.startShopping,
         onButtonPressed: () => Navigator.pop(context),
       );
     }
@@ -109,16 +112,16 @@ class CartPage extends StatelessWidget {
       color: AppColors.primary,
       onRefresh: () => cartProvider.loadCart(),
       child: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: AppDimensions.paddingVerticalMd,
         children: [
           // Free Shipping Progress Meter
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            margin: const EdgeInsets.symmetric(horizontal: AppDimensions.lg, vertical: 4),
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppColors.surface,
               borderRadius: AppRadius.borderMd,
-              border: Border.all(color: AppColors.slate200),
+              border: Border.all(color: AppColors.border),
               boxShadow: AppShadows.card,
             ),
             child: Column(
@@ -128,15 +131,15 @@ class CartPage extends StatelessWidget {
                   children: [
                     Icon(
                       qualifiesForFreeShipping ? Icons.check_circle_rounded : Icons.local_shipping_outlined,
-                      size: 18,
+                      size: AppIconSizes.sm + 2,
                       color: qualifiesForFreeShipping ? AppColors.success : AppColors.primary,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppDimensions.sm),
                     Expanded(
                       child: Text(
                         qualifiesForFreeShipping
-                            ? '🎉 You unlocked FREE Standard Shipping!'
-                            : 'Add \$${neededForFreeShipping.toStringAsFixed(2)} more for FREE Delivery',
+                            ? AppStrings.cart.freeShippingUnlocked
+                            : AppStrings.cart.freeShippingAddMore(neededForFreeShipping),
                         style: AppTypography.bodySmall.copyWith(
                           fontWeight: FontWeight.w600,
                           color: qualifiesForFreeShipping ? AppColors.success : AppColors.slate800,
@@ -145,7 +148,7 @@ class CartPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.sm),
                 ClipRRect(
                   borderRadius: AppRadius.borderFull,
                   child: LinearProgressIndicator(
@@ -176,35 +179,35 @@ class CartPage extends StatelessWidget {
             );
           }),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.md),
 
           // Order Summary Card
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            margin: const EdgeInsets.symmetric(horizontal: AppDimensions.lg, vertical: AppDimensions.sm),
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppColors.surface,
               borderRadius: AppRadius.borderMd,
-              border: Border.all(color: AppColors.slate200),
+              border: Border.all(color: AppColors.border),
               boxShadow: AppShadows.card,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Order Summary', style: AppTypography.headingSmall),
+                Text(AppStrings.cart.orderSummary, style: AppTypography.headingSmall),
                 const SizedBox(height: 14),
-                _summaryRow('Subtotal', '\$${cartProvider.subtotal.toStringAsFixed(2)}'),
-                const SizedBox(height: 8),
+                _summaryRow(AppStrings.cart.subtotal, '\$${cartProvider.subtotal.toStringAsFixed(2)}'),
+                const SizedBox(height: AppDimensions.sm),
                 _summaryRow(
-                  'Shipping',
-                  cartProvider.shipping == 0 ? 'FREE' : '\$${cartProvider.shipping.toStringAsFixed(2)}',
+                  AppStrings.cart.shipping,
+                  cartProvider.shipping == 0 ? AppStrings.cart.shippingFree : '\$${cartProvider.shipping.toStringAsFixed(2)}',
                   valueColor: cartProvider.shipping == 0 ? AppColors.success : null,
                 ),
-                const SizedBox(height: 8),
-                _summaryRow('Estimated Tax', '\$${cartProvider.tax.toStringAsFixed(2)}'),
-                const Divider(height: 24, color: AppColors.slate200),
+                const SizedBox(height: AppDimensions.sm),
+                _summaryRow(AppStrings.cart.tax, '\$${cartProvider.tax.toStringAsFixed(2)}'),
+                const Divider(height: AppDimensions.xxl, color: AppColors.divider),
                 _summaryRow(
-                  'Estimated Total',
+                  AppStrings.cart.estimatedTotal,
                   '\$${cartProvider.totalAmount.toStringAsFixed(2)}',
                   isBold: true,
                 ),
@@ -212,7 +215,7 @@ class CartPage extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: AppDimensions.xxxl),
         ],
       ),
     );
@@ -225,8 +228,8 @@ class CartPage extends StatelessWidget {
         Text(
           label,
           style: isBold
-              ? AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: AppColors.slate900)
-              : AppTypography.bodyMedium.copyWith(color: AppColors.slate600),
+              ? AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: AppColors.textPrimary)
+              : AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
         ),
         Text(
           value,
@@ -234,7 +237,7 @@ class CartPage extends StatelessWidget {
               ? AppTypography.headingSmall.copyWith(color: AppColors.primary)
               : AppTypography.bodyMedium.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: valueColor ?? AppColors.slate900,
+                  color: valueColor ?? AppColors.textPrimary,
                 ),
         ),
       ],
@@ -245,10 +248,10 @@ class CartPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
       decoration: const BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.surface,
         boxShadow: AppShadows.bottomBar,
         border: Border(
-          top: BorderSide(color: AppColors.slate200, width: 1),
+          top: BorderSide(color: AppColors.border, width: 1),
         ),
       ),
       child: Row(
@@ -258,8 +261,8 @@ class CartPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Total Amount',
-                style: AppTypography.caption.copyWith(color: AppColors.slate500),
+                AppStrings.cart.total,
+                style: AppTypography.caption.copyWith(color: AppColors.textSecondary),
               ),
               Text(
                 '\$${cartProvider.totalAmount.toStringAsFixed(2)}',
@@ -267,10 +270,10 @@ class CartPage extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(width: 20),
+          const SizedBox(width: AppDimensions.xl),
           Expanded(
             child: AppButton(
-              label: 'Proceed to Checkout',
+              label: AppStrings.cart.proceedToCheckout,
               icon: Icons.arrow_forward_rounded,
               isFullWidth: true,
               onPressed: () {

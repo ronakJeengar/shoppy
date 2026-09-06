@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
+import 'package:shopp_app/core/theme/app_dimensions.dart';
+import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 
 /// A sleek text field component with label, prefix/suffix icons, and error handling.
+/// Fully integrated with centralized design tokens.
 class AppTextField extends StatelessWidget {
   final String? label;
   final String? hintText;
@@ -62,28 +65,28 @@ class AppTextField extends StatelessWidget {
           autofocus: autofocus,
           maxLines: maxLines,
           enabled: enabled,
-          style: AppTypography.bodyLarge.copyWith(color: AppColors.slate900),
+          style: AppTypography.bodyLarge.copyWith(color: AppColors.textPrimary),
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: AppTypography.bodyMedium.copyWith(color: AppColors.slate400),
+            hintStyle: AppTypography.bodyMedium.copyWith(color: AppColors.textMuted),
             filled: true,
             fillColor: enabled ? AppColors.slate100 : AppColors.slate200.withValues(alpha: 0.5),
             prefixIcon: prefixIcon != null
-                ? Icon(prefixIcon, size: 20, color: AppColors.slate500)
+                ? Icon(prefixIcon, size: AppIconSizes.md, color: AppColors.slate500)
                 : null,
             suffixIcon: suffixIcon,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: AppDimensions.inputPadding,
             border: const OutlineInputBorder(
               borderRadius: AppRadius.borderMd,
               borderSide: BorderSide.none,
             ),
             enabledBorder: const OutlineInputBorder(
               borderRadius: AppRadius.borderMd,
-              borderSide: BorderSide(color: AppColors.slate200, width: 1),
+              borderSide: BorderSide(color: AppColors.border, width: 1),
             ),
             focusedBorder: const OutlineInputBorder(
               borderRadius: AppRadius.borderMd,
-              borderSide: BorderSide(color: AppColors.primary, width: 1.5),
+              borderSide: BorderSide(color: AppColors.borderFocused, width: 1.5),
             ),
             errorBorder: const OutlineInputBorder(
               borderRadius: AppRadius.borderMd,

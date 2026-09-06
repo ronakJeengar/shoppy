@@ -125,4 +125,16 @@ class AppTypography {
     letterSpacing: 0.2,
     color: AppColors.white,
   );
+
+  // Semantic Aliases
+  static const TextStyle h1 = displayLarge;
+  static const TextStyle h2 = displayMedium;
+  static const TextStyle h3 = headingLarge;
+  static const TextStyle h4 = headingMedium;
+  static const TextStyle button = buttonText;
+  static const TextStyle productTitle = headingSmall;
+  static const TextStyle productDescription = bodyMedium;
+  static const TextStyle price = priceCard;
+  static const TextStyle discount = label;
+  static const TextStyle badge = label;
 }

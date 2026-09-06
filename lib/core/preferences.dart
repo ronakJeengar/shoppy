@@ -1,11 +1,12 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shopp_app/core/constants/storage_keys.dart';
 
 class Preferences {
   static SharedPreferences? preferences;
 
-  static const String keyAccessToken = 'token';
-  static const String keyRefreshToken = 'refreshToken';
-  static const String keyRecentSearches = 'recent_searches';
+  static const String keyAccessToken = StorageKeys.accessToken;
+  static const String keyRefreshToken = StorageKeys.refreshToken;
+  static const String keyRecentSearches = StorageKeys.recentSearches;
 
   static Future<void> init() async {
     preferences = await SharedPreferences.getInstance();
@@ -51,8 +52,8 @@ class Preferences {
     preferences?.clear();
   }
 
-  static const String keyUserRole = 'user_role';
-  static const String keyUserId = 'user_id';
+  static const String keyUserRole = StorageKeys.userRole;
+  static const String keyUserId = StorageKeys.userId;
 
   // Token management helpers
   static Future<void> saveTokens({

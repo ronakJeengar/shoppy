@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:shopp_app/core/constants/app_strings.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
@@ -191,7 +192,7 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
                   child: IconButton(
                     icon: const Icon(Icons.fullscreen_rounded,
                         color: Colors.white, size: 22),
-                    tooltip: 'Fullscreen Media',
+                    tooltip: AppStrings.product.fullscreen,
                     onPressed: () => _openFullscreenMedia(context),
                   ),
                 ),
@@ -331,7 +332,7 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
                 const Icon(Icons.broken_image_outlined,
                     size: 40, color: AppColors.slate400),
                 const SizedBox(height: 6),
-                Text('Image unavailable',
+                Text(AppStrings.product.imageUnavailable,
                     style: AppTypography.caption
                         .copyWith(color: AppColors.slate500)),
               ],
@@ -351,7 +352,7 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
             const Icon(Icons.videocam_off_outlined,
                 size: 48, color: AppColors.slate400),
             const SizedBox(height: 8),
-            Text('Video playback unavailable',
+            Text(AppStrings.product.videoUnavailable,
                 style: AppTypography.bodySmall
                     .copyWith(color: AppColors.slate600)),
           ],
@@ -525,7 +526,7 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
                           color: Colors.white70, size: 16),
                       const SizedBox(width: 6),
                       Text(
-                        'Drag to rotate 360°',
+                        AppStrings.product.dragRotate360,
                         style: AppTypography.caption.copyWith(
                           color: Colors.white,
                           letterSpacing: 0.2,
@@ -569,17 +570,17 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
     switch (media.type) {
       case ProductMediaType.video:
         icon = Icons.play_arrow_rounded;
-        label = 'VIDEO';
+        label = AppStrings.product.mediaVideo;
         color = AppColors.secondary;
         break;
       case ProductMediaType.model3d:
         icon = Icons.view_in_ar_rounded;
-        label = '3D VIEW';
+        label = AppStrings.product.media3d;
         color = AppColors.violet;
         break;
       case ProductMediaType.image:
         icon = Icons.photo_camera_rounded;
-        label = 'PHOTO';
+        label = AppStrings.product.mediaPhoto;
         color = AppColors.primary;
         break;
     }

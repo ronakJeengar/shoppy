@@ -8,6 +8,10 @@ class AppMotion {
   static const Duration normal = Duration(milliseconds: 260);
   static const Duration slow = Duration(milliseconds: 380);
   static const Duration transition = Duration(milliseconds: 300);
+  static const Duration pageTransition = Duration(milliseconds: 300);
+  static const Duration modalTransition = Duration(milliseconds: 250);
+  static const Duration buttonAnimation = Duration(milliseconds: 150);
+  static const Duration shimmer = Duration(milliseconds: 1200);
 
   // Easing curves
   static const Curve standard = Curves.easeInOutCubicEmphasized;

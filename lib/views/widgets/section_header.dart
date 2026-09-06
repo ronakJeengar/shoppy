@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
+import 'package:shopp_app/core/theme/app_dimensions.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 
 /// Clean section header with title, subtitle, and optional trailing action.
@@ -20,7 +21,7 @@ class SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: AppDimensions.screenPadding,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -32,10 +33,10 @@ class SectionHeader extends StatelessWidget {
               children: [
                 Text(title, style: AppTypography.headingSmall),
                 if (subtitle != null) ...[
-                  const SizedBox(height: 2),
+                  const SizedBox(height: AppDimensions.xxs),
                   Text(
                     subtitle!,
-                    style: AppTypography.caption.copyWith(color: AppColors.slate500),
+                    style: AppTypography.caption.copyWith(color: AppColors.textSecondary),
                   ),
                 ],
               ],

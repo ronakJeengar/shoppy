@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shopp_app/core/constants/app_strings.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
+import 'package:shopp_app/core/theme/app_dimensions.dart';
+import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/providers/user_provider.dart';
@@ -52,14 +55,14 @@ class _LoginPageState extends State<LoginPage> {
     final userProvider = context.watch<UserProvider>();
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: AppColors.surface,
       appBar: AppBar(
-        backgroundColor: AppColors.white,
+        backgroundColor: AppColors.surface,
         elevation: 0,
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.xxl, vertical: AppDimensions.md),
           child: Form(
             key: _formKey,
             child: Column(
@@ -69,37 +72,37 @@ class _LoginPageState extends State<LoginPage> {
                 // Logo & Header
                 Center(
                   child: Container(
-                    width: 48,
-                    height: 48,
+                    width: AppDimensions.avatarXl,
+                    height: AppDimensions.avatarXl,
                     decoration: const BoxDecoration(
                       color: AppColors.primary50,
                       borderRadius: AppRadius.borderLg,
                     ),
                     child: const Icon(
                       Icons.shopping_bag_rounded,
-                      size: 24,
+                      size: AppIconSizes.hero,
                       color: AppColors.primary,
                     ),
                   ),
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  'Shoppy Login',
+                Text(
+                  AppStrings.auth.loginTitle,
                   textAlign: TextAlign.center,
                   style: AppTypography.displayMedium,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppDimensions.xs),
                 Text(
-                  'Sign in to access your cart, orders, and saved items',
+                  AppStrings.auth.loginSubtitle,
                   textAlign: TextAlign.center,
-                  style: AppTypography.bodySmall.copyWith(color: AppColors.slate500),
+                  style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 14),
 
                 // Error Banner
                 if (userProvider.errorMessage != null) ...[
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: AppDimensions.paddingMd,
                     decoration: BoxDecoration(
                       color: AppColors.errorLight,
                       borderRadius: AppRadius.borderMd,
@@ -107,8 +110,8 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.error_outline_rounded, size: 18, color: AppColors.error),
-                        const SizedBox(width: 8),
+                        const Icon(Icons.error_outline_rounded, size: AppIconSizes.sm + 2, color: AppColors.error),
+                        const SizedBox(width: AppDimensions.sm),
                         Expanded(
                           child: Text(
                             userProvider.errorMessage!,
@@ -118,40 +121,40 @@ class _LoginPageState extends State<LoginPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.lg),
                 ],
 
                 // Email Input
                 AppTextField(
-                  label: 'Email',
-                  hintText: 'Enter your email address',
+                  label: AppStrings.auth.email,
+                  hintText: AppStrings.auth.enterEmail,
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   prefixIcon: Icons.email_outlined,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Please enter your email';
+                      return AppStrings.validation.emailRequired;
                     }
                     final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
                     if (!emailRegex.hasMatch(value.trim())) {
-                      return 'Please enter a valid email address';
+                      return AppStrings.validation.emailInvalid;
                     }
                     return null;
                   },
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.md),
 
                 // Password Input
                 AppTextField(
-                  label: 'Password',
-                  hintText: 'Enter your password',
+                  label: AppStrings.auth.password,
+                  hintText: AppStrings.auth.enterPassword,
                   controller: _passwordController,
                   obscureText: _obscurePassword,
                   prefixIcon: Icons.lock_outline_rounded,
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                      size: 20,
+                      size: AppIconSizes.md,
                       color: AppColors.slate500,
                     ),
                     onPressed: () {
@@ -162,7 +165,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
+                      return AppStrings.validation.passwordRequired;
                     }
                     return null;
                   },
@@ -171,7 +174,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 // Submit Button
                 AppButton(
-                  label: 'Login',
+                  label: AppStrings.auth.login,
                   icon: Icons.login_rounded,
                   isLoading: userProvider.isLoading,
                   isFullWidth: true,
@@ -181,18 +184,18 @@ class _LoginPageState extends State<LoginPage> {
 
                 // Demo Credentials Helper Box
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: AppDimensions.paddingSm,
                   decoration: BoxDecoration(
-                    color: AppColors.slate50,
+                    color: AppColors.background,
                     borderRadius: AppRadius.borderMd,
-                    border: Border.all(color: AppColors.slate200),
+                    border: Border.all(color: AppColors.border),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'QUICK DEMO ACCOUNTS',
-                        style: AppTypography.label.copyWith(color: AppColors.slate500),
+                        AppStrings.auth.quickDemo,
+                        style: AppTypography.label.copyWith(color: AppColors.textSecondary),
                       ),
                       const SizedBox(height: 6),
                       Row(
@@ -201,29 +204,29 @@ class _LoginPageState extends State<LoginPage> {
                             child: OutlinedButton(
                               style: OutlinedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(vertical: 6),
-                                side: const BorderSide(color: AppColors.slate300),
+                                side: const BorderSide(color: AppColors.border),
                                 shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderSm),
                               ),
                               onPressed: () => _fillDemoCredentials(
                                 'customer@shoppy.com',
                                 'Customer@12345',
                               ),
-                              child: const Text('Customer', style: TextStyle(fontSize: 12)),
+                              child: Text(AppStrings.auth.demoCustomer, style: const TextStyle(fontSize: 12)),
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppDimensions.sm),
                           Expanded(
                             child: OutlinedButton(
                               style: OutlinedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(vertical: 6),
-                                side: const BorderSide(color: AppColors.slate300),
+                                side: const BorderSide(color: AppColors.border),
                                 shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderSm),
                               ),
                               onPressed: () => _fillDemoCredentials(
                                 'admin@shoppy.com',
                                 'Admin@12345',
                               ),
-                              child: const Text('Admin', style: TextStyle(fontSize: 12)),
+                              child: Text(AppStrings.auth.demoAdmin, style: const TextStyle(fontSize: 12)),
                             ),
                           ),
                         ],
@@ -238,8 +241,8 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Don\'t have an account?',
-                      style: AppTypography.bodySmall.copyWith(color: AppColors.slate600),
+                      AppStrings.auth.noAccountPrompt,
+                      style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
                     ),
                     TextButton(
                       onPressed: () {
@@ -251,7 +254,7 @@ class _LoginPageState extends State<LoginPage> {
                         );
                       },
                       child: Text(
-                        'Register',
+                        AppStrings.auth.register,
                         style: AppTypography.bodySmall.copyWith(
                           color: AppColors.primary,
                           fontWeight: FontWeight.bold,

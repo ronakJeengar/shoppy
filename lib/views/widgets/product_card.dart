@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shopp_app/core/constants/app_strings.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
+import 'package:shopp_app/core/theme/app_dimensions.dart';
+import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
@@ -24,9 +27,9 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.surface,
         borderRadius: AppRadius.borderMd,
-        border: Border.all(color: AppColors.slate200, width: 1),
+        border: Border.all(color: AppColors.border, width: 1),
         boxShadow: AppShadows.card,
       ),
       child: Material(
@@ -61,8 +64,8 @@ class ProductCard extends StatelessWidget {
 
                     // Wishlist Floating Button (Top Left)
                     Positioned(
-                      top: 8,
-                      left: 8,
+                      top: AppDimensions.sm,
+                      left: AppDimensions.sm,
                       child: Consumer<WishlistProvider>(
                         builder: (context, wishlistProvider, _) {
                           final isWishlisted =
@@ -86,7 +89,7 @@ class ProductCard extends StatelessWidget {
                                   color: isWishlisted
                                       ? AppColors.error
                                       : AppColors.slate600,
-                                  size: 16,
+                                  size: AppIconSizes.sm,
                                 ),
                               ),
                             ),
@@ -98,8 +101,8 @@ class ProductCard extends StatelessWidget {
                     // Rating Badge (Top Right)
                     if (product.productRating > 0)
                       Positioned(
-                        top: 8,
-                        right: 8,
+                        top: AppDimensions.sm,
+                        right: AppDimensions.sm,
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 6,
@@ -121,10 +124,10 @@ class ProductCard extends StatelessWidget {
                             children: [
                               const Icon(
                                 Icons.star_rounded,
-                                size: 14,
+                                size: AppIconSizes.xs + 2,
                                 color: AppColors.accent,
                               ),
-                              const SizedBox(width: 2),
+                              const SizedBox(width: AppDimensions.xxs),
                               Text(
                                 product.productRating.toStringAsFixed(1),
                                 style: AppTypography.caption.copyWith(
@@ -152,7 +155,7 @@ class ProductCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTypography.label.copyWith(
-                        color: AppColors.slate400,
+                        color: AppColors.textMuted,
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -165,11 +168,11 @@ class ProductCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: AppTypography.bodySmall.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: AppColors.slate900,
+                        color: AppColors.textPrimary,
                         height: 1.25,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppDimensions.sm),
 
                     // Price and Quick Add-to-Cart Row
                     Row(
@@ -185,7 +188,7 @@ class ProductCard extends StatelessWidget {
                             ),
                             if (product.stock <= 5 && product.stock > 0)
                               Text(
-                                'Only ${product.stock} left',
+                                AppStrings.product.onlyLeft(product.stock),
                                 style: AppTypography.caption.copyWith(
                                   color: AppColors.warning,
                                   fontWeight: FontWeight.w600,
@@ -193,7 +196,7 @@ class ProductCard extends StatelessWidget {
                               )
                             else if (product.stock == 0)
                               Text(
-                                'Out of stock',
+                                AppStrings.product.outOfStock,
                                 style: AppTypography.caption.copyWith(
                                   color: AppColors.error,
                                   fontWeight: FontWeight.w600,
@@ -206,7 +209,7 @@ class ProductCard extends StatelessWidget {
                         Material(
                           color: product.stock > 0
                               ? AppColors.primary
-                              : AppColors.slate200,
+                              : AppColors.border,
                           borderRadius: AppRadius.borderSm,
                           child: InkWell(
                             borderRadius: AppRadius.borderSm,
@@ -218,7 +221,7 @@ class ProductCard extends StatelessWidget {
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
                                           content: Text(
-                                            'Added ${product.productName} to cart',
+                                            AppStrings.product.addedToCart(product.productName),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           ),
@@ -234,7 +237,7 @@ class ProductCard extends StatelessWidget {
                               padding: EdgeInsets.all(6.0),
                               child: Icon(
                                 Icons.add_shopping_cart_rounded,
-                                size: 16,
+                                size: AppIconSizes.sm,
                                 color: AppColors.white,
                               ),
                             ),

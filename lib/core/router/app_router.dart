@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shopp_app/core/constants/app_strings.dart';
+import 'package:shopp_app/core/constants/route_names.dart';
 import 'package:shopp_app/core/preferences.dart';
 import 'package:shopp_app/core/router/main_shell.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
+import 'package:shopp_app/core/theme/app_dimensions.dart';
+import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/riverpod/auth_riverpod_provider.dart';
 import 'package:shopp_app/views/addresses_page.dart';
@@ -50,15 +54,16 @@ class RouterNotifier extends ChangeNotifier {
     final isAuthenticated = token != null && token.isNotEmpty;
     final path = state.uri.path;
 
-    final isAuthRoute = path == '/login' || path == '/register';
+    final isAuthRoute =
+        path == RouteNames.login || path == RouteNames.register;
 
     // If unauthenticated, redirect to login unless already on an auth route
     if (!isAuthenticated) {
       if (isAuthRoute) return null;
-      if (path == '/' || path == '/home') {
-        return '/login';
+      if (path == RouteNames.root || path == RouteNames.home) {
+        return RouteNames.login;
       }
-      return '/login?redirect=${Uri.encodeComponent(state.uri.toString())}';
+      return RouteNames.loginWithRedirect(state.uri.toString());
     }
 
     // Authenticated user trying to access login/register is redirected to home or destination
@@ -67,18 +72,18 @@ class RouterNotifier extends ChangeNotifier {
       if (redirectParam != null && redirectParam.isNotEmpty) {
         return redirectParam;
       }
-      return '/home';
+      return RouteNames.home;
     }
 
     // Admin role guard
-    if (path.startsWith('/admin')) {
+    if (path.startsWith(RouteNames.admin)) {
       if (!Preferences.isAdmin) {
-        return '/home';
+        return RouteNames.home;
       }
     }
 
-    if (path == '/') {
-      return '/home';
+    if (path == RouteNames.root) {
+      return RouteNames.home;
     }
 
     return null;
@@ -95,15 +100,17 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     navigatorKey: rootNavigatorKey,
-    initialLocation: '/',
+    initialLocation: RouteNames.root,
     refreshListenable: notifier,
     redirect: notifier.redirect,
     routes: [
       GoRoute(
-        path: '/',
+        path: RouteNames.root,
         redirect: (context, state) {
           final token = Preferences.getAccessToken();
-          return (token != null && token.isNotEmpty) ? '/home' : '/login';
+          return (token != null && token.isNotEmpty)
+              ? RouteNames.home
+              : RouteNames.login;
         },
       ),
       // Bottom Navigation Shell
@@ -117,25 +124,25 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
         routes: [
           GoRoute(
-            path: '/home',
+            path: RouteNames.home,
             builder: (context, state) => const HomePage(),
           ),
           GoRoute(
-            path: '/search',
+            path: RouteNames.search,
             builder: (context, state) => SearchPage(
               initialQuery: state.uri.queryParameters['q'],
             ),
           ),
           GoRoute(
-            path: '/cart',
+            path: RouteNames.cart,
             builder: (context, state) => const CartPage(),
           ),
           GoRoute(
-            path: '/wishlist',
+            path: RouteNames.wishlist,
             builder: (context, state) => const WishlistPage(),
           ),
           GoRoute(
-            path: '/profile',
+            path: RouteNames.profile,
             builder: (context, state) => const ProfilePage(),
           ),
         ],
@@ -143,17 +150,17 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Auth Routes
       GoRoute(
-        path: '/login',
+        path: RouteNames.login,
         builder: (context, state) => const LoginPage(),
       ),
       GoRoute(
-        path: '/register',
+        path: RouteNames.register,
         builder: (context, state) => const SignUpPage(),
       ),
 
       // Catalog & Product Detail Route
       GoRoute(
-        path: '/product/:id',
+        path: RouteNames.productDetails,
         builder: (context, state) {
           final productId = state.pathParameters['id'] ?? '';
           return ProductDetailPage(productId: productId);
@@ -162,11 +169,11 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Checkout & Order Confirmation Routes
       GoRoute(
-        path: '/checkout',
+        path: RouteNames.checkout,
         builder: (context, state) => const CheckoutPage(),
       ),
       GoRoute(
-        path: '/checkout/success/:orderId',
+        path: RouteNames.checkoutSuccess,
         builder: (context, state) {
           final orderId = state.pathParameters['orderId'] ?? '';
           return OrderConfirmationPage(orderId: orderId);
@@ -175,7 +182,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Orders Routes
       GoRoute(
-        path: '/orders',
+        path: RouteNames.orders,
         builder: (context, state) => const OrdersPage(),
         routes: [
           GoRoute(
@@ -190,21 +197,21 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // User Feature Routes
       GoRoute(
-        path: '/notifications',
+        path: RouteNames.notifications,
         builder: (context, state) => const NotificationsPage(),
       ),
       GoRoute(
-        path: '/addresses',
+        path: RouteNames.addresses,
         builder: (context, state) => const AddressesPage(),
       ),
       GoRoute(
-        path: '/assistant',
+        path: RouteNames.assistant,
         builder: (context, state) => const AssistantPage(),
       ),
 
       // Admin Routes with sub-routes
       GoRoute(
-        path: '/admin',
+        path: RouteNames.admin,
         builder: (context, state) => const AdminDashboardPage(),
         routes: [
           GoRoute(
@@ -233,47 +240,47 @@ final routerProvider = Provider<GoRouter>((ref) {
 
     // Global 404 Error Page
     errorBuilder: (context, state) => Scaffold(
-      backgroundColor: AppColors.slate50,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Page Not Found', style: AppTypography.titleLarge),
-        backgroundColor: AppColors.white,
+        title: Text(AppStrings.errors.notFound, style: AppTypography.titleLarge),
+        backgroundColor: AppColors.surface,
         elevation: 0,
       ),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: AppDimensions.modalPadding,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.all(24),
+                padding: AppDimensions.paddingXl,
                 decoration: const BoxDecoration(
                   color: AppColors.slate100,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.error_outline_rounded,
-                  size: 64,
-                  color: AppColors.slate400,
+                  size: AppIconSizes.emptyState,
+                  color: AppColors.textMuted,
                 ),
               ),
-              const SizedBox(height: 24),
-              const Text(
-                '404 - Page Not Found',
+              const SizedBox(height: AppDimensions.xxl),
+              Text(
+                AppStrings.errors.notFound,
                 style: AppTypography.headingMedium,
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.md),
               Text(
-                'We could not find the page at "${state.uri.path}".',
-                style: AppTypography.bodyMedium.copyWith(color: AppColors.slate500),
+                '${AppStrings.errors.notFoundSubtitle} ("${state.uri.path}")',
+                style: AppTypography.productDescription.copyWith(color: AppColors.textSecondary),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppDimensions.xxxl),
               AppButton(
-                label: 'Return to Home',
+                label: AppStrings.common.back,
                 icon: Icons.home_rounded,
-                onPressed: () => context.go('/home'),
+                onPressed: () => context.go(RouteNames.home),
               ),
             ],
           ),

@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 
 /// Elevation & shadow tokens for smooth modern cards and floating chrome.
 class AppShadows {
+  static const List<BoxShadow> none = [];
   // Aliases for sm/md/lg
   static const List<BoxShadow> sm = card;
   static const List<BoxShadow> md = elevated;
+  static const List<BoxShadow> lg = floating;
+  static const List<BoxShadow> modal = elevated;
+  static const List<BoxShadow> bottomSheet = bottomBar;
 
   // Soft card shadow
   static const List<BoxShadow> card = [

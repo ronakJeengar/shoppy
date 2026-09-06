@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
+import 'package:shopp_app/core/theme/app_dimensions.dart';
+import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/views/widgets/app_button.dart';
 
 /// A polished, modern empty-state component with icon, description, and primary CTA.
+/// Adheres strictly to the centralized design system tokens.
 class EmptyStateView extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -24,40 +27,45 @@ class EmptyStateView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveIconColor = iconColor ?? AppColors.primary;
+
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.xxxl,
+          vertical: AppDimensions.huge,
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 80,
-              height: 80,
+              width: AppDimensions.avatarXl,
+              height: AppDimensions.avatarXl,
               decoration: BoxDecoration(
-                color: (iconColor ?? AppColors.primary).withValues(alpha: 0.1),
+                color: effectiveIconColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
-                size: 40,
-                color: iconColor ?? AppColors.primary,
+                size: AppIconSizes.hero,
+                color: effectiveIconColor,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppDimensions.xl),
             Text(
               title,
               style: AppTypography.headingMedium,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.sm),
             Text(
               description,
-              style: AppTypography.bodyMedium.copyWith(color: AppColors.slate500),
+              style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
               textAlign: TextAlign.center,
             ),
             if (buttonText != null && onButtonPressed != null) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: AppDimensions.xxl),
               AppButton(
                 label: buttonText!,
                 onPressed: onButtonPressed,

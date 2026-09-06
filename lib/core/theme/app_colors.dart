@@ -47,6 +47,20 @@ class AppColors {
   static const Color slate50 = Color(0xFFF8FAFC); // App Background / Canvas
   static const Color white = Color(0xFFFFFFFF); // Card & Sheet Surface
 
+  // Semantic UI Aliases
+  static const Color background = slate50;
+  static const Color surface = white;
+  static const Color card = white;
+  static const Color textPrimary = slate900;
+  static const Color textSecondary = slate600;
+  static const Color textMuted = slate400;
+  static const Color border = slate200;
+  static const Color borderFocused = primary;
+  static const Color divider = slate200;
+  static const Color disabled = slate300;
+  static const Color disabledText = slate400;
+  static const Color overlay = Color(0x66000000);
+
   // Gradients
   static const LinearGradient primaryGradient = LinearGradient(
     colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],

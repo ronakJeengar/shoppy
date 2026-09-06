@@ -2,13 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shopp_app/core/constants/app_strings.dart';
+import 'package:shopp_app/core/constants/route_names.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
+import 'package:shopp_app/core/theme/app_dimensions.dart';
+import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
+import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/riverpod/cart_riverpod_provider.dart';
 
 /// The responsive, polished bottom shell navigation for the core commerce tabs.
+/// Consumes centralized design tokens, strings, and route names.
 class MainShell extends ConsumerWidget {
   final Widget child;
   final String location;
@@ -20,10 +26,10 @@ class MainShell extends ConsumerWidget {
   });
 
   int _calculateSelectedIndex(String loc) {
-    if (loc.startsWith('/search')) return 1;
-    if (loc.startsWith('/cart')) return 2;
-    if (loc.startsWith('/wishlist')) return 3;
-    if (loc.startsWith('/profile')) return 4;
+    if (loc.startsWith(RouteNames.search)) return 1;
+    if (loc.startsWith(RouteNames.cart)) return 2;
+    if (loc.startsWith(RouteNames.wishlist)) return 3;
+    if (loc.startsWith(RouteNames.profile)) return 4;
     return 0; // Default to /home
   }
 
@@ -31,19 +37,19 @@ class MainShell extends ConsumerWidget {
     HapticFeedback.selectionClick();
     switch (index) {
       case 0:
-        context.go('/home');
+        context.go(RouteNames.home);
         break;
       case 1:
-        context.go('/search');
+        context.go(RouteNames.search);
         break;
       case 2:
-        context.go('/cart');
+        context.go(RouteNames.cart);
         break;
       case 3:
-        context.go('/wishlist');
+        context.go(RouteNames.wishlist);
         break;
       case 4:
-        context.go('/profile');
+        context.go(RouteNames.profile);
         break;
     }
   }
@@ -57,16 +63,16 @@ class MainShell extends ConsumerWidget {
       body: child,
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
-          color: AppColors.white,
+          color: AppColors.surface,
           border: Border(
-            top: BorderSide(color: AppColors.slate200, width: 1),
+            top: BorderSide(color: AppColors.border, width: 1),
           ),
           boxShadow: AppShadows.bottomBar,
         ),
         child: SafeArea(
           child: Container(
-            height: 64,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            height: AppDimensions.bottomBarHeight,
+            padding: AppDimensions.paddingHorizontalSm,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -76,7 +82,7 @@ class MainShell extends ConsumerWidget {
                   selectedIndex: selectedIndex,
                   icon: AppIcons.home,
                   activeIcon: Icons.home_rounded,
-                  label: 'Home',
+                  label: AppStrings.nav.home,
                 ),
                 _buildNavItem(
                   context,
@@ -84,7 +90,7 @@ class MainShell extends ConsumerWidget {
                   selectedIndex: selectedIndex,
                   icon: AppIcons.search,
                   activeIcon: Icons.search_rounded,
-                  label: 'Explore',
+                  label: AppStrings.nav.explore,
                 ),
                 _buildNavItem(
                   context,
@@ -92,7 +98,7 @@ class MainShell extends ConsumerWidget {
                   selectedIndex: selectedIndex,
                   icon: Icons.shopping_bag_outlined,
                   activeIcon: Icons.shopping_bag_rounded,
-                  label: 'Cart',
+                  label: AppStrings.nav.cart,
                   badgeCount: cartCount,
                 ),
                 _buildNavItem(
@@ -101,7 +107,7 @@ class MainShell extends ConsumerWidget {
                   selectedIndex: selectedIndex,
                   icon: AppIcons.wishlist,
                   activeIcon: AppIcons.wishlistFilled,
-                  label: 'Wishlist',
+                  label: AppStrings.nav.wishlist,
                 ),
                 _buildNavItem(
                   context,
@@ -109,7 +115,7 @@ class MainShell extends ConsumerWidget {
                   selectedIndex: selectedIndex,
                   icon: Icons.account_circle_outlined,
                   activeIcon: Icons.account_circle,
-                  label: 'Profile',
+                  label: AppStrings.nav.profile,
                 ),
               ],
             ),
@@ -129,7 +135,7 @@ class MainShell extends ConsumerWidget {
     int badgeCount = 0,
   }) {
     final isSelected = index == selectedIndex;
-    final color = isSelected ? AppColors.primary : AppColors.slate500;
+    final color = isSelected ? AppColors.primary : AppColors.textSecondary;
 
     return Expanded(
       child: Material(
@@ -149,7 +155,7 @@ class MainShell extends ConsumerWidget {
                     Icon(
                       isSelected ? activeIcon : icon,
                       color: color,
-                      size: 24,
+                      size: AppIconSizes.lg,
                     ),
                     if (badgeCount > 0)
                       Positioned(
@@ -165,8 +171,8 @@ class MainShell extends ConsumerWidget {
                           constraints: const BoxConstraints(minWidth: 16),
                           child: Text(
                             badgeCount > 99 ? '99+' : '$badgeCount',
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.white,
                               fontSize: 9,
                               fontWeight: FontWeight.bold,
                             ),

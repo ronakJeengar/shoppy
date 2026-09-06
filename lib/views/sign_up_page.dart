@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shopp_app/core/constants/app_strings.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
+import 'package:shopp_app/core/theme/app_dimensions.dart';
+import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/data/models/user_model.dart';
@@ -52,9 +55,9 @@ class _SignUpPageState extends State<SignUpPage> {
     final userProvider = context.watch<UserProvider>();
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: AppColors.surface,
       appBar: AppBar(
-        backgroundColor: AppColors.white,
+        backgroundColor: AppColors.surface,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, color: AppColors.slate800),
@@ -63,7 +66,7 @@ class _SignUpPageState extends State<SignUpPage> {
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.xxl, vertical: AppDimensions.md),
           child: Form(
             key: _formKey,
             child: Column(
@@ -72,36 +75,36 @@ class _SignUpPageState extends State<SignUpPage> {
               children: [
                 Center(
                   child: Container(
-                    width: 64,
-                    height: 64,
+                    width: AppDimensions.giant,
+                    height: AppDimensions.giant,
                     decoration: const BoxDecoration(
                       color: AppColors.primary50,
                       borderRadius: AppRadius.borderLg,
                     ),
                     child: const Icon(
                       Icons.person_add_rounded,
-                      size: 32,
+                      size: AppIconSizes.xxl,
                       color: AppColors.primary,
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
-                const Text(
-                  'Create Account',
+                const SizedBox(height: AppDimensions.xl),
+                Text(
+                  AppStrings.auth.createAccount,
                   textAlign: TextAlign.center,
                   style: AppTypography.displayMedium,
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Join Shoppy Today',
+                  AppStrings.auth.registerTitle,
                   textAlign: TextAlign.center,
-                  style: AppTypography.bodySmall.copyWith(color: AppColors.slate500),
+                  style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 28),
 
                 if (userProvider.errorMessage != null) ...[
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: AppDimensions.paddingMd,
                     decoration: BoxDecoration(
                       color: AppColors.errorLight,
                       borderRadius: AppRadius.borderMd,
@@ -109,8 +112,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.error_outline_rounded, size: 18, color: AppColors.error),
-                        const SizedBox(width: 8),
+                        const Icon(Icons.error_outline_rounded, size: AppIconSizes.sm + 2, color: AppColors.error),
+                        const SizedBox(width: AppDimensions.sm),
                         Expanded(
                           child: Text(
                             userProvider.errorMessage!,
@@ -120,55 +123,55 @@ class _SignUpPageState extends State<SignUpPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.lg),
                 ],
 
                 // Full Name
                 AppTextField(
-                  label: 'Full Name',
-                  hintText: 'Alex Rivera',
+                  label: AppStrings.auth.fullName,
+                  hintText: AppStrings.auth.enterName,
                   controller: _nameController,
                   prefixIcon: Icons.person_outline_rounded,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Please enter your name';
+                      return AppStrings.validation.nameRequired;
                     }
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.lg),
 
                 // Email
                 AppTextField(
-                  label: 'Email Address',
-                  hintText: 'alex@example.com',
+                  label: AppStrings.auth.email,
+                  hintText: AppStrings.auth.enterEmail,
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   prefixIcon: Icons.email_outlined,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Please enter your email';
+                      return AppStrings.validation.emailRequired;
                     }
                     final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
                     if (!emailRegex.hasMatch(value.trim())) {
-                      return 'Please enter a valid email address';
+                      return AppStrings.validation.emailInvalid;
                     }
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.lg),
 
                 // Password
                 AppTextField(
-                  label: 'Password',
-                  hintText: 'At least 6 characters',
+                  label: AppStrings.auth.password,
+                  hintText: AppStrings.auth.passwordRule,
                   controller: _passwordController,
                   obscureText: _obscurePassword,
                   prefixIcon: Icons.lock_outline_rounded,
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                      size: 20,
+                      size: AppIconSizes.md,
                       color: AppColors.slate500,
                     ),
                     onPressed: () {
@@ -179,27 +182,27 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter a password';
+                      return AppStrings.validation.passwordRequired;
                     }
                     if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
+                      return AppStrings.validation.passwordTooShort;
                     }
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.lg),
 
                 // Confirm Password
                 AppTextField(
-                  label: 'Confirm Password',
-                  hintText: 'Re-enter your password',
+                  label: AppStrings.auth.confirmPassword,
+                  hintText: AppStrings.auth.enterConfirmPassword,
                   controller: _confirmPasswordController,
                   obscureText: _obscureConfirmPassword,
                   prefixIcon: Icons.lock_reset_rounded,
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                      size: 20,
+                      size: AppIconSizes.md,
                       color: AppColors.slate500,
                     ),
                     onPressed: () {
@@ -210,10 +213,10 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please confirm your password';
+                      return AppStrings.validation.confirmPasswordRequired;
                     }
                     if (value != _passwordController.text) {
-                      return 'Passwords do not match';
+                      return AppStrings.validation.passwordsDoNotMatch;
                     }
                     return null;
                   },
@@ -222,26 +225,26 @@ class _SignUpPageState extends State<SignUpPage> {
 
                 // Submit Button
                 AppButton(
-                  label: 'Register',
+                  label: AppStrings.auth.register,
                   icon: Icons.check_circle_outline_rounded,
                   isLoading: userProvider.isLoading,
                   isFullWidth: true,
                   onPressed: userProvider.isLoading ? null : _submitRegister,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.xxl),
 
                 // Back to Login
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Already have an account?',
-                      style: AppTypography.bodySmall.copyWith(color: AppColors.slate600),
+                      AppStrings.auth.alreadyHaveAccountPrompt,
+                      style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
                     ),
                     TextButton(
                       onPressed: () => Navigator.pop(context),
                       child: Text(
-                        'Sign In',
+                        AppStrings.auth.signIn,
                         style: AppTypography.bodySmall.copyWith(
                           color: AppColors.primary,
                           fontWeight: FontWeight.bold,
