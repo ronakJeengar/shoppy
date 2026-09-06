@@ -4,9 +4,8 @@ import 'package:shopp_app/data/models/product_model.dart';
 import 'package:shopp_app/data/repositories/catalog_repository.dart';
 import 'package:shopp_app/domain/models/ui_state.dart';
 
-final catalogRepositoryProvider = Provider<CatalogRepository>((ref) {
-  return CatalogRepository();
-});
+import 'package:shopp_app/riverpod/di_providers.dart';
+export 'di_providers.dart';
 
 class CategoriesNotifier extends StateNotifier<UiState<List<CategoryModel>>> {
   final CatalogRepository _repository;

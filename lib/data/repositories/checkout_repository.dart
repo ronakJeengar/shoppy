@@ -8,7 +8,9 @@ import 'package:shopp_app/data/models/order_model.dart';
 import 'package:shopp_app/data/models/payment_model.dart';
 
 class CheckoutRepository {
-  final Api _api = Api();
+  final Api _api;
+
+  CheckoutRepository({Api? api}) : _api = api ?? Api();
 
   Future<ApiResponse> validateCheckout(
     String addressId, {

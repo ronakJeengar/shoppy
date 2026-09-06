@@ -6,7 +6,9 @@ import 'package:shopp_app/data/models/api_response.dart';
 import 'package:shopp_app/data/models/review_model.dart';
 
 class ReviewRepository {
-  final Api _api = Api();
+  final Api _api;
+
+  ReviewRepository({Api? api}) : _api = api ?? Api();
 
   // 1. Get Product Reviews (Public)
   Future<ApiResponse> getProductReviews(

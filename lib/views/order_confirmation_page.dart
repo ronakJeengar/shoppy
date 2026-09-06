@@ -11,12 +11,22 @@ import 'package:shopp_app/views/widgets/app_button.dart';
 import 'package:shopp_app/views/widgets/app_network_image.dart';
 
 class OrderConfirmationPage extends StatelessWidget {
-  final OrderModel order;
+  final OrderModel? order;
+  final String? orderId;
 
-  const OrderConfirmationPage({super.key, required this.order});
+  const OrderConfirmationPage({
+    super.key,
+    this.order,
+    this.orderId,
+  }) : assert(order != null || orderId != null,
+            'Either order or orderId must be provided');
 
   @override
   Widget build(BuildContext context) {
+    final resolvedNumber = order?.orderNumber ?? orderId ?? 'N/A';
+    final resolvedStatus = order?.status ?? 'CONFIRMED';
+    final resolvedMethod = order?.shippingMethod ?? 'STANDARD';
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
@@ -94,7 +104,7 @@ class OrderConfirmationPage extends StatelessWidget {
                       ),
                       InkWell(
                         onTap: () {
-                          Clipboard.setData(ClipboardData(text: order.orderNumber));
+                          Clipboard.setData(ClipboardData(text: resolvedNumber));
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('Order number copied!'),
@@ -105,7 +115,7 @@ class OrderConfirmationPage extends StatelessWidget {
                         child: Row(
                           children: [
                             Text(
-                              order.orderNumber,
+                              resolvedNumber,
                               style: AppTypography.bodyMedium.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.slate900,
@@ -133,7 +143,7 @@ class OrderConfirmationPage extends StatelessWidget {
                           borderRadius: AppRadius.borderFull,
                         ),
                         child: Text(
-                          order.status,
+                          resolvedStatus,
                           style: AppTypography.label.copyWith(color: AppColors.success),
                         ),
                       ),
@@ -148,7 +158,7 @@ class OrderConfirmationPage extends StatelessWidget {
                         style: AppTypography.caption.copyWith(color: AppColors.slate500),
                       ),
                       Text(
-                        order.shippingMethod == 'EXPRESS'
+                        resolvedMethod == 'EXPRESS'
                             ? 'Express (1-2 Days)'
                             : 'Standard (3-5 Days)',
                         style: AppTypography.bodySmall.copyWith(
@@ -163,8 +173,8 @@ class OrderConfirmationPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Delivery Address Snapshot Card
-            if (order.shippingAddress != null)
+            // Delivery Address Snapshot Card (if available)
+            if (order?.shippingAddress != null)
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -188,96 +198,98 @@ class OrderConfirmationPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      order.shippingAddress!.fullName,
+                      order!.shippingAddress!.fullName,
                       style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      order.shippingAddress!.formattedAddress,
+                      order!.shippingAddress!.formattedAddress,
                       style: AppTypography.caption.copyWith(color: AppColors.slate600),
                     ),
                   ],
                 ),
               ),
-            const SizedBox(height: 16),
+            if (order != null) const SizedBox(height: 16),
 
-            // Order Items & Pricing Breakdown Card
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: AppRadius.borderMd,
-                border: Border.all(color: AppColors.slate200),
-                boxShadow: AppShadows.card,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Ordered Items (${order.orderItems.length})',
-                    style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  ...order.orderItems.map((item) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: Row(
-                        children: [
-                          AppNetworkImage(
-                            imageUrl: item.productImage,
-                            width: 44,
-                            height: 44,
-                            borderRadius: AppRadius.borderSm,
-                            fit: BoxFit.cover,
-                            memCacheWidth: 120,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  item.productName,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
-                                ),
-                                Text(
-                                  'Qty: ${item.quantity} × \$${item.unitPrice.toStringAsFixed(2)}',
-                                  style: AppTypography.caption.copyWith(color: AppColors.slate500),
-                                ),
-                              ],
+            // Order Items & Pricing Breakdown Card (if available)
+            if (order != null) ...[
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: AppRadius.borderMd,
+                  border: Border.all(color: AppColors.slate200),
+                  boxShadow: AppShadows.card,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Ordered Items (${order!.orderItems.length})',
+                      style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 12),
+                    ...order!.orderItems.map((item) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: Row(
+                          children: [
+                            AppNetworkImage(
+                              imageUrl: item.productImage,
+                              width: 44,
+                              height: 44,
+                              borderRadius: AppRadius.borderSm,
+                              fit: BoxFit.cover,
+                              memCacheWidth: 120,
                             ),
-                          ),
-                          Text(
-                            '\$${item.lineTotal.toStringAsFixed(2)}',
-                            style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
-                  const Divider(height: 20, color: AppColors.slate200),
-                  _summaryRow('Subtotal', '\$${order.subtotal.toStringAsFixed(2)}'),
-                  const SizedBox(height: 6),
-                  _summaryRow(
-                    'Shipping',
-                    order.shippingFee == 0 ? 'FREE' : '\$${order.shippingFee.toStringAsFixed(2)}',
-                    color: order.shippingFee == 0 ? AppColors.success : null,
-                  ),
-                  const SizedBox(height: 6),
-                  _summaryRow('Tax', '\$${order.tax.toStringAsFixed(2)}'),
-                  const Divider(height: 20, color: AppColors.slate200),
-                  _summaryRow(
-                    'Total Paid',
-                    '\$${order.totalAmount.toStringAsFixed(2)}',
-                    isTotal: true,
-                    color: AppColors.primary,
-                  ),
-                ],
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item.productName,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
+                                  ),
+                                  Text(
+                                    'Qty: ${item.quantity} × \$${item.unitPrice.toStringAsFixed(2)}',
+                                    style: AppTypography.caption.copyWith(color: AppColors.slate500),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text(
+                              '\$${item.lineTotal.toStringAsFixed(2)}',
+                              style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                    const Divider(height: 24, color: AppColors.slate200),
+                    _summaryRow('Subtotal', '\$${order!.subtotal.toStringAsFixed(2)}'),
+                    const SizedBox(height: 6),
+                    _summaryRow(
+                      'Shipping',
+                      order!.shippingFee == 0 ? 'FREE' : '\$${order!.shippingFee.toStringAsFixed(2)}',
+                      color: order!.shippingFee == 0 ? AppColors.success : null,
+                    ),
+                    const SizedBox(height: 6),
+                    _summaryRow('Estimated Tax (8%)', '\$${order!.tax.toStringAsFixed(2)}'),
+                    const Divider(height: 20, color: AppColors.slate200),
+                    _summaryRow(
+                      'Total Paid',
+                      '\$${order!.totalAmount.toStringAsFixed(2)}',
+                      isTotal: true,
+                      color: AppColors.primary,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
+            ],
 
             // Actions
             AppButton(

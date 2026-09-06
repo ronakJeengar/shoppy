@@ -13,7 +13,9 @@ class AppColors {
 
   // Brand Secondary & Accents
   static const Color accent = Color(0xFFF59E0B); // Warm Amber
+  static const Color secondary = accent;
   static const Color accentLight = Color(0xFFFEF3C7);
+  static const Color secondaryLight = accentLight;
   static const Color coral = Color(0xFFEC4899); // Pink / Coral
   static const Color coralLight = Color(0xFFFDF2F8);
   static const Color rose500 = Color(0xFFF43F5E); // Rose 500

@@ -51,6 +51,9 @@ class Preferences {
     preferences?.clear();
   }
 
+  static const String keyUserRole = 'user_role';
+  static const String keyUserId = 'user_id';
+
   // Token management helpers
   static Future<void> saveTokens({
     required String accessToken,
@@ -70,9 +73,29 @@ class Preferences {
     return preferences?.getString(keyRefreshToken);
   }
 
+  static Future<void> saveUserRole(String role) async {
+    await preferences?.setString(keyUserRole, role);
+  }
+
+  static String? getUserRole() {
+    return preferences?.getString(keyUserRole);
+  }
+
+  static bool get isAdmin => (getUserRole() ?? '').toUpperCase() == 'ADMIN';
+
+  static Future<void> saveUserId(String id) async {
+    await preferences?.setString(keyUserId, id);
+  }
+
+  static String? getUserId() {
+    return preferences?.getString(keyUserId);
+  }
+
   static Future<void> clearAuth() async {
     await preferences?.remove(keyAccessToken);
     await preferences?.remove(keyRefreshToken);
+    await preferences?.remove(keyUserRole);
+    await preferences?.remove(keyUserId);
   }
 
   // Recent Search History helpers

@@ -27,7 +27,9 @@ class NotificationPaginatedResult {
 }
 
 class NotificationRepository {
-  final Api _api = Api();
+  final Api _api;
+
+  NotificationRepository({Api? api}) : _api = api ?? Api();
 
   Future<ApiResponse> getNotifications({
     int page = 1,

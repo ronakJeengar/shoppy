@@ -3,9 +3,8 @@ import 'package:shopp_app/data/models/order_model.dart';
 import 'package:shopp_app/data/repositories/order_repository.dart';
 import 'package:shopp_app/domain/models/ui_state.dart';
 
-final orderRepositoryProvider = Provider<OrderRepository>((ref) {
-  return OrderRepository();
-});
+import 'package:shopp_app/riverpod/di_providers.dart';
+export 'di_providers.dart';
 
 class OrdersNotifier extends StateNotifier<UiState<List<OrderModel>>> {
   final OrderRepository _repository;

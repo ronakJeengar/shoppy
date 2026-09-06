@@ -132,6 +132,11 @@ class UserProvider extends ChangeNotifier {
         await getCurrentUser();
       }
 
+      if (currentUser != null) {
+        await Preferences.saveUserRole(currentUser!.role);
+        await Preferences.saveUserId(currentUser!.id);
+      }
+
       notifyListeners();
 
       if (context.mounted) {
@@ -170,6 +175,8 @@ class UserProvider extends ChangeNotifier {
 
       if (response.data is Map<String, dynamic>) {
         currentUser = CurrentUserModel.fromJson(response.data as Map<String, dynamic>);
+        await Preferences.saveUserRole(currentUser!.role);
+        await Preferences.saveUserId(currentUser!.id);
       }
       notifyListeners();
       return currentUser;

@@ -43,6 +43,8 @@ class AppTypography {
     color: AppColors.slate900,
     height: 1.4,
   );
+  static const TextStyle titleLarge = headingMedium;
+  static const TextStyle titleMedium = headingSmall;
 
   // Subtitles
   static const TextStyle subtitleLarge = TextStyle(

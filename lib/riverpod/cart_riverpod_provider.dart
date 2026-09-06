@@ -3,9 +3,8 @@ import 'package:shopp_app/data/models/cart_model.dart';
 import 'package:shopp_app/data/repositories/cart_repository.dart';
 import 'package:shopp_app/domain/models/ui_state.dart';
 
-final cartRepositoryProvider = Provider<CartRepository>((ref) {
-  return CartRepository();
-});
+import 'package:shopp_app/riverpod/di_providers.dart';
+export 'di_providers.dart';
 
 class CartNotifier extends StateNotifier<UiState<CartModel>> {
   final CartRepository _repository;

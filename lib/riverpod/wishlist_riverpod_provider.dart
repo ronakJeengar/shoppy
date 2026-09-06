@@ -3,9 +3,8 @@ import 'package:shopp_app/data/models/product_model.dart';
 import 'package:shopp_app/data/repositories/wishlist_repository.dart';
 import 'package:shopp_app/domain/models/ui_state.dart';
 
-final wishlistRepositoryProvider = Provider<WishlistRepository>((ref) {
-  return WishlistRepository();
-});
+import 'package:shopp_app/riverpod/di_providers.dart';
+export 'di_providers.dart';
 
 class WishlistNotifier extends StateNotifier<UiState<List<Product>>> {
   final WishlistRepository _repository;

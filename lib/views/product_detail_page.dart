@@ -14,17 +14,20 @@ import 'package:shopp_app/providers/user_provider.dart';
 import 'package:shopp_app/providers/wishlist_provider.dart';
 import 'package:shopp_app/views/cart_page.dart';
 import 'package:shopp_app/views/widgets/app_button.dart';
-import 'package:shopp_app/views/widgets/app_network_image.dart';
+import 'package:shopp_app/views/widgets/product_media_gallery.dart';
 import 'package:shopp_app/views/widgets/recommendation_carousel.dart';
 import 'package:shopp_app/views/widgets/write_review_dialog.dart';
 
 class ProductDetailPage extends StatefulWidget {
-  final Product product;
+  final Product? product;
+  final String? productId;
 
   const ProductDetailPage({
     super.key,
-    required this.product,
-  });
+    this.product,
+    this.productId,
+  }) : assert(product != null || productId != null,
+            'Either product or productId must be provided');
 
   @override
   State<ProductDetailPage> createState() => _ProductDetailPageState();
@@ -38,7 +41,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   @override
   void initState() {
     super.initState();
-    _currentProduct = widget.product;
+    if (widget.product != null) {
+      _currentProduct = widget.product!;
+    } else {
+      _currentProduct = Product(
+        id: widget.productId!,
+        productName: 'Loading...',
+        price: 0,
+        productImage: '',
+      );
+    }
     _fetchFreshDetails();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       try {
@@ -240,22 +252,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Hero Image Container with border
-            Container(
-              height: 340,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                color: AppColors.slate100,
-                border: Border(
-                  bottom: BorderSide(color: AppColors.slate200, width: 1),
-                ),
-              ),
-              child: AppNetworkImage(
-                imageUrl: _currentProduct.productImage,
-                fit: BoxFit.cover,
-                memCacheWidth: 800,
-                memCacheHeight: 680,
-              ),
+            // Hero Multi-Media Gallery (Images, Video, 3D)
+            ProductMediaGallery(
+              product: _currentProduct,
+              height: 350,
             ),
 
             // Product Details Content

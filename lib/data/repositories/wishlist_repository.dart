@@ -6,7 +6,9 @@ import 'package:shopp_app/data/models/api_response.dart';
 import 'package:shopp_app/data/models/product_model.dart';
 
 class WishlistRepository {
-  final Api _api = Api();
+  final Api _api;
+
+  WishlistRepository({Api? api}) : _api = api ?? Api();
 
   Future<ApiResponse> getWishlist() async {
     try {

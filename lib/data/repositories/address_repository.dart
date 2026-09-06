@@ -6,7 +6,9 @@ import 'package:shopp_app/data/models/address_model.dart';
 import 'package:shopp_app/data/models/api_response.dart';
 
 class AddressRepository {
-  final Api _api = Api();
+  final Api _api;
+
+  AddressRepository({Api? api}) : _api = api ?? Api();
 
   Future<ApiResponse> getAddresses() async {
     try {

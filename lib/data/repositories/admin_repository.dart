@@ -11,7 +11,9 @@ import 'package:shopp_app/data/models/order_model.dart';
 import 'package:shopp_app/data/models/product_model.dart';
 
 class AdminRepository {
-  final Api _api = Api();
+  final Api _api;
+
+  AdminRepository({Api? api}) : _api = api ?? Api();
 
   // 1. Dashboard
   Future<ApiResponse> getDashboardMetrics() async {

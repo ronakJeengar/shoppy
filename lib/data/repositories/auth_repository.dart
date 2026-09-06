@@ -6,7 +6,9 @@ import 'package:shopp_app/data/models/api_response.dart';
 import 'package:shopp_app/data/models/user_model.dart';
 
 class AuthRepository {
-  final Api _api = Api();
+  final Api _api;
+
+  AuthRepository({Api? api}) : _api = api ?? Api();
 
   Future<ApiResponse> signUp({required User userData}) async {
     try {

@@ -3,9 +3,8 @@ import 'package:shopp_app/data/models/review_model.dart';
 import 'package:shopp_app/data/repositories/review_repository.dart';
 import 'package:shopp_app/domain/models/ui_state.dart';
 
-final reviewRepositoryProvider = Provider<ReviewRepository>((ref) {
-  return ReviewRepository();
-});
+import 'package:shopp_app/riverpod/di_providers.dart';
+export 'di_providers.dart';
 
 class ProductReviewsData {
   final List<ReviewModel> reviews;

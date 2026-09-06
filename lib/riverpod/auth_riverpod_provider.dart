@@ -5,9 +5,8 @@ import 'package:shopp_app/data/models/user_model.dart';
 import 'package:shopp_app/data/repositories/auth_repository.dart';
 import 'package:shopp_app/domain/models/ui_state.dart';
 
-final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  return AuthRepository();
-});
+import 'package:shopp_app/riverpod/di_providers.dart';
+export 'di_providers.dart';
 
 class AuthState {
   final UiState<CurrentUserModel?> userState;
@@ -75,6 +74,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
           }
         }
 
+        if (user != null) {
+          await Preferences.saveUserRole(user.role);
+          await Preferences.saveUserId(user.id);
+        }
+
         state = state.copyWith(
           userState: UiState.success(user),
           isAuthenticated: true,
@@ -131,6 +135,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final response = await _repository.getCurrentUser();
       if (response.status && response.data is Map<String, dynamic>) {
         final user = CurrentUserModel.fromJson(response.data as Map<String, dynamic>);
+        await Preferences.saveUserRole(user.role);
+        await Preferences.saveUserId(user.id);
         state = state.copyWith(
           userState: UiState.success(user),
           isAuthenticated: true,

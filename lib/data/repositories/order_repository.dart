@@ -24,7 +24,9 @@ class OrderPaginatedResult {
 }
 
 class OrderRepository {
-  final Api _api = Api();
+  final Api _api;
+
+  OrderRepository({Api? api}) : _api = api ?? Api();
 
   Future<ApiResponse> getOrders({
     int page = 1,

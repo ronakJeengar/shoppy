@@ -6,7 +6,9 @@ import 'package:shopp_app/data/models/api_response.dart';
 import 'package:shopp_app/data/models/cart_model.dart';
 
 class CartRepository {
-  final Api _api = Api();
+  final Api _api;
+
+  CartRepository({Api? api}) : _api = api ?? Api();
 
   Future<ApiResponse> getCart() async {
     try {

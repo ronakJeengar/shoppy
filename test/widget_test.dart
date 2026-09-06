@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart' show ProviderScope;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shopp_app/core/preferences.dart';
@@ -63,23 +64,25 @@ void main() {
     if (user != null) {
       userProvider.currentUser = user;
     }
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: userProvider),
-        ChangeNotifierProvider(create: (_) => CatalogProvider()),
-        ChangeNotifierProvider(create: (_) => SearchProvider()),
-        ChangeNotifierProvider(create: (_) => CartProvider()),
-        ChangeNotifierProvider(create: (_) => WishlistProvider()),
-        ChangeNotifierProvider(create: (_) => AddressProvider()),
-        ChangeNotifierProvider(create: (_) => CheckoutProvider()),
-        ChangeNotifierProvider(create: (_) => OrderProvider()),
-        ChangeNotifierProvider(create: (_) => NotificationProvider()),
-        ChangeNotifierProvider(create: (_) => AdminProvider()),
-        ChangeNotifierProvider(create: (_) => ReviewProvider()),
-        ChangeNotifierProvider(create: (_) => AssistantProvider()),
-        ChangeNotifierProvider(create: (_) => RecommendationProvider()),
-      ],
-      child: home != null ? MaterialApp(home: home) : const MyApp(),
+    return ProviderScope(
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: userProvider),
+          ChangeNotifierProvider(create: (_) => CatalogProvider()),
+          ChangeNotifierProvider(create: (_) => SearchProvider()),
+          ChangeNotifierProvider(create: (_) => CartProvider()),
+          ChangeNotifierProvider(create: (_) => WishlistProvider()),
+          ChangeNotifierProvider(create: (_) => AddressProvider()),
+          ChangeNotifierProvider(create: (_) => CheckoutProvider()),
+          ChangeNotifierProvider(create: (_) => OrderProvider()),
+          ChangeNotifierProvider(create: (_) => NotificationProvider()),
+          ChangeNotifierProvider(create: (_) => AdminProvider()),
+          ChangeNotifierProvider(create: (_) => ReviewProvider()),
+          ChangeNotifierProvider(create: (_) => AssistantProvider()),
+          ChangeNotifierProvider(create: (_) => RecommendationProvider()),
+        ],
+        child: home != null ? MaterialApp(home: home) : const MyApp(),
+      ),
     );
   }
 

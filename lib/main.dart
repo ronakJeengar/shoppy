@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:provider/provider.dart' as legacy_provider;
+import 'package:shopp_app/core/notifications/notification_service.dart';
 import 'package:shopp_app/core/preferences.dart';
+import 'package:shopp_app/core/router/app_router.dart';
+import 'package:shopp_app/core/theme/app_theme.dart';
 import 'package:shopp_app/providers/address_provider.dart';
 import 'package:shopp_app/providers/admin_provider.dart';
 import 'package:shopp_app/providers/assistant_provider.dart';
@@ -15,13 +18,12 @@ import 'package:shopp_app/providers/review_provider.dart';
 import 'package:shopp_app/providers/search_provider.dart';
 import 'package:shopp_app/providers/user_provider.dart';
 import 'package:shopp_app/providers/wishlist_provider.dart';
-import 'package:shopp_app/core/theme/app_theme.dart';
-import 'package:shopp_app/views/home_page.dart';
-import 'package:shopp_app/views/login_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Preferences.init();
+  await NotificationService.instance.initialize();
+
   runApp(
     ProviderScope(
       child: legacy_provider.MultiProvider(
@@ -46,38 +48,20 @@ void main() async {
   );
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(routerProvider);
+    NotificationService.instance.attachRouter(router);
 
-class _MyAppState extends State<MyApp> {
-  String? token;
-
-  @override
-  void initState() {
-    super.initState();
-    getToken();
-  }
-
-  void getToken() async {
-    token = Preferences.getAccessToken() ?? await Preferences.getString('token');
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Shoppy',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: (token != null && token!.isNotEmpty)
-          ? const HomePage()
-          : const LoginPage(),
+      routerConfig: router,
     );
   }
 }
+

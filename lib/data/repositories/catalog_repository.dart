@@ -7,7 +7,9 @@ import 'package:shopp_app/data/models/category_model.dart';
 import 'package:shopp_app/data/models/product_model.dart';
 
 class CatalogRepository {
-  final Api _api = Api();
+  final Api _api;
+
+  CatalogRepository({Api? api}) : _api = api ?? Api();
 
   Future<ApiResponse> getCategories() async {
     try {

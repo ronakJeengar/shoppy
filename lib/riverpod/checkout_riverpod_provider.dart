@@ -5,9 +5,8 @@ import 'package:shopp_app/data/models/payment_model.dart';
 import 'package:shopp_app/data/repositories/checkout_repository.dart';
 import 'package:shopp_app/domain/models/ui_state.dart';
 
-final checkoutRepositoryProvider = Provider<CheckoutRepository>((ref) {
-  return CheckoutRepository();
-});
+import 'package:shopp_app/riverpod/di_providers.dart';
+export 'di_providers.dart';
 
 class CheckoutState {
   final String? selectedAddressId;

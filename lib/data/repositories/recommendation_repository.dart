@@ -6,7 +6,9 @@ import 'package:shopp_app/data/models/api_response.dart';
 import 'package:shopp_app/data/models/recommendation_model.dart';
 
 class RecommendationRepository {
-  final Api _api = Api();
+  final Api _api;
+
+  RecommendationRepository({Api? api}) : _api = api ?? Api();
 
   /// Fetches product recommendations by type:
   /// PERSONALIZED, SIMILAR_PRODUCTS, FREQUENTLY_BOUGHT_TOGETHER, TRENDING, RECENTLY_VIEWED
