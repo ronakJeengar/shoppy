@@ -9,6 +9,7 @@ import 'package:shopp_app/providers/wishlist_provider.dart';
 import 'package:shopp_app/views/home_page.dart';
 import 'package:shopp_app/views/product_detail_page.dart';
 import 'package:shopp_app/views/widgets/app_button.dart';
+import 'package:shopp_app/views/widgets/app_network_image.dart';
 import 'package:shopp_app/views/widgets/empty_state.dart';
 
 class WishlistPage extends StatelessWidget {
@@ -110,27 +111,16 @@ class WishlistPage extends StatelessWidget {
                     Expanded(
                       child: Stack(
                         children: [
-                          ClipRRect(
-                            borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(12),
-                            ),
-                            child: Container(
-                              width: double.infinity,
-                              height: double.infinity,
-                              color: AppColors.slate100,
-                              child: product.imageUrl.isNotEmpty
-                                  ? Image.network(
-                                      product.imageUrl,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => const Icon(
-                                        Icons.image_not_supported_outlined,
-                                        color: AppColors.slate400,
-                                      ),
-                                    )
-                                  : const Icon(
-                                      Icons.shopping_bag_outlined,
-                                      color: AppColors.slate400,
-                                    ),
+                          SizedBox(
+                            width: double.infinity,
+                            height: double.infinity,
+                            child: AppNetworkImage(
+                              imageUrl: product.imageUrl,
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(12),
+                              ),
+                              fit: BoxFit.cover,
+                              memCacheWidth: 350,
                             ),
                           ),
                           Positioned(

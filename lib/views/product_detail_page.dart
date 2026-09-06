@@ -14,6 +14,7 @@ import 'package:shopp_app/providers/user_provider.dart';
 import 'package:shopp_app/providers/wishlist_provider.dart';
 import 'package:shopp_app/views/cart_page.dart';
 import 'package:shopp_app/views/widgets/app_button.dart';
+import 'package:shopp_app/views/widgets/app_network_image.dart';
 import 'package:shopp_app/views/widgets/recommendation_carousel.dart';
 import 'package:shopp_app/views/widgets/write_review_dialog.dart';
 
@@ -249,25 +250,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   bottom: BorderSide(color: AppColors.slate200, width: 1),
                 ),
               ),
-              child: _currentProduct.productImage.isNotEmpty
-                  ? Image.network(
-                      _currentProduct.productImage,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const Center(
-                        child: Icon(
-                          Icons.image_not_supported_outlined,
-                          size: 64,
-                          color: AppColors.slate400,
-                        ),
-                      ),
-                    )
-                  : const Center(
-                      child: Icon(
-                        Icons.inventory_2_outlined,
-                        size: 64,
-                        color: AppColors.slate400,
-                      ),
-                    ),
+              child: AppNetworkImage(
+                imageUrl: _currentProduct.productImage,
+                fit: BoxFit.cover,
+                memCacheWidth: 800,
+                memCacheHeight: 680,
+              ),
             ),
 
             // Product Details Content

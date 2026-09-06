@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:provider/provider.dart' as legacy_provider;
 import 'package:shopp_app/core/preferences.dart';
 import 'package:shopp_app/providers/address_provider.dart';
 import 'package:shopp_app/providers/admin_provider.dart';
@@ -22,23 +23,25 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Preferences.init();
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => UserProvider()),
-        ChangeNotifierProvider(create: (_) => CatalogProvider()),
-        ChangeNotifierProvider(create: (_) => SearchProvider()),
-        ChangeNotifierProvider(create: (_) => CartProvider()),
-        ChangeNotifierProvider(create: (_) => WishlistProvider()),
-        ChangeNotifierProvider(create: (_) => AddressProvider()),
-        ChangeNotifierProvider(create: (_) => CheckoutProvider()),
-        ChangeNotifierProvider(create: (_) => OrderProvider()),
-        ChangeNotifierProvider(create: (_) => NotificationProvider()),
-        ChangeNotifierProvider(create: (_) => AdminProvider()),
-        ChangeNotifierProvider(create: (_) => ReviewProvider()),
-        ChangeNotifierProvider(create: (_) => AssistantProvider()),
-        ChangeNotifierProvider(create: (_) => RecommendationProvider()),
-      ],
-      child: const MyApp(),
+    ProviderScope(
+      child: legacy_provider.MultiProvider(
+        providers: [
+          legacy_provider.ChangeNotifierProvider(create: (_) => UserProvider()),
+          legacy_provider.ChangeNotifierProvider(create: (_) => CatalogProvider()),
+          legacy_provider.ChangeNotifierProvider(create: (_) => SearchProvider()),
+          legacy_provider.ChangeNotifierProvider(create: (_) => CartProvider()),
+          legacy_provider.ChangeNotifierProvider(create: (_) => WishlistProvider()),
+          legacy_provider.ChangeNotifierProvider(create: (_) => AddressProvider()),
+          legacy_provider.ChangeNotifierProvider(create: (_) => CheckoutProvider()),
+          legacy_provider.ChangeNotifierProvider(create: (_) => OrderProvider()),
+          legacy_provider.ChangeNotifierProvider(create: (_) => NotificationProvider()),
+          legacy_provider.ChangeNotifierProvider(create: (_) => AdminProvider()),
+          legacy_provider.ChangeNotifierProvider(create: (_) => ReviewProvider()),
+          legacy_provider.ChangeNotifierProvider(create: (_) => AssistantProvider()),
+          legacy_provider.ChangeNotifierProvider(create: (_) => RecommendationProvider()),
+        ],
+        child: const MyApp(),
+      ),
     ),
   );
 }

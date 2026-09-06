@@ -8,6 +8,7 @@ import 'package:shopp_app/data/models/product_model.dart';
 import 'package:shopp_app/providers/cart_provider.dart';
 import 'package:shopp_app/providers/wishlist_provider.dart';
 import 'package:shopp_app/views/product_detail_page.dart';
+import 'package:shopp_app/views/widgets/app_network_image.dart';
 
 /// A modern, Figma-quality e-commerce product card with ratings, wishlist toggle,
 /// stock urgency badge, and instant add-to-cart button.
@@ -48,47 +49,14 @@ class ProductCard extends StatelessWidget {
               Expanded(
                 child: Stack(
                   children: [
-                    Container(
+                    SizedBox(
                       width: double.infinity,
                       height: double.infinity,
-                      color: AppColors.slate100,
-                      child: product.productImage.isNotEmpty
-                          ? Image.network(
-                              product.productImage,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Center(
-                                child: Icon(
-                                  Icons.image_not_supported_outlined,
-                                  size: 32,
-                                  color: AppColors.slate400,
-                                ),
-                              ),
-                              loadingBuilder:
-                                  (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return const Center(
-                                  child: SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor:
-                                          AlwaysStoppedAnimation<Color>(
-                                        AppColors.primary,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            )
-                          : const Center(
-                              child: Icon(
-                                Icons.inventory_2_outlined,
-                                size: 32,
-                                color: AppColors.slate400,
-                              ),
-                            ),
+                      child: AppNetworkImage(
+                        imageUrl: product.productImage,
+                        fit: BoxFit.cover,
+                        memCacheWidth: 350,
+                      ),
                     ),
 
                     // Wishlist Floating Button (Top Left)

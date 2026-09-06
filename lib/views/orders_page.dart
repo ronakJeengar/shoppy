@@ -8,6 +8,7 @@ import 'package:shopp_app/data/models/order_model.dart';
 import 'package:shopp_app/providers/order_provider.dart';
 import 'package:shopp_app/views/home_page.dart';
 import 'package:shopp_app/views/order_detail_page.dart';
+import 'package:shopp_app/views/widgets/app_network_image.dart';
 import 'package:shopp_app/views/widgets/empty_state.dart';
 
 class OrdersPage extends StatefulWidget {
@@ -197,19 +198,13 @@ class _OrdersPageState extends State<OrdersPage> {
                 if (order.orderItems.isNotEmpty) ...[
                   Row(
                     children: [
-                      ClipRRect(
+                      AppNetworkImage(
+                        imageUrl: order.orderItems.first.productImage,
+                        width: 50,
+                        height: 50,
                         borderRadius: AppRadius.borderSm,
-                        child: Container(
-                          width: 50,
-                          height: 50,
-                          color: AppColors.slate100,
-                          child: order.orderItems.first.productImage.isNotEmpty
-                              ? Image.network(
-                                  order.orderItems.first.productImage,
-                                  fit: BoxFit.cover,
-                                )
-                              : const Icon(Icons.shopping_bag_outlined, color: AppColors.slate400),
-                        ),
+                        fit: BoxFit.cover,
+                        memCacheWidth: 150,
                       ),
                       const SizedBox(width: 12),
                       Expanded(

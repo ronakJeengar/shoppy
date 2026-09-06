@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shopp_app/data/models/assistant_message_model.dart';
 import 'package:shopp_app/providers/assistant_provider.dart';
 import 'package:shopp_app/views/product_detail_page.dart';
+import 'package:shopp_app/views/widgets/app_network_image.dart';
 
 class AssistantPage extends StatefulWidget {
   const AssistantPage({super.key});
@@ -458,24 +459,13 @@ class _AssistantPageState extends State<AssistantPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Product Image
-                ClipRRect(
+                AppNetworkImage(
+                  imageUrl: p.productImage,
+                  height: 100,
+                  width: double.infinity,
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                  child: Container(
-                    height: 100,
-                    width: double.infinity,
-                    color: Colors.grey.shade100,
-                    child: p.productImage.isNotEmpty
-                        ? Image.network(
-                            p.productImage,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const Center(
-                              child: Icon(Icons.image_not_supported, color: Colors.grey),
-                            ),
-                          )
-                        : const Center(
-                            child: Icon(Icons.shopping_bag_outlined, color: Colors.grey),
-                          ),
-                  ),
+                  fit: BoxFit.cover,
+                  memCacheWidth: 250,
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8),

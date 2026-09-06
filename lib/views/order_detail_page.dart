@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shopp_app/data/models/order_model.dart';
 import 'package:shopp_app/providers/order_provider.dart';
+import 'package:shopp_app/views/widgets/app_network_image.dart';
+import 'package:shopp_app/views/widgets/order_timeline.dart';
 import 'package:shopp_app/views/widgets/write_review_dialog.dart';
 
 class OrderDetailPage extends StatefulWidget {
@@ -172,7 +174,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     const SizedBox(height: 16),
 
                     // 2. Tracking Timeline Card
-                    _buildTrackingTimeline(order),
+                    OrderTimeline(order: order),
                     const SizedBox(height: 16),
 
                     // 3. Shipping Address Card
@@ -336,165 +338,6 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     );
   }
 
-  Widget _buildTrackingTimeline(OrderModel order) {
-    if (order.isCancelled) {
-      return Card(
-        color: Colors.red.shade50,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: Colors.red.shade200),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              const Icon(Icons.cancel, color: Colors.red, size: 32),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Order Cancelled',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
-                        fontSize: 15,
-                      ),
-                    ),
-                    if (order.cancellationReason.isNotEmpty) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        'Reason: ${order.cancellationReason}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.red.shade700,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    final steps = ['Confirmed', 'Processing', 'Shipped', 'Delivered'];
-    final currentStep = order.trackingStepIndex;
-
-    return Card(
-      elevation: 0.5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade200),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Row(
-              children: [
-                Icon(Icons.local_shipping_outlined,
-                    color: Colors.blue, size: 20),
-                SizedBox(width: 8),
-                Text(
-                  'Fulfillment Timeline',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: List.generate(steps.length, (index) {
-                final isDone = index <= currentStep;
-                final isCurrent = index == currentStep;
-                final color = isDone ? Colors.green : Colors.grey.shade300;
-
-                return Expanded(
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              height: 3,
-                              color: index == 0
-                                  ? Colors.transparent
-                                  : (index <= currentStep
-                                      ? Colors.green
-                                      : Colors.grey.shade300),
-                            ),
-                          ),
-                          CircleAvatar(
-                            radius: 12,
-                            backgroundColor: color,
-                            child: isDone
-                                ? const Icon(Icons.check,
-                                    size: 14, color: Colors.white)
-                                : Text(
-                                    '${index + 1}',
-                                    style: const TextStyle(
-                                      fontSize: 10,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                          ),
-                          Expanded(
-                            child: Container(
-                              height: 3,
-                              color: index == steps.length - 1
-                                  ? Colors.transparent
-                                  : (index < currentStep
-                                      ? Colors.green
-                                      : Colors.grey.shade300),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        steps[index],
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight:
-                              isCurrent ? FontWeight.bold : FontWeight.normal,
-                          color: isCurrent ? Colors.black87 : Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }),
-            ),
-            if (order.carrier.isNotEmpty || order.trackingNumber.isNotEmpty) ...[
-              const Divider(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  if (order.carrier.isNotEmpty)
-                    Text(
-                      'Carrier: ${order.carrier}',
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
-                  if (order.trackingNumber.isNotEmpty)
-                    Text(
-                      'Tracking: ${order.trackingNumber}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                ],
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildAddressCard(OrderModel order) {
     final addr = order.shippingAddress!;
@@ -566,27 +409,14 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   children: [
                     Row(
                       children: [
-                        ClipRRect(
+                        AppNetworkImage(
+                          imageUrl: item.productImage,
+                          width: 50,
+                          height: 50,
                           borderRadius: BorderRadius.circular(8),
-                          child: Container(
-                        width: 50,
-                        height: 50,
-                        color: Colors.grey.shade100,
-                        child: item.productImage.isNotEmpty
-                            ? Image.network(
-                                item.productImage,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => const Icon(
-                                  Icons.shopping_bag_outlined,
-                                  color: Colors.grey,
-                                ),
-                              )
-                            : const Icon(
-                                Icons.shopping_bag_outlined,
-                                color: Colors.grey,
-                              ),
-                      ),
-                    ),
+                          fit: BoxFit.cover,
+                          memCacheWidth: 150,
+                        ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(

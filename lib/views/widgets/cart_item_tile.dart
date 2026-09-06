@@ -4,6 +4,7 @@ import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/data/models/cart_model.dart';
+import 'package:shopp_app/views/widgets/app_network_image.dart';
 
 class CartItemTile extends StatelessWidget {
   final CartItemModel item;
@@ -35,23 +36,13 @@ class CartItemTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Product Thumbnail
-            ClipRRect(
+            AppNetworkImage(
+              imageUrl: item.productImage,
+              width: 80,
+              height: 80,
               borderRadius: AppRadius.borderSm,
-              child: Container(
-                width: 80,
-                height: 80,
-                color: AppColors.slate100,
-                child: item.productImage.isNotEmpty
-                    ? Image.network(
-                        item.productImage,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Icon(
-                          Icons.image_not_supported_outlined,
-                          color: AppColors.slate400,
-                        ),
-                      )
-                    : const Icon(Icons.shopping_bag_outlined, color: AppColors.slate400),
-              ),
+              fit: BoxFit.cover,
+              memCacheWidth: 200,
             ),
             const SizedBox(width: 14),
 

@@ -8,6 +8,7 @@ import 'package:shopp_app/data/models/order_model.dart';
 import 'package:shopp_app/views/home_page.dart';
 import 'package:shopp_app/views/orders_page.dart';
 import 'package:shopp_app/views/widgets/app_button.dart';
+import 'package:shopp_app/views/widgets/app_network_image.dart';
 
 class OrderConfirmationPage extends StatelessWidget {
   final OrderModel order;
@@ -222,16 +223,13 @@ class OrderConfirmationPage extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 6),
                       child: Row(
                         children: [
-                          ClipRRect(
+                          AppNetworkImage(
+                            imageUrl: item.productImage,
+                            width: 44,
+                            height: 44,
                             borderRadius: AppRadius.borderSm,
-                            child: Container(
-                              width: 44,
-                              height: 44,
-                              color: AppColors.slate100,
-                              child: item.productImage.isNotEmpty
-                                  ? Image.network(item.productImage, fit: BoxFit.cover)
-                                  : const Icon(Icons.shopping_bag_outlined, color: AppColors.slate400),
-                            ),
+                            fit: BoxFit.cover,
+                            memCacheWidth: 120,
                           ),
                           const SizedBox(width: 12),
                           Expanded(
