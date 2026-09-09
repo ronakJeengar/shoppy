@@ -4,6 +4,7 @@ import 'package:shopp_app/core/theme/app_dimensions.dart';
 import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 
 enum AppButtonVariant {
   primary,
@@ -20,7 +21,7 @@ class AppButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final AppButtonVariant variant;
   final bool isLoading;
-  final IconData? icon;
+  final String? icon;
   final bool isFullWidth;
   final double? height;
   final EdgeInsetsGeometry? padding;
@@ -88,7 +89,11 @@ class AppButton extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: AppIconSizes.md, color: fgColor),
+            AppIcon(
+              icon!,
+              size: AppIconSizes.button,
+              color: fgColor,
+            ),
             const SizedBox(width: AppDimensions.sm),
           ],
           Text(
@@ -145,9 +150,11 @@ class AppButton extends StatelessWidget {
       );
     }
 
-    if (isFullWidth) {
-      return SizedBox(width: double.infinity, child: buttonWidget);
-    }
-    return buttonWidget;
+    return Semantics(
+      button: true,
+      enabled: !isDisabled,
+      label: label,
+      child: buttonWidget,
+    );
   }
 }

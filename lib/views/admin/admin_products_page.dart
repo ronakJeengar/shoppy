@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/data/models/product_model.dart';
 import 'package:shopp_app/features/admin/presentation/providers/admin_providers.dart';
@@ -323,7 +325,7 @@ class _AdminProductsPageState extends ConsumerState<AdminProductsPage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const AppIcon(AppIcons.add, size: 22),
             tooltip: 'Add Product',
             onPressed: () => _openAddProductDialog(context),
           ),
@@ -341,14 +343,17 @@ class _AdminProductsPageState extends ConsumerState<AdminProductsPage> {
                     controller: _searchController,
                     decoration: InputDecoration(
                       hintText: 'Search products...',
-                      prefixIcon: const Icon(Icons.search, size: 20),
+                      prefixIcon: const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: AppIcon(AppIcons.search, size: 20),
+                      ),
                       isDense: true,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                       suffixIcon: _searchController.text.isNotEmpty
                           ? IconButton(
-                              icon: const Icon(Icons.clear, size: 18),
+                              icon: const AppIcon(AppIcons.close, size: 18),
                               onPressed: () {
                                 _searchController.clear();
                                 adminNotifier.loadProducts(search: '');
@@ -414,12 +419,14 @@ class _AdminProductsPageState extends ConsumerState<AdminProductsPage> {
                                   backgroundColor: isLowStock
                                       ? Colors.red.shade50
                                       : Colors.blue.shade50,
-                                  child: Icon(
-                                    Icons.inventory_2_outlined,
-                                    size: 20,
-                                    color: isLowStock
-                                        ? Colors.red
-                                        : Colors.blue.shade700,
+                                  child: Center(
+                                    child: AppIcon(
+                                      AppIcons.products,
+                                      size: 20,
+                                      color: isLowStock
+                                          ? Colors.red
+                                          : Colors.blue.shade700,
+                                    ),
                                   ),
                                 ),
                                 title: Text(

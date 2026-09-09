@@ -2,22 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/features/catalog/presentation/providers/catalog_providers.dart';
 import 'package:shopp_app/views/widgets/skeleton_loader.dart';
 
 class CategorySelector extends ConsumerWidget {
   const CategorySelector({super.key});
 
-  IconData _getCategoryIcon(String name) {
+  String _getCategoryIcon(String name) {
     final lower = name.toLowerCase();
-    if (lower.contains('electronic')) return Icons.devices_rounded;
-    if (lower.contains('fashion') || lower.contains('apparel')) return Icons.checkroom_rounded;
-    if (lower.contains('home') || lower.contains('living')) return Icons.chair_rounded;
-    if (lower.contains('sport') || lower.contains('outdoor')) return Icons.fitness_center_rounded;
-    if (lower.contains('book') || lower.contains('stationery')) return Icons.menu_book_rounded;
-    if (lower.contains('beauty') || lower.contains('wellness')) return Icons.spa_rounded;
-    return Icons.category_rounded;
+    if (lower.contains('electronic')) return AppIcons.electronics;
+    if (lower.contains('fashion') || lower.contains('apparel')) return AppIcons.clothing;
+    if (lower.contains('home') || lower.contains('living')) return AppIcons.furniture;
+    if (lower.contains('sport') || lower.contains('outdoor')) return AppIcons.sports;
+    if (lower.contains('book') || lower.contains('stationery')) return AppIcons.books;
+    if (lower.contains('beauty') || lower.contains('wellness')) return AppIcons.beauty;
+    return AppIcons.category;
   }
 
   @override
@@ -55,7 +57,7 @@ class CategorySelector extends ConsumerWidget {
           final isSelected =
               isAll ? selectedId == null : selectedId == categories[index - 1].id;
           final title = isAll ? 'All Items' : categories[index - 1].displayName;
-          final icon = isAll ? Icons.grid_view_rounded : _getCategoryIcon(categories[index - 1].name);
+          final icon = isAll ? AppIcons.dashboard : _getCategoryIcon(categories[index - 1].name);
 
           return Material(
             color: isSelected ? AppColors.primary : AppColors.white,
@@ -78,7 +80,7 @@ class CategorySelector extends ConsumerWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
+                    AppIcon(
                       icon,
                       size: 16,
                       color: isSelected ? AppColors.white : AppColors.slate600,

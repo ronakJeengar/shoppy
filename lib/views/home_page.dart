@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/constants/app_strings.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/features/auth/presentation/providers/auth_providers.dart';
 import 'package:shopp_app/features/cart/presentation/providers/cart_providers.dart';
 import 'package:shopp_app/data/models/recommendation_model.dart';
@@ -115,10 +118,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                 color: AppColors.primary50,
                 borderRadius: AppRadius.borderSm,
               ),
-              child: const Icon(
-                Icons.shopping_bag_rounded,
-                color: AppColors.primary,
-                size: 20,
+              child: const Center(
+                child: AppIcon(
+                  AppIcons.bagFilled,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
               ),
             ),
             const SizedBox(width: 10),
@@ -166,8 +171,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
-                        Icons.auto_awesome,
+                      const AppIcon(
+                        AppIcons.sparkles,
                         size: 15,
                         color: AppColors.violet,
                       ),
@@ -192,7 +197,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               alignment: Alignment.center,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.notifications_none_outlined),
+                  icon: const AppIcon(AppIcons.notifications, size: AppIconSizes.lg),
                   color: AppColors.slate700,
                   tooltip: 'Notifications',
                   onPressed: () {
@@ -233,7 +238,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               alignment: Alignment.center,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.favorite_border),
+                  icon: const AppIcon(AppIcons.wishlist, size: AppIconSizes.lg),
                   color: AppColors.slate700,
                   tooltip: 'Wishlist',
                   onPressed: () {
@@ -271,7 +276,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             alignment: Alignment.center,
             children: [
               IconButton(
-                icon: const Icon(Icons.shopping_cart_outlined),
+                icon: const AppIcon(AppIcons.cart, size: AppIconSizes.lg),
                 color: AppColors.slate700,
                 tooltip: 'Cart',
                 onPressed: () {
@@ -306,7 +311,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
           // Profile / Account Action
           IconButton(
-            icon: const Icon(Icons.person_outline),
+            icon: const AppIcon(AppIcons.user, size: AppIconSizes.lg),
             color: AppColors.slate700,
             tooltip: 'My Account',
             onPressed: () {
@@ -388,8 +393,8 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
           child: Row(
             children: [
-              const Icon(
-                Icons.search_rounded,
+              const AppIcon(
+                AppIcons.search,
                 color: AppColors.slate400,
                 size: 20,
               ),
@@ -408,10 +413,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                   color: AppColors.slate100,
                   borderRadius: AppRadius.borderXs,
                 ),
-                child: const Icon(
-                  Icons.tune_rounded,
-                  size: 16,
-                  color: AppColors.slate600,
+                child: const Center(
+                  child: AppIcon(
+                    AppIcons.tune,
+                    size: 16,
+                    color: AppColors.slate600,
+                  ),
                 ),
               ),
             ],
@@ -536,10 +543,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                 color: AppColors.primary,
                 borderRadius: AppRadius.borderMd,
               ),
-              child: const Icon(
-                Icons.local_offer_outlined,
-                color: AppColors.white,
-                size: 20,
+              child: const Center(
+                child: AppIcon(
+                  AppIcons.tag,
+                  color: AppColors.white,
+                  size: 20,
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -682,8 +691,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                             ),
                           ),
                           const SizedBox(width: 4),
-                          const Icon(
-                            Icons.arrow_forward_rounded,
+                          const AppIcon(
+                            AppIcons.arrowForward,
                             color: AppColors.white,
                             size: 14,
                           ),
@@ -753,8 +762,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      Icons.sort_rounded,
+                    const AppIcon(
+                      AppIcons.sort,
                       size: 16,
                       color: AppColors.slate700,
                     ),
@@ -835,7 +844,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         SliverFillRemaining(
           hasScrollBody: false,
           child: EmptyStateView(
-            icon: Icons.inventory_2_outlined,
+            icon: AppIcons.package,
             title: AppStrings.home.noProductsCategory,
             description: AppStrings.home.noProductsCategorySubtitle,
             buttonText: AppStrings.home.viewAllProducts,

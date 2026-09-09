@@ -5,7 +5,9 @@ import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_dimensions.dart';
 import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/features/catalog/domain/entities/category_entity.dart';
 import 'package:shopp_app/features/catalog/presentation/providers/catalog_providers.dart';
 import 'package:shopp_app/features/search/presentation/providers/search_providers.dart';
@@ -75,7 +77,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         backgroundColor: AppColors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.slate800),
+          icon: const AppIcon(AppIcons.back, color: AppColors.slate800),
           onPressed: () => Navigator.pop(context),
         ),
         title: Container(
@@ -99,14 +101,17 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               border: InputBorder.none,
               enabledBorder: InputBorder.none,
               focusedBorder: InputBorder.none,
-              prefixIcon: const Icon(
-                Icons.search_rounded,
-                size: AppIconSizes.md,
-                color: AppColors.slate500,
+              prefixIcon: const Padding(
+                padding: EdgeInsets.all(12),
+                child: AppIcon(
+                  AppIcons.search,
+                  size: AppIconSizes.md,
+                  color: AppColors.slate500,
+                ),
               ),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
-                      icon: const Icon(Icons.close_rounded, size: AppIconSizes.sm + 2, color: AppColors.slate500),
+                      icon: const AppIcon(AppIcons.close, size: AppIconSizes.sm + 2, color: AppColors.slate500),
                       onPressed: () {
                         _searchController.clear();
                         searchNotifier.clearSearch();
@@ -129,7 +134,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             alignment: Alignment.center,
             children: [
               IconButton(
-                icon: const Icon(Icons.tune, color: AppColors.slate800),
+                icon: const AppIcon(AppIcons.tune, color: AppColors.slate800),
                 tooltip: AppStrings.search.filters,
                 onPressed: _openFilters,
               ),
@@ -197,7 +202,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       final searchResults = searchState.resultsState.data ?? [];
       if (searchResults.isEmpty) {
         return EmptyStateView(
-          icon: Icons.search_off_rounded,
+          icon: AppIcons.searchOff,
           title: AppStrings.search.noResults,
           description:
               'No products matched "${searchState.query}". Try different keywords or clear filters.',
@@ -232,7 +237,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   icon: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.sort_rounded, size: AppIconSizes.sm, color: AppColors.slate700),
+                      const AppIcon(AppIcons.sort, size: AppIconSizes.sm, color: AppColors.slate700),
                       const SizedBox(width: AppDimensions.xs),
                       Text(
                         AppStrings.search.sort,
@@ -302,8 +307,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           final type = item['type']?.toString() ?? 'product';
 
           return ListTile(
-            leading: Icon(
-              type == 'category' ? Icons.category_rounded : Icons.search_rounded,
+            leading: AppIcon(
+              type == 'category' ? AppIcons.category : AppIcons.search,
               size: AppIconSizes.md,
               color: AppColors.textMuted,
             ),
@@ -311,8 +316,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               text,
               style: AppTypography.bodyMedium.copyWith(color: AppColors.slate800),
             ),
-            trailing: const Icon(
-              Icons.north_west_rounded,
+            trailing: const AppIcon(
+              AppIcons.arrowNorthWest,
               size: AppIconSizes.sm,
               color: AppColors.textMuted,
             ),
@@ -366,7 +371,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     term,
                     style: AppTypography.bodySmall.copyWith(color: AppColors.slate800),
                   ),
-                  deleteIcon: const Icon(Icons.close_rounded, size: 14, color: AppColors.textMuted),
+                  deleteIcon: const AppIcon(AppIcons.close, size: 14, color: AppColors.textMuted),
                   onDeleted: () => searchNotifier.removeRecentSearch(term),
                 );
               }).toList(),
@@ -387,7 +392,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               return ActionChip(
                 backgroundColor: AppColors.surface,
                 side: const BorderSide(color: AppColors.border),
-                avatar: const Icon(Icons.category_rounded, size: AppIconSizes.sm, color: AppColors.primary),
+                avatar: const AppIcon(AppIcons.category, size: AppIconSizes.sm, color: AppColors.primary),
                 label: Text(
                   cat.name,
                   style: AppTypography.bodySmall.copyWith(

@@ -6,7 +6,9 @@ import 'package:shopp_app/core/theme/app_dimensions.dart';
 import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/features/cart/presentation/providers/cart_providers.dart';
 import 'package:shopp_app/features/catalog/domain/entities/product_entity.dart';
 import 'package:shopp_app/features/wishlist/presentation/providers/wishlist_providers.dart';
@@ -82,14 +84,14 @@ class ProductCard extends ConsumerWidget {
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(6.0),
-                            child: Icon(
+                            child: AppIcon(
                               isWishlisted
-                                  ? Icons.favorite_rounded
-                                  : Icons.favorite_border,
+                                  ? AppIcons.wishlistFilled
+                                  : AppIcons.wishlist,
                               color: isWishlisted
                                   ? AppColors.error
                                   : AppColors.slate600,
-                              size: AppIconSizes.sm,
+                              size: AppIconSizes.productAction,
                             ),
                           ),
                         ),
@@ -120,8 +122,8 @@ class ProductCard extends ConsumerWidget {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(
-                                Icons.star_rounded,
+                              const AppIcon(
+                                AppIcons.star,
                                 size: AppIconSizes.xs + 2,
                                 color: AppColors.accent,
                               ),
@@ -236,9 +238,9 @@ class ProductCard extends ConsumerWidget {
                                 : null,
                             child: const Padding(
                               padding: EdgeInsets.all(6.0),
-                              child: Icon(
-                                Icons.add_shopping_cart_rounded,
-                                size: AppIconSizes.sm,
+                              child: AppIcon(
+                                AppIcons.addToCart,
+                                size: AppIconSizes.productAction,
                                 color: AppColors.white,
                               ),
                             ),

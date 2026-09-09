@@ -5,6 +5,7 @@ import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_spacing.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/data/models/order_model.dart';
 
 class OrderTimeline extends StatelessWidget {
@@ -33,7 +34,7 @@ class OrderTimeline extends StatelessWidget {
         title: 'Processing',
         subtitle: 'Seller is preparing your items',
         statusKey: 'PROCESSING',
-        icon: Icons.inventory_2_outlined,
+        icon: AppIcons.package,
         stepIndex: 1,
       ),
       _TimelineStep(
@@ -42,14 +43,14 @@ class OrderTimeline extends StatelessWidget {
             ? '${order.carrier} • Tracking #${order.trackingNumber}'
             : 'Package is on its way',
         statusKey: 'SHIPPED',
-        icon: Icons.local_shipping_outlined,
+        icon: AppIcons.shipped,
         stepIndex: 2,
       ),
       _TimelineStep(
         title: 'Delivered',
         subtitle: 'Package safely delivered',
         statusKey: 'DELIVERED',
-        icon: Icons.home_outlined,
+        icon: AppIcons.delivered,
         stepIndex: 3,
       ),
     ];
@@ -162,7 +163,7 @@ class OrderTimeline extends StatelessWidget {
     );
   }
 
-  Widget _buildStepNode(bool isCompleted, bool isCurrent, IconData icon) {
+  Widget _buildStepNode(bool isCompleted, bool isCurrent, String icon) {
     if (isCompleted) {
       return Container(
         width: 36,
@@ -180,10 +181,12 @@ class OrderTimeline extends StatelessWidget {
                 ]
               : null,
         ),
-        child: Icon(
-          isCurrent ? icon : Icons.check,
-          color: isCurrent ? Colors.white : AppColors.primary,
-          size: 18,
+        child: Center(
+          child: AppIcon(
+            isCurrent ? icon : AppIcons.check,
+            color: isCurrent ? Colors.white : AppColors.primary,
+            size: 18,
+          ),
         ),
       );
     }
@@ -196,10 +199,12 @@ class OrderTimeline extends StatelessWidget {
         shape: BoxShape.circle,
         border: Border.all(color: AppColors.slate200, width: 1.5),
       ),
-      child: Icon(
-        icon,
-        color: AppColors.slate400,
-        size: 18,
+      child: Center(
+        child: AppIcon(
+          icon,
+          color: AppColors.slate400,
+          size: 18,
+        ),
       ),
     );
   }
@@ -217,7 +222,7 @@ class OrderTimeline extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.cancel, color: AppColors.error, size: 24),
+              const AppIcon(AppIcons.cancel, color: AppColors.error, size: 24),
               const SizedBox(width: AppSpacing.sm),
               Text(
                 'Order Cancelled',
@@ -256,7 +261,7 @@ class OrderTimeline extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.pin_drop_outlined, size: 16, color: AppColors.primary),
+          const AppIcon(AppIcons.trackOrder, size: 16, color: AppColors.primary),
           const SizedBox(width: AppSpacing.xs),
           Expanded(
             child: Text(
@@ -280,7 +285,7 @@ class OrderTimeline extends StatelessWidget {
             },
             child: const Padding(
               padding: EdgeInsets.all(4.0),
-              child: Icon(Icons.copy, size: 14, color: AppColors.primary),
+              child: AppIcon(AppIcons.copy, size: 14, color: AppColors.primary),
             ),
           ),
         ],
@@ -339,7 +344,7 @@ class _TimelineStep {
   final String title;
   final String subtitle;
   final String statusKey;
-  final IconData icon;
+  final String icon;
   final int stepIndex;
 
   _TimelineStep({

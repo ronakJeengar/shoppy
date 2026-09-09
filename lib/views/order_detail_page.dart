@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
@@ -213,7 +215,7 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
                             color: Colors.red,
                           ),
                         )
-                      : const Icon(Icons.cancel_outlined),
+                      : const AppIcon(AppIcons.cancel, size: 18),
                   label: Text(
                     _isCancelling
                         ? 'Cancelling Order...'
@@ -275,7 +277,7 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Icon(Icons.copy, size: 14, color: Colors.blue),
+                      const AppIcon(AppIcons.copy, size: 14, color: Colors.blue),
                     ],
                   ),
                 ),
@@ -352,7 +354,7 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
           children: [
             const Row(
               children: [
-                Icon(Icons.location_on_outlined,
+                AppIcon(AppIcons.address,
                     color: Colors.blue, size: 20),
                 SizedBox(width: 8),
                 Text(
@@ -462,7 +464,7 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
                         visualDensity: VisualDensity.compact,
                         foregroundColor: Colors.amber.shade800,
                       ),
-                      icon: const Icon(Icons.star_outline, size: 16),
+                      icon: const AppIcon(AppIcons.starEmpty, size: 16),
                       label: const Text(
                         'Review Item',
                         style: TextStyle(fontSize: 12),
@@ -504,7 +506,7 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
           children: [
             const Row(
               children: [
-                Icon(Icons.payment_outlined, color: Colors.blue, size: 20),
+                AppIcon(AppIcons.payment, color: Colors.blue, size: 20),
                 SizedBox(width: 8),
                 Text(
                   'Payment Details',

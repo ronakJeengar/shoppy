@@ -3,7 +3,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/domain/models/ui_state.dart';
 import 'package:shopp_app/features/addresses/domain/entities/address_entity.dart';
 import 'package:shopp_app/features/addresses/presentation/providers/address_providers.dart';
@@ -59,7 +61,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                     style: AppTypography.headingSmall,
                   ),
                   TextButton.icon(
-                    icon: const Icon(Icons.add_rounded, size: 18),
+                    icon: const AppIcon(AppIcons.add, size: 18),
                     label: const Text('New'),
                     onPressed: () {
                       Navigator.pop(ctx);
@@ -126,7 +128,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
         backgroundColor: AppColors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.slate800),
+          icon: const AppIcon(AppIcons.back, color: AppColors.slate800),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text('Checkout', style: AppTypography.headingSmall),
@@ -179,7 +181,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                       color: AppColors.primary50,
                       borderRadius: AppRadius.borderSm,
                     ),
-                    child: const Icon(Icons.location_on_rounded, color: AppColors.primary, size: 18),
+                    child: const Center(child: AppIcon(AppIcons.address, color: AppColors.primary, size: 18)),
                   ),
                   const SizedBox(width: 10),
                   const Text('Delivery Address', style: AppTypography.headingSmall),
@@ -202,7 +204,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
           if (selected == null)
             AppButton(
               label: 'Add Delivery Address',
-              icon: Icons.add_location_alt_rounded,
+              icon: AppIcons.addressAdd,
               variant: AppButtonVariant.outline,
               isFullWidth: true,
               onPressed: () => _openAddressForm(context),
@@ -253,7 +255,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                   color: AppColors.primary50,
                   borderRadius: AppRadius.borderSm,
                 ),
-                child: const Icon(Icons.local_shipping_rounded, color: AppColors.primary, size: 18),
+                child: const Center(child: AppIcon(AppIcons.shipping, color: AppColors.primary, size: 18)),
               ),
               const SizedBox(width: 10),
               const Text('Shipping Method', style: AppTypography.headingSmall),
@@ -309,7 +311,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                   color: AppColors.primary50,
                   borderRadius: AppRadius.borderSm,
                 ),
-                child: const Icon(Icons.payment_rounded, color: AppColors.primary, size: 18),
+                child: const Center(child: AppIcon(AppIcons.payment, color: AppColors.primary, size: 18)),
               ),
               const SizedBox(width: 10),
               const Text('Payment Method', style: AppTypography.headingSmall),
@@ -320,14 +322,14 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
             title: 'Credit / Debit Card',
             subtitle: 'Instant secure checkout via Stripe',
             isSelected: currentMethod == 'CARD',
-            icon: Icons.credit_card_rounded,
+            icon: AppIcons.creditCard,
             onTap: () => ref.read(checkoutNotifierProvider.notifier).setPaymentMethod('CARD'),
           ),
           _buildSelectionTile(
             title: 'Cash on Delivery (COD)',
             subtitle: 'Pay with cash upon receipt of order',
             isSelected: currentMethod == 'COD',
-            icon: Icons.money_rounded,
+            icon: AppIcons.cash,
             onTap: () => ref.read(checkoutNotifierProvider.notifier).setPaymentMethod('COD'),
           ),
         ],
@@ -364,7 +366,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                   color: AppColors.primary50,
                   borderRadius: AppRadius.borderSm,
                 ),
-                child: const Icon(Icons.receipt_long_rounded, color: AppColors.primary, size: 18),
+                child: const Center(child: AppIcon(AppIcons.orders, color: AppColors.primary, size: 18)),
               ),
               const SizedBox(width: 10),
               const Text('Order Summary', style: AppTypography.headingSmall),
@@ -396,7 +398,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
     required String subtitle,
     required bool isSelected,
     required VoidCallback onTap,
-    IconData? icon,
+    String? icon,
   }) {
     return InkWell(
       onTap: onTap,
@@ -439,7 +441,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                   : null,
             ),
             if (icon != null) ...[
-              Icon(icon, size: 20, color: isSelected ? AppColors.primary : AppColors.slate600),
+              AppIcon(icon, size: 20, color: isSelected ? AppColors.primary : AppColors.slate600),
               const SizedBox(width: 10),
             ],
             Expanded(
@@ -531,7 +533,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
             Expanded(
               child: AppButton(
                 label: checkoutState.isPlacingOrder ? 'Processing...' : 'Place Order',
-                icon: Icons.lock_outline_rounded,
+                icon: AppIcons.lock,
                 isLoading: checkoutState.isPlacingOrder,
                 isFullWidth: true,
                 onPressed: canPlace

@@ -5,7 +5,9 @@ import 'package:shopp_app/core/theme/app_dimensions.dart';
 import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/features/cart/domain/entities/cart_entity.dart';
 import 'package:shopp_app/views/widgets/app_network_image.dart';
 
@@ -74,8 +76,8 @@ class CartItemTile extends StatelessWidget {
                       IconButton(
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
-                        icon: const Icon(
-                          Icons.close_rounded,
+                        icon: const AppIcon(
+                          AppIcons.close,
                           size: AppIconSizes.sm + 2,
                           color: AppColors.textMuted,
                         ),
@@ -128,10 +130,10 @@ class CartItemTile extends StatelessWidget {
                               },
                               child: Padding(
                                 padding: const EdgeInsets.all(6.0),
-                                child: Icon(
+                                child: AppIcon(
                                   item.quantity > 1
-                                      ? Icons.remove_rounded
-                                      : Icons.delete_outline_rounded,
+                                      ? AppIcons.remove
+                                      : AppIcons.delete,
                                   size: AppIconSizes.sm,
                                   color: item.quantity > 1 ? AppColors.slate700 : AppColors.error,
                                 ),
@@ -154,8 +156,8 @@ class CartItemTile extends StatelessWidget {
                                   : null,
                               child: Padding(
                                 padding: const EdgeInsets.all(6.0),
-                                child: Icon(
-                                  Icons.add_rounded,
+                                child: AppIcon(
+                                  AppIcons.add,
                                   size: AppIconSizes.sm,
                                   color: canIncrement ? AppColors.slate700 : AppColors.disabled,
                                 ),

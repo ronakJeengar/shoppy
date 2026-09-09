@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/data/models/admin_dashboard_model.dart';
 import 'package:shopp_app/features/admin/presentation/providers/admin_providers.dart';
@@ -34,7 +36,7 @@ class AdminDashboardPage extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const AppIcon(AppIcons.refresh, size: 20),
             tooltip: 'Refresh Metrics',
             onPressed: () =>
                 ref.read(adminDashboardNotifierProvider.notifier).loadDashboard(),
@@ -61,7 +63,7 @@ class AdminDashboardPage extends ConsumerWidget {
                         padding: const EdgeInsets.all(12),
                         child: Row(
                           children: [
-                            const Icon(Icons.cloud_off_outlined,
+                            const AppIcon(AppIcons.cloudOff,
                                 color: Colors.orange, size: 20),
                             const SizedBox(width: 10),
                             Expanded(
@@ -162,25 +164,25 @@ class AdminDashboardPage extends ConsumerWidget {
         _buildKPICard(
           title: 'Total Revenue',
           value: '\$${revenue.toStringAsFixed(2)}',
-          icon: Icons.attach_money,
+          icon: AppIcons.dollar,
           color: Colors.green,
         ),
         _buildKPICard(
           title: 'Total Orders',
           value: '$orders',
-          icon: Icons.shopping_bag_outlined,
+          icon: AppIcons.bag,
           color: Colors.blue,
         ),
         _buildKPICard(
           title: 'Active Products',
           value: '$products',
-          icon: Icons.inventory_2_outlined,
+          icon: AppIcons.products,
           color: Colors.orange,
         ),
         _buildKPICard(
           title: 'Total Users',
           value: '$users',
-          icon: Icons.people_outline,
+          icon: AppIcons.users,
           color: Colors.purple,
         ),
       ],
@@ -190,7 +192,7 @@ class AdminDashboardPage extends ConsumerWidget {
   Widget _buildKPICard({
     required String title,
     required String value,
-    required IconData icon,
+    required String icon,
     required Color color,
   }) {
     return Card(
@@ -219,7 +221,7 @@ class AdminDashboardPage extends ConsumerWidget {
                 CircleAvatar(
                   radius: 14,
                   backgroundColor: color.withValues(alpha: 0.1),
-                  child: Icon(icon, size: 16, color: color),
+                  child: Center(child: AppIcon(icon, size: 16, color: color)),
                 ),
               ],
             ),
@@ -248,7 +250,7 @@ class AdminDashboardPage extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
           children: [
-            const Icon(Icons.warning_amber_rounded, color: Colors.red),
+            const AppIcon(AppIcons.warning, color: Colors.red, size: 20),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -293,7 +295,7 @@ class AdminDashboardPage extends ConsumerWidget {
             Expanded(
               child: _buildNavButton(
                 context,
-                icon: Icons.inventory_2_outlined,
+                icon: AppIcons.products,
                 label: 'Products',
                 color: Colors.blue,
                 onTap: () => Navigator.push(
@@ -306,7 +308,7 @@ class AdminDashboardPage extends ConsumerWidget {
             Expanded(
               child: _buildNavButton(
                 context,
-                icon: Icons.receipt_long_outlined,
+                icon: AppIcons.orders,
                 label: 'Orders',
                 color: Colors.indigo,
                 onTap: () => Navigator.push(
@@ -319,7 +321,7 @@ class AdminDashboardPage extends ConsumerWidget {
             Expanded(
               child: _buildNavButton(
                 context,
-                icon: Icons.people_outline,
+                icon: AppIcons.users,
                 label: 'Users',
                 color: Colors.teal,
                 onTap: () => Navigator.push(
@@ -336,7 +338,7 @@ class AdminDashboardPage extends ConsumerWidget {
             Expanded(
               child: _buildNavButton(
                 context,
-                icon: Icons.rate_review_outlined,
+                icon: AppIcons.reviews,
                 label: 'Reviews',
                 color: Colors.orange,
                 onTap: () => Navigator.push(
@@ -349,7 +351,7 @@ class AdminDashboardPage extends ConsumerWidget {
             Expanded(
               child: _buildNavButton(
                 context,
-                icon: Icons.history_edu_outlined,
+                icon: AppIcons.auditLogs,
                 label: 'Audit',
                 color: Colors.deepPurple,
                 onTap: () => Navigator.push(
@@ -366,7 +368,7 @@ class AdminDashboardPage extends ConsumerWidget {
 
   Widget _buildNavButton(
     BuildContext context, {
-    required IconData icon,
+    required String icon,
     required String label,
     required Color color,
     required VoidCallback onTap,
@@ -385,7 +387,7 @@ class AdminDashboardPage extends ConsumerWidget {
             CircleAvatar(
               radius: 16,
               backgroundColor: color.withValues(alpha: 0.1),
-              child: Icon(icon, size: 18, color: color),
+              child: Center(child: AppIcon(icon, size: 18, color: color)),
             ),
             const SizedBox(height: 6),
             Text(

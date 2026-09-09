@@ -3,7 +3,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/features/auth/domain/entities/user_entity.dart';
 import 'package:shopp_app/features/auth/presentation/providers/auth_providers.dart';
 import 'package:shopp_app/features/notifications/presentation/providers/notification_providers.dart';
@@ -44,7 +46,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 AppTextField(
                   label: 'Full Name',
                   controller: nameController,
-                  prefixIcon: Icons.person_outline_rounded,
+                  prefixIcon: AppIcons.user,
                   validator: (val) =>
                       (val == null || val.trim().isEmpty) ? 'Enter your name' : null,
                 ),
@@ -52,7 +54,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 AppTextField(
                   label: 'Phone Number',
                   controller: phoneController,
-                  prefixIcon: Icons.phone_outlined,
+                  prefixIcon: AppIcons.phone,
                   keyboardType: TextInputType.phone,
                 ),
               ],
@@ -116,7 +118,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   label: 'Current Password',
                   controller: currentPasswordController,
                   obscureText: true,
-                  prefixIcon: Icons.lock_outline_rounded,
+                  prefixIcon: AppIcons.lock,
                   validator: (val) =>
                       (val == null || val.isEmpty) ? 'Enter current password' : null,
                 ),
@@ -125,7 +127,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   label: 'New Password',
                   controller: newPasswordController,
                   obscureText: true,
-                  prefixIcon: Icons.lock_reset_rounded,
+                  prefixIcon: AppIcons.lockReset,
                   validator: (val) =>
                       (val == null || val.length < 6) ? 'At least 6 characters' : null,
                 ),
@@ -134,7 +136,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   label: 'Confirm New Password',
                   controller: confirmPasswordController,
                   obscureText: true,
-                  prefixIcon: Icons.check_circle_outline_rounded,
+                  prefixIcon: AppIcons.checkCircleOutline,
                   validator: (val) {
                     if (val == null || val.isEmpty) return 'Confirm your password';
                     if (val != newPasswordController.text) return 'Passwords do not match';
@@ -227,7 +229,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         backgroundColor: AppColors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.slate800),
+          icon: const AppIcon(AppIcons.back, color: AppColors.slate800),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text('My Account', style: AppTypography.headingSmall),
@@ -260,7 +262,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       boxShadow: AppShadows.card,
                     ),
                     child: _buildTile(
-                      icon: Icons.dashboard_rounded,
+                      icon: AppIcons.dashboard,
                       iconColor: AppColors.violet,
                       title: 'Admin Dashboard',
                       subtitle: 'Store overview, products, orders & audit logs',
@@ -291,7 +293,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   child: Column(
                     children: [
                       _buildTile(
-                        icon: Icons.receipt_long_rounded,
+                        icon: AppIcons.orders,
                         iconColor: AppColors.primary,
                         title: 'My Orders',
                         subtitle: 'Track, view, or cancel your orders',
@@ -304,7 +306,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       ),
                       const Divider(height: 1, color: AppColors.slate200, indent: 56),
                       _buildTile(
-                        icon: Icons.favorite_rounded,
+                        icon: AppIcons.wishlistFilled,
                         iconColor: AppColors.coral,
                         title: 'My Wishlist',
                         subtitle: 'Saved products and future purchases',
@@ -317,7 +319,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       ),
                       const Divider(height: 1, color: AppColors.slate200, indent: 56),
                       _buildTile(
-                        icon: Icons.location_on_rounded,
+                        icon: AppIcons.address,
                         iconColor: AppColors.success,
                         title: 'Delivery Addresses',
                         subtitle: 'Manage saved shipping addresses',
@@ -330,7 +332,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       ),
                       const Divider(height: 1, color: AppColors.slate200, indent: 56),
                       _buildTile(
-                        icon: Icons.notifications_rounded,
+                        icon: AppIcons.notificationsFilled,
                         iconColor: AppColors.accent,
                         title: 'Notifications',
                         subtitle: 'Order updates and promotional offers',
@@ -363,7 +365,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   child: Column(
                     children: [
                       _buildTile(
-                        icon: Icons.edit_rounded,
+                        icon: AppIcons.edit,
                         iconColor: AppColors.primary,
                         title: 'Edit Profile',
                         subtitle: 'Update your display name and contact phone',
@@ -371,7 +373,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       ),
                       const Divider(height: 1, color: AppColors.slate200, indent: 56),
                       _buildTile(
-                        icon: Icons.lock_outline_rounded,
+                        icon: AppIcons.lock,
                         iconColor: AppColors.slate700,
                         title: 'Change Password',
                         subtitle: 'Keep your Shoppy account secure',
@@ -379,7 +381,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       ),
                       const Divider(height: 1, color: AppColors.slate200, indent: 56),
                       _buildTile(
-                        icon: Icons.tune_rounded,
+                        icon: AppIcons.tune,
                         iconColor: AppColors.violet,
                         title: 'Notification Preferences',
                         subtitle: 'Manage email and app notifications',
@@ -406,7 +408,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     boxShadow: AppShadows.card,
                   ),
                   child: _buildTile(
-                    icon: Icons.logout_rounded,
+                    icon: AppIcons.logout,
                     iconColor: AppColors.error,
                     title: 'Log Out',
                     subtitle: 'Safely sign out of this device',
@@ -493,7 +495,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   Widget _buildTile({
-    required IconData icon,
+    required String icon,
     required Color iconColor,
     required String title,
     required String subtitle,
@@ -507,7 +509,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           color: iconColor.withValues(alpha: 0.1),
           borderRadius: AppRadius.borderSm,
         ),
-        child: Icon(icon, color: iconColor, size: 20),
+        child: AppIcon(icon, color: iconColor, size: 20),
       ),
       title: Text(
         title,
@@ -540,8 +542,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ),
             ),
           const SizedBox(width: 6),
-          const Icon(
-            Icons.chevron_right_rounded,
+          const AppIcon(
+            AppIcons.chevronRight,
             size: 18,
             color: AppColors.slate400,
           ),

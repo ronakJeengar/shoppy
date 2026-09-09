@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/domain/models/ui_state.dart';
@@ -84,7 +86,7 @@ class _AddressesPageState extends ConsumerState<AddressesPage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const AppIcon(AppIcons.add, size: 22),
             tooltip: 'Add Address',
             onPressed: () => _openAddressForm(),
           ),
@@ -125,7 +127,7 @@ class _AddressesPageState extends ConsumerState<AddressesPage> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  icon: const Icon(Icons.add_location_alt_outlined),
+                  icon: const AppIcon(AppIcons.addressAdd, size: 20),
                   label: const Text(
                     'Add New Address',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -145,10 +147,10 @@ class _AddressesPageState extends ConsumerState<AddressesPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.location_off_outlined,
+            const AppIcon(
+              AppIcons.locationOff,
               size: 80,
-              color: Colors.grey.shade300,
+              color: AppColors.slate300,
             ),
             const SizedBox(height: 16),
             const Text(
@@ -172,7 +174,7 @@ class _AddressesPageState extends ConsumerState<AddressesPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              icon: const Icon(Icons.add),
+              icon: const AppIcon(AppIcons.add, size: 22),
               label: const Text('Add Address'),
               onPressed: () => _openAddressForm(),
             ),
@@ -235,7 +237,7 @@ class _AddressesPageState extends ConsumerState<AddressesPage> {
                   ],
                 ),
                 PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_vert, size: 20, color: Colors.grey),
+                  icon: const AppIcon(AppIcons.moreVert, size: 20, color: Colors.grey),
                   onSelected: (val) async {
                     if (val == 'edit') {
                       _openAddressForm(address: addr);

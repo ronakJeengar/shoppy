@@ -3,7 +3,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/data/models/order_model.dart';
 import 'package:shopp_app/domain/models/ui_state.dart';
 import 'package:shopp_app/features/orders/presentation/providers/order_providers.dart';
@@ -81,7 +83,7 @@ class _OrdersPageState extends ConsumerState<OrdersPage> {
         backgroundColor: AppColors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.slate800),
+          icon: const AppIcon(AppIcons.back, color: AppColors.slate800),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text('My Orders', style: AppTypography.headingSmall),
@@ -94,7 +96,7 @@ class _OrdersPageState extends ConsumerState<OrdersPage> {
             )
           : orders.isEmpty
               ? EmptyStateView(
-                  icon: Icons.receipt_long_outlined,
+                  icon: AppIcons.orders,
                   title: 'No orders yet',
                   description: 'When you place orders, they will appear here with live tracking updates.',
                   buttonText: 'Start Shopping',

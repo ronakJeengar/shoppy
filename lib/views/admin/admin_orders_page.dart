@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/data/models/order_model.dart';
 import 'package:shopp_app/features/admin/presentation/providers/admin_providers.dart';
@@ -94,7 +96,7 @@ class _AdminOrdersPageState extends ConsumerState<AdminOrdersPage> {
                     foregroundColor: Colors.white,
                     minimumSize: const Size.fromHeight(44),
                   ),
-                  icon: const Icon(Icons.autorenew),
+                  icon: const AppIcon(AppIcons.refresh, size: 18),
                   label: const Text('Move to Processing'),
                   onPressed: () async {
                     Navigator.pop(sheetCtx);
@@ -111,7 +113,7 @@ class _AdminOrdersPageState extends ConsumerState<AdminOrdersPage> {
                     foregroundColor: Colors.white,
                     minimumSize: const Size.fromHeight(44),
                   ),
-                  icon: const Icon(Icons.local_shipping_outlined),
+                  icon: const AppIcon(AppIcons.shipping, size: 18),
                   label: const Text('Dispatch / Ship Order'),
                   onPressed: () {
                     Navigator.pop(sheetCtx);
@@ -127,7 +129,7 @@ class _AdminOrdersPageState extends ConsumerState<AdminOrdersPage> {
                     foregroundColor: Colors.white,
                     minimumSize: const Size.fromHeight(44),
                   ),
-                  icon: const Icon(Icons.check_circle_outline),
+                  icon: const AppIcon(AppIcons.checkCircleOutline, size: 18),
                   label: const Text('Mark as Delivered'),
                   onPressed: () async {
                     Navigator.pop(sheetCtx);
@@ -145,7 +147,7 @@ class _AdminOrdersPageState extends ConsumerState<AdminOrdersPage> {
                     side: const BorderSide(color: Colors.red),
                     minimumSize: const Size.fromHeight(44),
                   ),
-                  icon: const Icon(Icons.cancel_outlined),
+                  icon: const AppIcon(AppIcons.cancel, size: 18),
                   label: const Text('Cancel Order & Restock'),
                   onPressed: () async {
                     Navigator.pop(sheetCtx);
@@ -322,7 +324,7 @@ class _AdminOrdersPageState extends ConsumerState<AdminOrdersPage> {
                                       ),
                                     ),
                                     const SizedBox(width: 4),
-                                    const Icon(Icons.chevron_right,
+                                    const AppIcon(AppIcons.chevronRight,
                                         size: 18, color: Colors.grey),
                                   ],
                                 ),

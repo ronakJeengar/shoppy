@@ -5,7 +5,9 @@ import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_dimensions.dart';
 import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/core/widgets/app_button.dart';
 import 'package:shopp_app/core/widgets/app_text_field.dart';
 import 'package:shopp_app/features/auth/presentation/providers/auth_providers.dart';
@@ -66,7 +68,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
         backgroundColor: AppColors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.slate800),
+          icon: const AppIcon(AppIcons.back, color: AppColors.slate800),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -88,10 +90,12 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                       color: AppColors.primary50,
                       borderRadius: AppRadius.borderLg,
                     ),
-                    child: const Icon(
-                      Icons.person_add_rounded,
-                      size: AppIconSizes.xxl,
-                      color: AppColors.primary,
+                    child: const Center(
+                      child: AppIcon(
+                        AppIcons.userAdd,
+                        size: AppIconSizes.xxl,
+                        color: AppColors.primary,
+                      ),
                     ),
                   ),
                 ),
@@ -121,7 +125,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.error_outline_rounded,
+                        const AppIcon(AppIcons.errorOutline,
                             size: AppIconSizes.sm + 2, color: AppColors.error),
                         const SizedBox(width: AppDimensions.sm),
                         Expanded(
@@ -142,7 +146,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                   label: AppStrings.auth.fullName,
                   hintText: AppStrings.auth.enterName,
                   controller: _nameController,
-                  prefixIcon: Icons.person_outline_rounded,
+                  prefixIcon: AppIcons.user,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return AppStrings.validation.nameRequired;
@@ -158,7 +162,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                   hintText: AppStrings.auth.enterEmail,
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  prefixIcon: Icons.email_outlined,
+                  prefixIcon: AppIcons.email,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return AppStrings.validation.emailRequired;
@@ -178,12 +182,12 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                   hintText: AppStrings.auth.passwordRule,
                   controller: _passwordController,
                   obscureText: _obscurePassword,
-                  prefixIcon: Icons.lock_outline_rounded,
+                  prefixIcon: AppIcons.lock,
                   suffixIcon: IconButton(
-                    icon: Icon(
+                    icon: AppIcon(
                       _obscurePassword
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
+                          ? AppIcons.eye
+                          : AppIcons.eyeOff,
                       size: AppIconSizes.md,
                       color: AppColors.slate500,
                     ),
@@ -211,12 +215,12 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                   hintText: AppStrings.auth.confirmPassword,
                   controller: _confirmPasswordController,
                   obscureText: _obscureConfirmPassword,
-                  prefixIcon: Icons.lock_clock_outlined,
+                  prefixIcon: AppIcons.lockClock,
                   suffixIcon: IconButton(
-                    icon: Icon(
+                    icon: AppIcon(
                       _obscureConfirmPassword
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
+                          ? AppIcons.eye
+                          : AppIcons.eyeOff,
                       size: AppIconSizes.md,
                       color: AppColors.slate500,
                     ),
@@ -241,7 +245,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                 // Submit Button
                 AppButton(
                   label: AppStrings.auth.createAccount,
-                  icon: Icons.check_circle_outline_rounded,
+                  icon: AppIcons.checkCircleOutline,
                   isLoading: authState.isLoading,
                   isFullWidth: true,
                   onPressed: authState.isLoading ? null : _submitRegister,

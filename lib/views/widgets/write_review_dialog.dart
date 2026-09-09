@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/data/models/review_model.dart';
 import 'package:shopp_app/features/reviews/presentation/providers/review_providers.dart';
@@ -87,9 +89,10 @@ class _WriteReviewDialogState extends ConsumerState<WriteReviewDialog> {
                   children: List.generate(5, (index) {
                     final starNum = index + 1;
                     return IconButton(
-                      icon: Icon(
-                        starNum <= _rating ? Icons.star : Icons.star_border,
+                      icon: AppIcon(
+                        starNum <= _rating ? AppIcons.star : AppIcons.starEmpty,
                         color: Colors.amber,
+                        size: 32,
                       ),
                       iconSize: 32,
                       onPressed: () {

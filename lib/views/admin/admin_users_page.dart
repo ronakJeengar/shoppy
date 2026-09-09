@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/data/models/admin_user_model.dart';
 import 'package:shopp_app/features/admin/presentation/providers/admin_providers.dart';
@@ -130,14 +132,17 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage> {
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: 'Search users by name or email...',
-                prefixIcon: const Icon(Icons.search, size: 20),
+                prefixIcon: const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: AppIcon(AppIcons.search, size: 20),
+                ),
                 isDense: true,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear, size: 18),
+                        icon: const AppIcon(AppIcons.close, size: 18),
                         onPressed: () {
                           _searchController.clear();
                           usersNotifier.loadUsers(search: '');

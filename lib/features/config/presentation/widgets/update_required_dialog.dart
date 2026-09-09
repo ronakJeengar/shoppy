@@ -4,7 +4,9 @@ import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/theme/app_icon_sizes.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/widgets/app_button.dart';
+import '../../../../core/widgets/app_icon.dart';
 
 class UpdateRequiredDialog extends StatelessWidget {
   final String minimumVersion;
@@ -36,10 +38,12 @@ class UpdateRequiredDialog extends StatelessWidget {
                   color: AppColors.primary50,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.system_update_rounded,
-                  size: AppIconSizes.xl,
-                  color: AppColors.primary,
+                child: const Center(
+                  child: AppIcon(
+                    AppIcons.systemUpdate,
+                    size: AppIconSizes.xl,
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
               const SizedBox(height: AppDimensions.lg),
@@ -59,7 +63,7 @@ class UpdateRequiredDialog extends StatelessWidget {
               const SizedBox(height: AppDimensions.xl),
               AppButton(
                 label: 'Update Now',
-                icon: Icons.open_in_new_rounded,
+                icon: AppIcons.openInNew,
                 isFullWidth: true,
                 onPressed: () {
                   // In production, opens launchUrlString(updateUrl)

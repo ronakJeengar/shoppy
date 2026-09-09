@@ -9,6 +9,8 @@ import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_dimensions.dart';
 import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/features/auth/presentation/providers/auth_providers.dart';
 import 'package:shopp_app/views/addresses_page.dart';
 import 'package:shopp_app/views/admin/admin_audit_logs_page.dart';
@@ -258,8 +260,8 @@ final routerProvider = Provider<GoRouter>((ref) {
                   color: AppColors.slate100,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.error_outline_rounded,
+                child: const AppIcon(
+                  AppIcons.errorOutline,
                   size: AppIconSizes.emptyState,
                   color: AppColors.textMuted,
                 ),
@@ -279,7 +281,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               const SizedBox(height: AppDimensions.xxxl),
               AppButton(
                 label: AppStrings.common.back,
-                icon: Icons.home_rounded,
+                icon: AppIcons.home,
                 onPressed: () => context.go(RouteNames.home),
               ),
             ],

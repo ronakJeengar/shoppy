@@ -49,8 +49,16 @@ import 'package:shopp_app/data/models/recommendation_model.dart';
 import 'package:shopp_app/views/widgets/recommendation_carousel.dart';
 import 'package:shopp_app/views/widgets/address_form_dialog.dart';
 import 'package:shopp_app/views/widgets/filter_bottom_sheet.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/views/widgets/product_card.dart';
 import 'package:shopp_app/views/widgets/write_review_dialog.dart';
+
+Finder findAppIcon(String assetPath) =>
+    find.byWidgetPredicate((w) => w is AppIcon && w.assetPath == assetPath);
+
+Finder findIconButtonWithAppIcon(String assetPath) =>
+    find.ancestor(of: findAppIcon(assetPath), matching: find.byType(IconButton));
 
 class FakeAuthRepository implements AuthRepository {
   final UserEntity? _user;
@@ -173,10 +181,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Shoppy Store'), findsOneWidget);
-    expect(find.byIcon(Icons.person_outline), findsOneWidget);
-    expect(find.byIcon(Icons.notifications_none_outlined), findsOneWidget);
-    expect(find.byIcon(Icons.favorite_border), findsWidgets);
-    expect(find.byIcon(Icons.shopping_cart_outlined), findsOneWidget);
+    expect(findAppIcon(AppIcons.user), findsOneWidget);
+    expect(findAppIcon(AppIcons.notifications), findsOneWidget);
+    expect(findAppIcon(AppIcons.wishlist), findsWidgets);
+    expect(findAppIcon(AppIcons.cart), findsOneWidget);
     expect(find.text('Categories'), findsOneWidget);
     expect(
         find.text('Search products, brands and categories...'), findsOneWidget);
@@ -186,7 +194,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(SearchPage), findsOneWidget);
-    expect(find.byIcon(Icons.tune), findsOneWidget);
+    expect(findAppIcon(AppIcons.tune), findsOneWidget);
   });
 
   testWidgets('Tapping Cart icon on HomePage opens CartPage',
@@ -199,7 +207,7 @@ void main() {
     await tester.pumpWidget(buildTestApp());
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byIcon(Icons.shopping_cart_outlined));
+    await tester.tap(findAppIcon(AppIcons.cart));
     await tester.pumpAndSettle();
 
     expect(find.byType(CartPage), findsOneWidget);
@@ -217,7 +225,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final wishlistIconFinder =
-        find.widgetWithIcon(IconButton, Icons.favorite_border);
+        findIconButtonWithAppIcon(AppIcons.wishlist);
     await tester.tap(wishlistIconFinder.first);
     await tester.pumpAndSettle();
 
@@ -236,7 +244,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final notifFinder =
-        find.widgetWithIcon(IconButton, Icons.notifications_none_outlined);
+        findIconButtonWithAppIcon(AppIcons.notifications);
     await tester.tap(notifFinder);
     await tester.pumpAndSettle();
 
@@ -262,7 +270,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final profileFinder =
-        find.widgetWithIcon(IconButton, Icons.person_outline);
+        findIconButtonWithAppIcon(AppIcons.user);
     await tester.tap(profileFinder);
     await tester.pumpAndSettle();
 
@@ -308,7 +316,7 @@ void main() {
     expect(find.byType(ProductDetailPage), findsOneWidget);
     expect(find.text('Sold by KeyCrafters'), findsOneWidget);
     expect(find.text('Add to Cart'), findsOneWidget);
-    expect(find.byIcon(Icons.favorite_border), findsOneWidget);
+    expect(findAppIcon(AppIcons.wishlist), findsOneWidget);
   });
 
   testWidgets('SearchPage displays recent searches and opens filter sheet',
@@ -330,7 +338,7 @@ void main() {
     expect(find.text('Keyboard'), findsOneWidget);
     expect(find.text('Clear All'), findsOneWidget);
 
-    await tester.tap(find.byIcon(Icons.tune));
+    await tester.tap(findAppIcon(AppIcons.tune));
     await tester.pumpAndSettle();
 
     expect(find.byType(FilterBottomSheet), findsOneWidget);
@@ -607,7 +615,7 @@ void main() {
     expect(find.text('Product Management'), findsOneWidget);
     expect(find.byType(TextField), findsOneWidget);
     expect(find.text('Low Stock'), findsOneWidget);
-    expect(find.byIcon(Icons.add), findsOneWidget);
+    expect(findAppIcon(AppIcons.add), findsOneWidget);
   });
 
   testWidgets('AdminOrdersPage renders status filter tabs and order list',
@@ -651,7 +659,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Security & Audit Trail'), findsOneWidget);
-    expect(find.byIcon(Icons.refresh), findsOneWidget);
+    expect(findAppIcon(AppIcons.refresh), findsOneWidget);
   });
 
   testWidgets(
@@ -832,7 +840,7 @@ void main() {
 
     expect(find.byType(TextField), findsOneWidget);
     expect(find.text('Search products, brands, or describe what you need...'), findsOneWidget);
-    expect(find.byIcon(Icons.tune), findsOneWidget);
+    expect(findAppIcon(AppIcons.tune), findsOneWidget);
   });
 
   test('SearchNotifier executes natural language query and maintains state', () async {
@@ -935,7 +943,7 @@ void main() {
     await tester.pumpWidget(buildTestApp());
     await tester.pumpAndSettle();
 
-    final assistantButtonFinder = find.byIcon(Icons.auto_awesome);
+    final assistantButtonFinder = findAppIcon(AppIcons.sparkles);
     expect(assistantButtonFinder, findsOneWidget);
 
     await tester.tap(assistantButtonFinder);
@@ -960,7 +968,7 @@ void main() {
     expect(find.text('How can I help you shop today?'), findsOneWidget);
     expect(find.text('Try asking:'), findsOneWidget);
     expect(find.byType(TextField), findsOneWidget);
-    expect(find.byIcon(Icons.send), findsOneWidget);
+    expect(findAppIcon(AppIcons.send), findsOneWidget);
   });
 
   test('AssistantConfirmationModel serializes and deserializes accurately', () {

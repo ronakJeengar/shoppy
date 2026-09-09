@@ -5,7 +5,9 @@ import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_dimensions.dart';
 import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/data/models/notification_model.dart';
 import 'package:shopp_app/domain/models/ui_state.dart';
 import 'package:shopp_app/features/notifications/presentation/providers/notification_providers.dart';
@@ -36,20 +38,20 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
     super.dispose();
   }
 
-  IconData _getTypeIcon(String type) {
+  String _getTypeIcon(String type) {
     switch (type) {
       case 'ORDER_CONFIRMED':
-        return Icons.check_circle_outline_rounded;
+        return AppIcons.checkCircleOutline;
       case 'ORDER_SHIPPED':
-        return Icons.local_shipping_outlined;
+        return AppIcons.shipping;
       case 'ORDER_DELIVERED':
-        return Icons.done_all_rounded;
+        return AppIcons.checkAll;
       case 'ORDER_CANCELLED':
-        return Icons.cancel_outlined;
+        return AppIcons.cancel;
       case 'PROMOTION':
-        return Icons.local_offer_outlined;
+        return AppIcons.tag;
       default:
-        return Icons.notifications_none_rounded;
+        return AppIcons.notifications;
     }
   }
 
@@ -82,7 +84,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
         backgroundColor: AppColors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.slate800),
+          icon: const AppIcon(AppIcons.back, color: AppColors.slate800),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(AppStrings.notifications.title, style: AppTypography.headingSmall),
@@ -109,7 +111,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
             )
           : notifications.isEmpty
               ? EmptyStateView(
-                  icon: Icons.notifications_off_outlined,
+                  icon: AppIcons.notificationsOff,
                   title: AppStrings.notifications.empty,
                   description: AppStrings.notifications.emptySubtitle,
                 )
@@ -165,7 +167,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                 color: typeColor.withValues(alpha: 0.1),
                 borderRadius: AppRadius.borderSm,
               ),
-              child: Icon(typeIcon, color: typeColor, size: AppIconSizes.md),
+              child: Center(child: AppIcon(typeIcon, color: typeColor, size: AppIconSizes.md)),
             ),
             const SizedBox(width: 14),
             Expanded(

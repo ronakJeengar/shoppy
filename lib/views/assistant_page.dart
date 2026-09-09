@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/data/models/assistant_message_model.dart';
 import 'package:shopp_app/features/assistant/presentation/providers/assistant_providers.dart';
@@ -63,10 +65,12 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
                 color: theme.colorScheme.primaryContainer,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.auto_awesome,
-                size: 20,
-                color: theme.colorScheme.primary,
+              child: Center(
+                child: AppIcon(
+                  AppIcons.sparkles,
+                  size: 20,
+                  color: theme.colorScheme.primary,
+                ),
               ),
             ),
             const SizedBox(width: 10),
@@ -88,7 +92,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add_comment_outlined),
+            icon: const AppIcon(AppIcons.commentAdd, size: 20),
             tooltip: 'New Conversation',
             onPressed: () {
               notifier.startNewConversation();
@@ -107,7 +111,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [
-                    const Icon(Icons.error_outline, color: Colors.red, size: 20),
+                    const AppIcon(AppIcons.errorOutline, color: Colors.red, size: 20),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -116,7 +120,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, size: 18, color: Colors.red),
+                      icon: const AppIcon(AppIcons.close, size: 18, color: Colors.red),
                       onPressed: () => notifier.clearError(),
                     ),
                   ],
@@ -175,10 +179,12 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
               color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.4),
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              Icons.auto_awesome,
-              size: 48,
-              color: Theme.of(context).colorScheme.primary,
+            child: Center(
+              child: AppIcon(
+                AppIcons.sparkles,
+                size: 48,
+                color: Theme.of(context).colorScheme.primary,
+              ),
             ),
           ),
           const SizedBox(height: 20),
@@ -220,7 +226,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
                 },
                 child: Row(
                   children: [
-                    const Icon(Icons.chat_bubble_outline, size: 16),
+                    const AppIcon(AppIcons.chatBubble, size: 16),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
@@ -228,7 +234,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
                         style: const TextStyle(fontSize: 14),
                       ),
                     ),
-                    const Icon(Icons.arrow_forward_ios, size: 12),
+                    const AppIcon(AppIcons.forward, size: 12),
                   ],
                 ),
               ),
@@ -278,10 +284,12 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
                     color: theme.colorScheme.primaryContainer,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    Icons.auto_awesome,
-                    size: 16,
-                    color: theme.colorScheme.primary,
+                  child: Center(
+                    child: AppIcon(
+                      AppIcons.sparkles,
+                      size: 16,
+                      color: theme.colorScheme.primary,
+                    ),
                   ),
                 ),
               ],
@@ -363,7 +371,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
         children: [
           Row(
             children: [
-              Icon(Icons.warning_amber_rounded, color: Colors.amber.shade900, size: 20),
+              AppIcon(AppIcons.warning, color: Colors.amber.shade900, size: 20),
               const SizedBox(width: 8),
               Text(
                 'Confirmation Required',
@@ -416,7 +424,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
                           );
                         }
                       },
-                icon: const Icon(Icons.check_circle_outline, size: 16),
+                icon: const AppIcon(AppIcons.checkCircleOutline, size: 16),
                 label: const Text('Confirm', style: TextStyle(fontSize: 13)),
               ),
               const SizedBox(width: 10),
@@ -578,7 +586,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.verified_outlined, size: 12, color: Colors.amber.shade900),
+              AppIcon(AppIcons.verifiedOutline, size: 12, color: Colors.amber.shade900),
               const SizedBox(width: 4),
               Text(
                 "Source: $title$sec",
@@ -606,7 +614,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          icon: Icon(_getActionIcon(act.type), size: 14),
+          icon: AppIcon(_getActionIcon(act.type), size: 14),
           label: Text(act.label, style: const TextStyle(fontSize: 12)),
           onPressed: () => notifier.executeAction(act, context),
         );
@@ -614,19 +622,19 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
     );
   }
 
-  IconData _getActionIcon(String type) {
+  String _getActionIcon(String type) {
     switch (type) {
       case 'OPEN_PRODUCT':
-        return Icons.shopping_bag_outlined;
+        return AppIcons.bag;
       case 'OPEN_SEARCH':
-        return Icons.search;
+        return AppIcons.search;
       case 'OPEN_CART':
-        return Icons.shopping_cart_outlined;
+        return AppIcons.cart;
       case 'OPEN_ORDER':
       case 'OPEN_ORDERS':
-        return Icons.local_shipping_outlined;
+        return AppIcons.shipping;
       default:
-        return Icons.arrow_forward;
+        return AppIcons.arrowForward;
     }
   }
 
@@ -672,7 +680,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
           ),
           const SizedBox(width: 8),
           IconButton.filled(
-            icon: const Icon(Icons.send, size: 18),
+            icon: const AppIcon(AppIcons.send, size: 18, color: Colors.white),
             onPressed: state.isLoading ? null : () => _sendMessage(notifier),
           ),
         ],

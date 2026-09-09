@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/data/models/order_model.dart';
 import 'package:shopp_app/domain/models/ui_state.dart';
 import 'package:shopp_app/views/widgets/app_network_image.dart';
@@ -141,7 +143,12 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.byIcon(Icons.inventory_2_outlined), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (widget) => widget is AppIcon && widget.assetPath == AppIcons.package,
+        ),
+        findsOneWidget,
+      );
     });
   });
 

@@ -6,7 +6,9 @@ import 'package:shopp_app/core/theme/app_dimensions.dart';
 import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/domain/models/ui_state.dart';
 import 'package:shopp_app/features/cart/domain/entities/cart_entity.dart';
 import 'package:shopp_app/features/cart/presentation/providers/cart_providers.dart';
@@ -56,7 +58,7 @@ class CartPage extends ConsumerWidget {
         backgroundColor: AppColors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.slate800),
+          icon: const AppIcon(AppIcons.back, color: AppColors.slate800),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -66,7 +68,7 @@ class CartPage extends ConsumerWidget {
         actions: [
           if (cart.items.isNotEmpty)
             IconButton(
-              icon: const Icon(Icons.delete_sweep_outlined, color: AppColors.textSecondary),
+              icon: const AppIcon(AppIcons.deleteSweep, color: AppColors.textSecondary, size: AppIconSizes.lg),
               tooltip: AppStrings.cart.clearCart,
               onPressed: () => _confirmClearCart(context, ref),
             ),
@@ -102,7 +104,7 @@ class CartPage extends ConsumerWidget {
 
     if (cart.items.isEmpty) {
       return EmptyStateView(
-        icon: Icons.shopping_cart_outlined,
+        icon: AppIcons.cart,
         title: AppStrings.cart.empty,
         description: AppStrings.cart.emptySubtitle,
         buttonText: AppStrings.cart.startShopping,
@@ -137,8 +139,8 @@ class CartPage extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    Icon(
-                      qualifiesForFreeShipping ? Icons.check_circle_rounded : Icons.local_shipping_outlined,
+                    AppIcon(
+                      qualifiesForFreeShipping ? AppIcons.checkCircle : AppIcons.shipping,
                       size: AppIconSizes.sm + 2,
                       color: qualifiesForFreeShipping ? AppColors.success : AppColors.primary,
                     ),
@@ -282,7 +284,7 @@ class CartPage extends ConsumerWidget {
           Expanded(
             child: AppButton(
               label: AppStrings.cart.proceedToCheckout,
-              icon: Icons.arrow_forward_rounded,
+              icon: AppIcons.arrowForward,
               isFullWidth: true,
               onPressed: () {
                 Navigator.push(

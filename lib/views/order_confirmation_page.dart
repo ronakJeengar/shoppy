@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/data/models/order_model.dart';
 import 'package:shopp_app/views/home_page.dart';
 import 'package:shopp_app/views/orders_page.dart';
@@ -61,10 +63,12 @@ class OrderConfirmationPage extends StatelessWidget {
                       color: AppColors.successLight,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
-                      Icons.check_circle_rounded,
-                      size: 44,
-                      color: AppColors.success,
+                    child: const Center(
+                      child: AppIcon(
+                        AppIcons.checkCircle,
+                        size: 44,
+                        color: AppColors.success,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -122,7 +126,7 @@ class OrderConfirmationPage extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 4),
-                            const Icon(Icons.copy_rounded, size: 14, color: AppColors.primary),
+                            const AppIcon(AppIcons.copy, size: 14, color: AppColors.primary),
                           ],
                         ),
                       ),
@@ -188,7 +192,7 @@ class OrderConfirmationPage extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.location_on_rounded, size: 18, color: AppColors.primary),
+                        const AppIcon(AppIcons.address, size: 18, color: AppColors.primary),
                         const SizedBox(width: 8),
                         Text(
                           'Shipping Address',
@@ -294,7 +298,7 @@ class OrderConfirmationPage extends StatelessWidget {
             // Actions
             AppButton(
               label: 'Continue Shopping',
-              icon: Icons.store_rounded,
+              icon: AppIcons.store,
               isFullWidth: true,
               onPressed: () {
                 Navigator.pushAndRemoveUntil(
@@ -307,7 +311,7 @@ class OrderConfirmationPage extends StatelessWidget {
             const SizedBox(height: 10),
             AppButton(
               label: 'View All Orders',
-              icon: Icons.receipt_long_rounded,
+              icon: AppIcons.orders,
               variant: AppButtonVariant.outline,
               isFullWidth: true,
               onPressed: () {

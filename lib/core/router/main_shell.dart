@@ -11,6 +11,7 @@ import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/features/cart/presentation/providers/cart_providers.dart';
 import 'package:shopp_app/features/config/presentation/providers/app_config_providers.dart';
 import 'package:shopp_app/features/config/presentation/widgets/maintenance_view.dart';
@@ -103,7 +104,7 @@ class MainShell extends ConsumerWidget {
                   index: 0,
                   selectedIndex: selectedIndex,
                   icon: AppIcons.home,
-                  activeIcon: Icons.home_rounded,
+                  activeIcon: AppIcons.homeFilled,
                   label: AppStrings.nav.home,
                 ),
                 _buildNavItem(
@@ -111,15 +112,15 @@ class MainShell extends ConsumerWidget {
                   index: 1,
                   selectedIndex: selectedIndex,
                   icon: AppIcons.search,
-                  activeIcon: Icons.search_rounded,
+                  activeIcon: AppIcons.searchFilled,
                   label: AppStrings.nav.explore,
                 ),
                 _buildNavItem(
                   context,
                   index: 2,
                   selectedIndex: selectedIndex,
-                  icon: Icons.shopping_bag_outlined,
-                  activeIcon: Icons.shopping_bag_rounded,
+                  icon: AppIcons.bag,
+                  activeIcon: AppIcons.bagFilled,
                   label: AppStrings.nav.cart,
                   badgeCount: cartCount,
                 ),
@@ -136,8 +137,8 @@ class MainShell extends ConsumerWidget {
                   context,
                   index: 4,
                   selectedIndex: selectedIndex,
-                  icon: Icons.account_circle_outlined,
-                  activeIcon: Icons.account_circle,
+                  icon: AppIcons.profile,
+                  activeIcon: AppIcons.profileFilled,
                   label: AppStrings.nav.profile,
                 ),
               ],
@@ -152,8 +153,8 @@ class MainShell extends ConsumerWidget {
     BuildContext context, {
     required int index,
     required int selectedIndex,
-    required IconData icon,
-    required IconData activeIcon,
+    required String icon,
+    required String activeIcon,
     required String label,
     int badgeCount = 0,
   }) {
@@ -175,10 +176,10 @@ class MainShell extends ConsumerWidget {
                 Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    Icon(
+                    AppIcon(
                       isSelected ? activeIcon : icon,
                       color: color,
-                      size: AppIconSizes.lg,
+                      size: AppIconSizes.navigation,
                     ),
                     if (badgeCount > 0)
                       Positioned(

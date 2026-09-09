@@ -3,11 +3,13 @@ import 'package:shopp_app/core/constants/app_strings.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_dimensions.dart';
 import 'package:shopp_app/core/theme/app_icon_sizes.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
-import 'package:shopp_app/views/widgets/app_button.dart';
+import 'package:shopp_app/core/widgets/app_button.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 
 /// A friendly, actionable error recovery view.
-/// Employs centralized strings, dimensions, and typography tokens.
+/// Employs centralized strings, dimensions, and typography tokens with custom SVG icon system.
 class ErrorStateView extends StatelessWidget {
   final String message;
   final VoidCallback? onRetry;
@@ -39,10 +41,12 @@ class ErrorStateView extends StatelessWidget {
                 color: AppColors.errorLight,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.cloud_off_rounded,
-                size: AppIconSizes.xxl + 4,
-                color: AppColors.error,
+              child: const Center(
+                child: AppIcon(
+                  AppIcons.cloudOff,
+                  size: AppIconSizes.xxl + 4,
+                  color: AppColors.error,
+                ),
               ),
             ),
             const SizedBox(height: AppDimensions.lg),
@@ -61,9 +65,8 @@ class ErrorStateView extends StatelessWidget {
               const SizedBox(height: AppDimensions.xl),
               AppButton(
                 label: retryText ?? AppStrings.common.retry,
-                icon: Icons.refresh_rounded,
                 onPressed: onRetry,
-                variant: AppButtonVariant.secondary,
+                variant: AppButtonVariant.primary,
               ),
             ],
           ],

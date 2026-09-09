@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shopp_app/core/notifications/notification_service.dart';
 import 'package:shopp_app/core/preferences.dart';
 import 'package:shopp_app/core/router/app_router.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/data/models/product_media_model.dart';
 import 'package:shopp_app/data/models/product_model.dart';
 import 'package:shopp_app/views/widgets/product_media_gallery.dart';
@@ -194,7 +196,12 @@ void main() {
 
       expect(find.text('3D VIEW'), findsOneWidget);
       expect(find.text('Drag to rotate 360°'), findsOneWidget);
-      expect(find.byIcon(Icons.view_in_ar_rounded), findsWidgets);
+      expect(
+        find.byWidgetPredicate(
+          (widget) => widget is AppIcon && widget.assetPath == AppIcons.model3d,
+        ),
+        findsWidgets,
+      );
     });
   });
 

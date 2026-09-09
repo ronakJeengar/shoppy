@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/views/widgets/skeleton_loader.dart';
 
 /// A 60 FPS zero-jank network image loader with automatic memory resizing,
@@ -75,8 +77,8 @@ class AppNetworkImage extends StatelessWidget {
         borderRadius: borderRadius ?? AppRadius.borderSm,
       ),
       child: const Center(
-        child: Icon(
-          Icons.inventory_2_outlined,
+        child: AppIcon(
+          AppIcons.package,
           color: AppColors.slate400,
           size: 28,
         ),

@@ -5,7 +5,9 @@ import 'package:shopp_app/core/constants/app_strings.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/data/models/product_media_model.dart';
 import 'package:shopp_app/data/models/product_model.dart';
 import 'package:video_player/video_player.dart';
@@ -167,7 +169,7 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
         height: widget.height,
         color: AppColors.slate100,
         alignment: Alignment.center,
-        child: const Icon(Icons.image_not_supported_outlined,
+        child: const AppIcon(AppIcons.imageOff,
             size: 48, color: AppColors.slate400),
       );
     }
@@ -218,7 +220,7 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
-                    icon: const Icon(Icons.fullscreen_rounded,
+                    icon: const AppIcon(AppIcons.fullscreen,
                         color: Colors.white, size: 22),
                     tooltip: AppStrings.product.fullscreen,
                     onPressed: () => _openFullscreenMedia(context),
@@ -300,7 +302,7 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
                               color: AppColors.slate100,
                             ),
                             errorWidget: (_, __, ___) => const Center(
-                              child: Icon(Icons.image_outlined,
+                              child: AppIcon(AppIcons.image,
                                   size: 18, color: AppColors.slate400),
                             ),
                           ),
@@ -308,7 +310,7 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
                             Container(
                               color: Colors.black.withValues(alpha: 0.3),
                               child: const Center(
-                                child: Icon(Icons.play_arrow_rounded,
+                                child: AppIcon(AppIcons.play,
                                     color: Colors.white, size: 24),
                               ),
                             ),
@@ -316,7 +318,7 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
                             Container(
                               color: Colors.black.withValues(alpha: 0.3),
                               child: const Center(
-                                child: Icon(Icons.view_in_ar_rounded,
+                                child: AppIcon(AppIcons.model3d,
                                     color: Colors.white, size: 22),
                               ),
                             ),
@@ -357,7 +359,7 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.broken_image_outlined,
+                const AppIcon(AppIcons.imageOff,
                     size: 40, color: AppColors.slate400),
                 const SizedBox(height: 6),
                 Text(AppStrings.product.imageUnavailable,
@@ -377,7 +379,7 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.videocam_off_outlined,
+            const AppIcon(AppIcons.videoOff,
                 size: 48, color: AppColors.slate400),
             const SizedBox(height: 8),
             Text(AppStrings.product.videoUnavailable,
@@ -429,8 +431,8 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
                   shape: BoxShape.circle,
                   boxShadow: AppShadows.md,
                 ),
-                child: const Icon(
-                  Icons.play_arrow_rounded,
+                child: const AppIcon(
+                  AppIcons.play,
                   color: Colors.white,
                   size: 44,
                 ),
@@ -445,20 +447,22 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
             child: Row(
               children: [
                 IconButton(
-                  icon: Icon(
+                  icon: AppIcon(
                     _isVideoPlaying
-                        ? Icons.pause_rounded
-                        : Icons.play_arrow_rounded,
+                        ? AppIcons.pause
+                        : AppIcons.play,
                     color: Colors.white,
+                    size: 20,
                   ),
                   onPressed: _togglePlayPause,
                 ),
                 IconButton(
-                  icon: Icon(
+                  icon: AppIcon(
                     _isVideoMuted
-                        ? Icons.volume_off_rounded
-                        : Icons.volume_up_rounded,
+                        ? AppIcons.volumeOff
+                        : AppIcons.volumeUp,
                     color: Colors.white,
+                    size: 20,
                   ),
                   onPressed: _toggleMute,
                 ),
@@ -523,10 +527,12 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
                       imageUrl: media.thumbnailUrl ??
                           widget.product.productImage,
                       fit: BoxFit.contain,
-                      errorWidget: (_, __, ___) => const Icon(
-                        Icons.view_in_ar_rounded,
-                        color: Colors.white,
-                        size: 80,
+                      errorWidget: (_, __, ___) => const Center(
+                        child: AppIcon(
+                          AppIcons.model3d,
+                          color: Colors.white,
+                          size: 80,
+                        ),
                       ),
                     ),
                   ),
@@ -550,7 +556,7 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.touch_app_rounded,
+                      const AppIcon(AppIcons.touch,
                           color: Colors.white70, size: 16),
                       const SizedBox(width: 6),
                       Text(
@@ -578,7 +584,7 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
                     backgroundColor: Colors.white24,
                     elevation: 0,
                     onPressed: _reset3dCamera,
-                    child: const Icon(Icons.refresh_rounded,
+                    child: const AppIcon(AppIcons.refresh,
                         color: Colors.white, size: 18),
                   ),
                 ],
@@ -591,23 +597,23 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
   }
 
   Widget _buildMediaBadge(ProductMedia media) {
-    IconData icon;
+    String icon;
     String label;
     Color color;
 
     switch (media.type) {
       case ProductMediaType.video:
-        icon = Icons.play_arrow_rounded;
+        icon = AppIcons.play;
         label = AppStrings.product.mediaVideo;
         color = AppColors.secondary;
         break;
       case ProductMediaType.model3d:
-        icon = Icons.view_in_ar_rounded;
+        icon = AppIcons.model3d;
         label = AppStrings.product.media3d;
         color = AppColors.violet;
         break;
       case ProductMediaType.image:
-        icon = Icons.photo_camera_rounded;
+        icon = AppIcons.camera;
         label = AppStrings.product.mediaPhoto;
         color = AppColors.primary;
         break;
@@ -623,7 +629,7 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.white, size: 13),
+          AppIcon(icon, color: Colors.white, size: 13),
           const SizedBox(width: 4),
           Text(
             label,

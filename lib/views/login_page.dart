@@ -7,7 +7,9 @@ import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_dimensions.dart';
 import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/core/widgets/app_button.dart';
 import 'package:shopp_app/core/widgets/app_text_field.dart';
 import 'package:shopp_app/features/auth/presentation/providers/auth_providers.dart';
@@ -82,10 +84,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       color: AppColors.primary50,
                       borderRadius: AppRadius.borderLg,
                     ),
-                    child: const Icon(
-                      Icons.shopping_bag_rounded,
-                      size: AppIconSizes.hero,
-                      color: AppColors.primary,
+                    child: const Center(
+                      child: AppIcon(
+                        AppIcons.bagFilled,
+                        size: AppIconSizes.hero,
+                        color: AppColors.primary,
+                      ),
                     ),
                   ),
                 ),
@@ -116,7 +120,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.error_outline_rounded,
+                        const AppIcon(AppIcons.errorOutline,
                             size: AppIconSizes.sm + 2, color: AppColors.error),
                         const SizedBox(width: AppDimensions.sm),
                         Expanded(
@@ -138,7 +142,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   hintText: AppStrings.auth.enterEmail,
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  prefixIcon: Icons.email_outlined,
+                  prefixIcon: AppIcons.email,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return AppStrings.validation.emailRequired;
@@ -158,12 +162,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   hintText: AppStrings.auth.enterPassword,
                   controller: _passwordController,
                   obscureText: _obscurePassword,
-                  prefixIcon: Icons.lock_outline_rounded,
+                  prefixIcon: AppIcons.lock,
                   suffixIcon: IconButton(
-                    icon: Icon(
+                    icon: AppIcon(
                       _obscurePassword
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
+                          ? AppIcons.eye
+                          : AppIcons.eyeOff,
                       size: AppIconSizes.md,
                       color: AppColors.slate500,
                     ),
@@ -185,7 +189,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 // Submit Button
                 AppButton(
                   label: AppStrings.auth.login,
-                  icon: Icons.login_rounded,
+                  icon: AppIcons.login,
                   isLoading: authState.isLoading,
                   isFullWidth: true,
                   onPressed: authState.isLoading ? null : _submitLogin,

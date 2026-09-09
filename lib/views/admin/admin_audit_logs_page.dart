@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/features/admin/presentation/providers/admin_providers.dart';
 
@@ -39,7 +41,7 @@ class _AdminAuditLogsPageState extends ConsumerState<AdminAuditLogsPage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const AppIcon(AppIcons.refresh, size: 20),
             onPressed: () => auditNotifier.loadAuditLogs(),
           ),
         ],
@@ -73,8 +75,10 @@ class _AdminAuditLogsPageState extends ConsumerState<AdminAuditLogsPage> {
                           leading: CircleAvatar(
                             radius: 16,
                             backgroundColor: color.withValues(alpha: 0.1),
-                            child: Icon(Icons.shield_outlined,
-                                size: 16, color: color),
+                            child: Center(
+                              child: AppIcon(AppIcons.shield,
+                                  size: 16, color: color),
+                            ),
                           ),
                           title: Text(
                             log.action,

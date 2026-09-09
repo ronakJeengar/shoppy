@@ -3,12 +3,13 @@ import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_dimensions.dart';
 import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
-import 'package:shopp_app/views/widgets/app_button.dart';
+import 'package:shopp_app/core/widgets/app_button.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 
-/// A polished, modern empty-state component with icon, description, and primary CTA.
+/// A polished, modern empty-state component with custom SVG icon, description, and primary CTA.
 /// Adheres strictly to the centralized design system tokens.
 class EmptyStateView extends StatelessWidget {
-  final IconData icon;
+  final String icon;
   final String title;
   final String description;
   final String? buttonText;
@@ -46,10 +47,12 @@ class EmptyStateView extends StatelessWidget {
                 color: effectiveIconColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                icon,
-                size: AppIconSizes.hero,
-                color: effectiveIconColor,
+              child: Center(
+                child: AppIcon(
+                  icon,
+                  size: AppIconSizes.hero,
+                  color: effectiveIconColor,
+                ),
               ),
             ),
             const SizedBox(height: AppDimensions.xl),

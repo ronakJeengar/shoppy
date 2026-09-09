@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/data/models/review_model.dart';
 import 'package:shopp_app/features/admin/presentation/providers/admin_providers.dart';
@@ -114,7 +116,7 @@ class _AdminReviewsPageState extends ConsumerState<AdminReviewsPage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const AppIcon(AppIcons.refresh, size: 20),
             onPressed: () => reviewsNotifier.loadReviews(),
           ),
         ],
@@ -128,14 +130,17 @@ class _AdminReviewsPageState extends ConsumerState<AdminReviewsPage> {
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: 'Search reviews by comment text...',
-                prefixIcon: const Icon(Icons.search, size: 20),
+                prefixIcon: const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: AppIcon(AppIcons.search, size: 20),
+                ),
                 isDense: true,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear, size: 18),
+                        icon: const AppIcon(AppIcons.close, size: 18),
                         onPressed: () {
                           _searchController.clear();
                           reviewsNotifier.loadReviews(search: '');
@@ -262,13 +267,13 @@ class _AdminReviewsPageState extends ConsumerState<AdminReviewsPage> {
                                         ),
                                         const Spacer(),
                                         ...List.generate(5, (starIdx) {
-                                          return Icon(
-                                            starIdx < rev.rating
-                                                ? Icons.star
-                                                : Icons.star_border,
-                                            size: 14,
-                                            color: Colors.amber,
-                                          );
+                                           return AppIcon(
+                                             starIdx < rev.rating
+                                                 ? AppIcons.star
+                                                 : AppIcons.starEmpty,
+                                             size: 14,
+                                             color: Colors.amber,
+                                           );
                                         }),
                                       ],
                                     ),
@@ -300,10 +305,10 @@ class _AdminReviewsPageState extends ConsumerState<AdminReviewsPage> {
                                                 : Colors.green,
                                           ),
                                         ),
-                                        icon: Icon(
+                                        icon: AppIcon(
                                           isPublished
-                                              ? Icons.visibility_off_outlined
-                                              : Icons.visibility_outlined,
+                                              ? AppIcons.eyeOff
+                                              : AppIcons.eye,
                                           size: 16,
                                         ),
                                         label: Text(

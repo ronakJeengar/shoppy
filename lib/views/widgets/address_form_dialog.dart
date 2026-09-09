@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/features/addresses/domain/entities/address_entity.dart';
 import 'package:shopp_app/features/addresses/presentation/providers/address_providers.dart';
@@ -138,7 +140,7 @@ class _AddressFormBottomSheetState extends ConsumerState<AddressFormBottomSheet>
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close),
+                      icon: const AppIcon(AppIcons.close, size: 20),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],

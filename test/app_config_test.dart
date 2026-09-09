@@ -4,8 +4,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shopp_app/core/errors/failures.dart';
 import 'package:shopp_app/core/router/main_shell.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/utils/result.dart';
 import 'package:shopp_app/core/preferences.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/features/catalog/domain/entities/product_entity.dart';
 import 'package:shopp_app/features/config/data/datasources/app_config_local_datasource.dart';
 import 'package:shopp_app/features/config/data/datasources/app_config_remote_datasource.dart';
@@ -295,7 +297,12 @@ void main() {
       expect(find.text('Under Maintenance'), findsOneWidget);
       expect(find.text('Shoppy is temporarily offline for upgrades.'), findsOneWidget);
       expect(find.text('Check Status'), findsOneWidget);
-      expect(find.byIcon(Icons.build_circle_outlined), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is AppIcon && w.assetPath == AppIcons.maintenance,
+        ),
+        findsOneWidget,
+      );
     });
   });
 
@@ -318,7 +325,12 @@ void main() {
       expect(find.text('Update Required'), findsOneWidget);
       expect(find.textContaining('2.1.0'), findsOneWidget);
       expect(find.text('Update Now'), findsOneWidget);
-      expect(find.byIcon(Icons.system_update_rounded), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is AppIcon && w.assetPath == AppIcons.systemUpdate,
+        ),
+        findsOneWidget,
+      );
     });
   });
 
@@ -489,8 +501,12 @@ void main() {
 
       expect(find.text('Config Test Watch'), findsNWidgets(2));
       // Wishlist icon should NOT be in the AppBar actions
-      expect(find.byIcon(Icons.favorite_border), findsNothing);
-      expect(find.byIcon(Icons.favorite_rounded), findsNothing);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is AppIcon && (w.assetPath == AppIcons.wishlist || w.assetPath == AppIcons.wishlistFilled),
+        ),
+        findsNothing,
+      );
       // Customer Reviews section should NOT be rendered
       expect(find.text('Customer Reviews'), findsNothing);
       expect(find.text('Frequently Bought Together'), findsNothing);
@@ -541,7 +557,12 @@ void main() {
       expect(find.text('Flash Deals & Offers'), findsOneWidget);
       expect(find.text('Shop By Category'), findsOneWidget);
       // Notifications AppBar icon should NOT be present when notifications flag is false
-      expect(find.byIcon(Icons.notifications_none_outlined), findsNothing);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is AppIcon && w.assetPath == AppIcons.notifications,
+        ),
+        findsNothing,
+      );
     });
   });
 }

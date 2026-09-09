@@ -4,16 +4,17 @@ import 'package:shopp_app/core/theme/app_dimensions.dart';
 import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 
 /// A sleek text field component with label, prefix/suffix icons, and error handling.
-/// Fully integrated with centralized design tokens.
+/// Fully integrated with centralized design tokens and custom SVG icon system.
 class AppTextField extends StatelessWidget {
   final String? label;
   final String? hintText;
   final TextEditingController? controller;
   final bool obscureText;
   final TextInputType keyboardType;
-  final IconData? prefixIcon;
+  final String? prefixIcon;
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
@@ -72,7 +73,14 @@ class AppTextField extends StatelessWidget {
             filled: true,
             fillColor: enabled ? AppColors.slate100 : AppColors.slate200.withValues(alpha: 0.5),
             prefixIcon: prefixIcon != null
-                ? Icon(prefixIcon, size: AppIconSizes.md, color: AppColors.slate500)
+                ? Padding(
+                    padding: const EdgeInsets.all(AppDimensions.sm),
+                    child: AppIcon(
+                      prefixIcon!,
+                      size: AppIconSizes.md,
+                      color: AppColors.slate500,
+                    ),
+                  )
                 : null,
             suffixIcon: suffixIcon,
             contentPadding: AppDimensions.inputPadding,

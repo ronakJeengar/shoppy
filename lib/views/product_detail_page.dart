@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/constants/app_strings.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/data/models/review_model.dart';
 import 'package:shopp_app/features/cart/presentation/providers/cart_providers.dart';
 import 'package:shopp_app/features/catalog/data/mappers/catalog_mappers.dart';
@@ -109,7 +112,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
         backgroundColor: AppColors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.slate800),
+          icon: const AppIcon(AppIcons.back, color: AppColors.slate800),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -131,11 +134,12 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
         actions: [
           if (featureFlags.wishlist)
             IconButton(
-              icon: Icon(
+              icon: AppIcon(
                 isWishlisted
-                    ? Icons.favorite_rounded
-                    : Icons.favorite_border,
+                    ? AppIcons.wishlistFilled
+                    : AppIcons.wishlist,
                 color: isWishlisted ? AppColors.error : AppColors.slate700,
+                size: AppIconSizes.lg,
               ),
               tooltip: AppStrings.nav.wishlist,
               onPressed: () {
@@ -146,7 +150,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
             alignment: Alignment.center,
             children: [
               IconButton(
-                icon: const Icon(Icons.shopping_cart_outlined, color: AppColors.slate700),
+                icon: const AppIcon(AppIcons.cart, color: AppColors.slate700, size: AppIconSizes.lg),
                 tooltip: AppStrings.nav.cart,
                 onPressed: () {
                   Navigator.push(
@@ -220,7 +224,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                         const SizedBox.shrink(),
                       Row(
                         children: [
-                          const Icon(Icons.star_rounded, color: AppColors.accent, size: 20),
+                          const AppIcon(AppIcons.star, color: AppColors.accent, size: 20),
                           const SizedBox(width: 4),
                           Text(
                             _currentProduct.productRating.toStringAsFixed(1),
@@ -332,7 +336,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
           label: inStock ? AppStrings.product.addToCart : AppStrings.product.outOfStock,
           isLoading: _isAddingToCart,
           onPressed: inStock ? _handleAddToCart : null,
-          icon: inStock ? Icons.shopping_bag_outlined : null,
+          icon: inStock ? AppIcons.bag : null,
         ),
       ),
     );
@@ -349,7 +353,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
           children: [
             Text(AppStrings.product.reviews, style: AppTypography.headingSmall),
             TextButton.icon(
-              icon: const Icon(Icons.rate_review_outlined, size: 16),
+              icon: const AppIcon(AppIcons.rateReview, size: 16),
               label: Text(AppStrings.reviews.writeReview),
               onPressed: () {
                 showDialog(
@@ -441,8 +445,8 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
             ),
             Row(
               children: List.generate(5, (index) {
-                return Icon(
-                  index < rev.rating ? Icons.star_rounded : Icons.star_outline_rounded,
+                return AppIcon(
+                  index < rev.rating ? AppIcons.star : AppIcons.starEmpty,
                   size: 14,
                   color: AppColors.accent,
                 );

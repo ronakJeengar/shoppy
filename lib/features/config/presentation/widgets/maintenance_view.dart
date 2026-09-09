@@ -5,7 +5,9 @@ import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/theme/app_icon_sizes.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/widgets/app_button.dart';
+import '../../../../core/widgets/app_icon.dart';
 import '../providers/app_config_providers.dart';
 
 /// Full-screen view displayed when backend remote configuration enables maintenance mode.
@@ -45,10 +47,12 @@ class MaintenanceView extends ConsumerWidget {
                     color: AppColors.warningLight,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
-                    Icons.build_circle_outlined,
-                    size: AppIconSizes.xxl + 12,
-                    color: AppColors.warning,
+                  child: const Center(
+                    child: AppIcon(
+                      AppIcons.maintenance,
+                      size: AppIconSizes.xxl + 12,
+                      color: AppColors.warning,
+                    ),
                   ),
                 ),
                 const SizedBox(height: AppDimensions.xl),
@@ -68,7 +72,7 @@ class MaintenanceView extends ConsumerWidget {
                 const SizedBox(height: AppDimensions.xxl),
                 AppButton(
                   label: 'Check Status',
-                  icon: Icons.refresh_rounded,
+                  icon: AppIcons.refresh,
                   isLoading: state.isLoading,
                   onPressed: () {
                     ref
@@ -87,8 +91,8 @@ class MaintenanceView extends ConsumerWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
-                          Icons.email_outlined,
+                        const AppIcon(
+                          AppIcons.email,
                           size: AppIconSizes.sm,
                           color: AppColors.textSecondary,
                         ),

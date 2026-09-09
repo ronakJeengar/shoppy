@@ -6,7 +6,9 @@ import 'package:shopp_app/core/theme/app_dimensions.dart';
 import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
+import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/domain/models/ui_state.dart';
 import 'package:shopp_app/features/cart/presentation/providers/cart_providers.dart';
 import 'package:shopp_app/features/catalog/domain/entities/product_entity.dart';
@@ -31,7 +33,7 @@ class WishlistPage extends ConsumerWidget {
         backgroundColor: AppColors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.slate800),
+          icon: const AppIcon(AppIcons.back, color: AppColors.slate800),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -59,7 +61,7 @@ class WishlistPage extends ConsumerWidget {
 
     if (items.isEmpty) {
       return EmptyStateView(
-        icon: Icons.favorite_border_rounded,
+        icon: AppIcons.wishlist,
         iconColor: AppColors.coral,
         title: AppStrings.wishlist.empty,
         description: AppStrings.wishlist.emptySubtitle,
@@ -142,10 +144,10 @@ class WishlistPage extends ConsumerWidget {
                                 },
                                 child: const Padding(
                                   padding: EdgeInsets.all(6.0),
-                                  child: Icon(
-                                    Icons.favorite_rounded,
+                                  child: AppIcon(
+                                    AppIcons.wishlistFilled,
                                     color: AppColors.coral,
-                                    size: AppIconSizes.sm,
+                                    size: AppIconSizes.productAction,
                                   ),
                                 ),
                               ),
@@ -178,7 +180,7 @@ class WishlistPage extends ConsumerWidget {
                           const SizedBox(height: AppDimensions.sm),
                           AppButton(
                             label: AppStrings.wishlist.moveToCart,
-                            icon: Icons.add_shopping_cart_rounded,
+                            icon: AppIcons.addToCart,
                             height: AppDimensions.buttonHeightSm,
                             variant: AppButtonVariant.outline,
                             isFullWidth: true,
