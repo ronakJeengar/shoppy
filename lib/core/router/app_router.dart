@@ -9,7 +9,7 @@ import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_dimensions.dart';
 import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
-import 'package:shopp_app/riverpod/auth_riverpod_provider.dart';
+import 'package:shopp_app/features/auth/presentation/providers/auth_providers.dart';
 import 'package:shopp_app/views/addresses_page.dart';
 import 'package:shopp_app/views/admin/admin_audit_logs_page.dart';
 import 'package:shopp_app/views/admin/admin_dashboard_page.dart';

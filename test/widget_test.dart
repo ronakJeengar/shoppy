@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart' show ProviderScope;
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shopp_app/core/preferences.dart';
 import 'package:shopp_app/data/models/address_model.dart';
@@ -11,18 +10,22 @@ import 'package:shopp_app/data/models/product_model.dart';
 import 'package:shopp_app/data/models/review_model.dart';
 import 'package:shopp_app/data/models/ai_config_model.dart';
 import 'package:shopp_app/data/repositories/ai_repository.dart';
+import 'package:shopp_app/features/catalog/data/mappers/catalog_mappers.dart';
+import 'package:shopp_app/features/reviews/domain/entities/review_entity.dart';
+import 'package:shopp_app/features/reviews/presentation/providers/review_providers.dart';
+import 'package:shopp_app/features/assistant/presentation/providers/assistant_providers.dart';
+import 'package:shopp_app/core/errors/failures.dart';
+import 'package:shopp_app/core/network/api_client.dart';
+import 'package:shopp_app/core/utils/result.dart';
+import 'package:shopp_app/features/catalog/data/datasources/catalog_remote_datasource.dart';
+import 'package:shopp_app/features/catalog/data/repositories/catalog_repository_impl.dart';
+import 'package:shopp_app/features/catalog/domain/usecases/catalog_usecases.dart';
+import 'package:shopp_app/features/search/presentation/providers/search_providers.dart';
+import 'package:shopp_app/features/auth/domain/entities/user_entity.dart';
+import 'package:shopp_app/features/auth/domain/repositories/auth_repository.dart';
+import 'package:shopp_app/features/auth/domain/usecases/auth_usecases.dart';
+import 'package:shopp_app/features/auth/presentation/providers/auth_providers.dart';
 import 'package:shopp_app/main.dart';
-import 'package:shopp_app/providers/address_provider.dart';
-import 'package:shopp_app/providers/admin_provider.dart';
-import 'package:shopp_app/providers/cart_provider.dart';
-import 'package:shopp_app/providers/catalog_provider.dart';
-import 'package:shopp_app/providers/checkout_provider.dart';
-import 'package:shopp_app/providers/notification_provider.dart';
-import 'package:shopp_app/providers/order_provider.dart';
-import 'package:shopp_app/providers/review_provider.dart';
-import 'package:shopp_app/providers/search_provider.dart';
-import 'package:shopp_app/providers/user_provider.dart';
-import 'package:shopp_app/providers/wishlist_provider.dart';
 import 'package:shopp_app/views/addresses_page.dart';
 import 'package:shopp_app/views/admin/admin_audit_logs_page.dart';
 import 'package:shopp_app/views/admin/admin_dashboard_page.dart';
@@ -41,15 +44,77 @@ import 'package:shopp_app/views/profile_page.dart';
 import 'package:shopp_app/views/search_page.dart';
 import 'package:shopp_app/views/wishlist_page.dart';
 import 'package:shopp_app/data/models/assistant_message_model.dart';
-import 'package:shopp_app/providers/assistant_provider.dart';
 import 'package:shopp_app/views/assistant_page.dart';
 import 'package:shopp_app/data/models/recommendation_model.dart';
-import 'package:shopp_app/providers/recommendation_provider.dart';
 import 'package:shopp_app/views/widgets/recommendation_carousel.dart';
 import 'package:shopp_app/views/widgets/address_form_dialog.dart';
 import 'package:shopp_app/views/widgets/filter_bottom_sheet.dart';
 import 'package:shopp_app/views/widgets/product_card.dart';
 import 'package:shopp_app/views/widgets/write_review_dialog.dart';
+
+class FakeAuthRepository implements AuthRepository {
+  final UserEntity? _user;
+  FakeAuthRepository([this._user]);
+  @override
+  Future<Result<UserEntity>> getCurrentUser() async =>
+      _user != null ? Success(_user) : const FailureResult(AuthFailure('No user'));
+  @override
+  Future<Result<UserEntity>> signIn({required String email, required String password}) async =>
+      _user != null ? Success(_user) : const FailureResult(AuthFailure('Invalid'));
+  @override
+  Future<Result<UserEntity>> signUp({required String name, required String email, required String password}) async =>
+      _user != null ? Success(_user) : const FailureResult(AuthFailure('Failed'));
+  @override
+  Future<Result<void>> logout() async => const Success(null);
+  @override
+  Future<Result<UserEntity>> updateProfile({String? fullName, String? phone, String? avatar}) async =>
+      _user != null ? Success(_user) : const FailureResult(AuthFailure('Failed'));
+  @override
+  Future<Result<void>> changePassword({required String currentPassword, required String newPassword}) async =>
+      const Success(null);
+}
+
+class MockAuthNotifier extends AuthNotifier {
+  MockAuthNotifier(UserEntity user)
+      : super(
+          signInUseCase: SignInUseCase(FakeAuthRepository(user)),
+          signUpUseCase: SignUpUseCase(FakeAuthRepository(user)),
+          getCurrentUserUseCase: GetCurrentUserUseCase(FakeAuthRepository(user)),
+          logoutUseCase: LogoutUseCase(FakeAuthRepository(user)),
+          updateProfileUseCase: UpdateProfileUseCase(FakeAuthRepository(user)),
+          changePasswordUseCase: ChangePasswordUseCase(FakeAuthRepository(user)),
+        ) {
+    state = AuthState(
+      userState: UiState.success(user),
+      isAuthenticated: true,
+    );
+  }
+}
+
+Widget buildTestApp({
+  Widget? home,
+  CurrentUserModel? user,
+  List<Override> overrides = const [],
+}) {
+  return ProviderScope(
+    overrides: [
+      if (user != null)
+        authStateProvider.overrideWith(
+          (ref) => MockAuthNotifier(
+            UserEntity(
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              phone: user.phone,
+              role: user.role,
+            ),
+          ),
+        ),
+      ...overrides,
+    ],
+    child: home != null ? MaterialApp(home: home) : const MyApp(),
+  );
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -58,33 +123,6 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     await Preferences.init();
   });
-
-  Widget buildTestApp({Widget? home, CurrentUserModel? user}) {
-    final userProvider = UserProvider();
-    if (user != null) {
-      userProvider.currentUser = user;
-    }
-    return ProviderScope(
-      child: MultiProvider(
-        providers: [
-          ChangeNotifierProvider.value(value: userProvider),
-          ChangeNotifierProvider(create: (_) => CatalogProvider()),
-          ChangeNotifierProvider(create: (_) => SearchProvider()),
-          ChangeNotifierProvider(create: (_) => CartProvider()),
-          ChangeNotifierProvider(create: (_) => WishlistProvider()),
-          ChangeNotifierProvider(create: (_) => AddressProvider()),
-          ChangeNotifierProvider(create: (_) => CheckoutProvider()),
-          ChangeNotifierProvider(create: (_) => OrderProvider()),
-          ChangeNotifierProvider(create: (_) => NotificationProvider()),
-          ChangeNotifierProvider(create: (_) => AdminProvider()),
-          ChangeNotifierProvider(create: (_) => ReviewProvider()),
-          ChangeNotifierProvider(create: (_) => AssistantProvider()),
-          ChangeNotifierProvider(create: (_) => RecommendationProvider()),
-        ],
-        child: home != null ? MaterialApp(home: home) : const MyApp(),
-      ),
-    );
-  }
 
   testWidgets('App launches and displays Login page when unauthenticated',
       (WidgetTester tester) async {
@@ -118,7 +156,7 @@ void main() {
     await tester.tap(registerButtonFinder);
     await tester.pumpAndSettle();
 
-    expect(find.text('Create Account'), findsOneWidget);
+    expect(find.text('Create Account'), findsNWidgets(2));
     expect(find.text('Join Shoppy Today'), findsOneWidget);
     expect(find.byType(TextFormField), findsNWidgets(4));
   });
@@ -252,7 +290,7 @@ void main() {
           body: SizedBox(
             height: 300,
             width: 200,
-            child: ProductCard(product: testProduct),
+            child: ProductCard(product: testProduct.toEntity()),
           ),
         ),
       ),
@@ -630,8 +668,7 @@ void main() {
       productImage: '',
     );
 
-    final reviewProvider = ReviewProvider();
-    reviewProvider.setReviewsForTesting(
+    final mockReviewsResult = ProductReviewsResult(
       summary: ReviewSummaryModel(
         averageRating: 4.5,
         totalReviews: 2,
@@ -648,24 +685,17 @@ void main() {
           createdAt: DateTime.now(),
         ),
       ],
-      eligibility: ReviewEligibilityModel(
-        canReview: true,
-        hasReviewed: false,
-        isVerifiedPurchase: true,
-      ),
     );
 
     await tester.pumpWidget(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => UserProvider()),
-          ChangeNotifierProvider(create: (_) => CartProvider()),
-          ChangeNotifierProvider(create: (_) => WishlistProvider()),
-          ChangeNotifierProvider.value(value: reviewProvider),
-          ChangeNotifierProvider(create: (_) => RecommendationProvider()),
+      ProviderScope(
+        overrides: [
+          productReviewsProvider(testProduct.id).overrideWith(
+            (ref) => Future.value(mockReviewsResult),
+          ),
         ],
         child: MaterialApp(
-          home: ProductDetailPage(product: testProduct),
+          home: ProductDetailPage(product: testProduct.toEntity()),
         ),
       ),
     );
@@ -805,22 +835,21 @@ void main() {
     expect(find.byIcon(Icons.tune), findsOneWidget);
   });
 
-  test('SearchProvider executes natural language query and maintains state', () async {
-    final provider = SearchProvider();
-    expect(provider.isSearching, isFalse);
-    expect(provider.hasExecutedSearch, isFalse);
+  test('SearchNotifier executes natural language query and maintains state', () async {
+    final notifier = SearchNotifier(GetProductsUseCase(CatalogRepositoryImpl(CatalogRemoteDataSourceImpl(ApiClient()))));
+    expect(notifier.state.hasExecutedSearch, isFalse);
 
     // Filter setting
-    provider.setFilters(maxPrice: 3000, inStockOnly: true);
-    expect(provider.maxPrice, equals(3000));
-    expect(provider.inStockOnly, isTrue);
-    expect(provider.activeFilterCount, equals(2));
+    notifier.setFilters(maxPrice: 3000, inStockOnly: true);
+    expect(notifier.state.maxPrice, equals(3000));
+    expect(notifier.state.inStockOnly, isTrue);
+    expect(notifier.state.activeFilterCount, equals(2));
 
     // Reset filters
-    provider.resetFilters();
-    expect(provider.maxPrice, isNull);
-    expect(provider.inStockOnly, isFalse);
-    expect(provider.activeFilterCount, equals(0));
+    notifier.resetFilters();
+    expect(notifier.state.maxPrice, isNull);
+    expect(notifier.state.inStockOnly, isFalse);
+    expect(notifier.state.activeFilterCount, equals(0));
   });
 
   test('AssistantMessageModel and AssistantChatResponseModel serialize and deserialize accurately', () {
@@ -884,16 +913,16 @@ void main() {
     expect(msg.hasActions, isTrue);
   });
 
-  test('AssistantProvider maintains conversation state and provides suggested prompts', () {
-    final provider = AssistantProvider();
-    expect(provider.messages.isEmpty, isTrue);
-    expect(provider.isLoading, isFalse);
-    expect(provider.suggestedPrompts.isNotEmpty, isTrue);
-    expect(provider.suggestedPrompts.any((p) => p.contains('headphones')), isTrue);
+  test('AssistantNotifier maintains conversation state and provides suggested prompts', () {
+    final notifier = AssistantNotifier(AiRepository());
+    expect(notifier.state.messages.isEmpty, isTrue);
+    expect(notifier.state.isLoading, isFalse);
+    expect(notifier.state.suggestedPrompts.isNotEmpty, isTrue);
+    expect(notifier.state.suggestedPrompts.any((p) => p.contains('headphones')), isTrue);
 
-    provider.startNewConversation();
-    expect(provider.messages.isEmpty, isTrue);
-    expect(provider.activeConversationId, isNull);
+    notifier.startNewConversation();
+    expect(notifier.state.messages.isEmpty, isTrue);
+    expect(notifier.state.activeConversationId, isNull);
   });
 
   testWidgets('HomePage renders AI Assistant AppBar action button and navigates to AssistantPage',
@@ -974,7 +1003,7 @@ void main() {
 
   testWidgets('AssistantPage renders ConfirmationCard when pendingConfirmation is present',
       (WidgetTester tester) async {
-    final assistantProvider = AssistantProvider();
+    final assistantNotifier = AssistantNotifier(AiRepository());
     const confModel = AssistantConfirmationModel(
       confirmationId: 'conf_test_77',
       action: 'cancel_order',
@@ -989,24 +1018,12 @@ void main() {
       content: 'I have prepared your order cancellation request. Please confirm below:',
       pendingConfirmation: confModel,
     );
-    assistantProvider.addMessage(msg);
+    assistantNotifier.addMessage(msg);
 
     await tester.pumpWidget(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider<AssistantProvider>.value(value: assistantProvider),
-          ChangeNotifierProvider(create: (_) => UserProvider()),
-          ChangeNotifierProvider(create: (_) => CatalogProvider()),
-          ChangeNotifierProvider(create: (_) => SearchProvider()),
-          ChangeNotifierProvider(create: (_) => CartProvider()),
-          ChangeNotifierProvider(create: (_) => WishlistProvider()),
-          ChangeNotifierProvider(create: (_) => AddressProvider()),
-          ChangeNotifierProvider(create: (_) => CheckoutProvider()),
-          ChangeNotifierProvider(create: (_) => OrderProvider()),
-          ChangeNotifierProvider(create: (_) => NotificationProvider()),
-          ChangeNotifierProvider(create: (_) => AdminProvider()),
-          ChangeNotifierProvider(create: (_) => ReviewProvider()),
-          ChangeNotifierProvider(create: (_) => RecommendationProvider()),
+      ProviderScope(
+        overrides: [
+          assistantNotifierProvider.overrideWith((ref) => assistantNotifier),
         ],
         child: const MaterialApp(
           home: AssistantPage(),

@@ -1,38 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/data/models/order_model.dart';
-import 'package:shopp_app/providers/order_provider.dart';
+import 'package:shopp_app/domain/models/ui_state.dart';
+import 'package:shopp_app/features/orders/presentation/providers/order_providers.dart';
 import 'package:shopp_app/views/home_page.dart';
 import 'package:shopp_app/views/order_detail_page.dart';
 import 'package:shopp_app/views/widgets/app_network_image.dart';
 import 'package:shopp_app/views/widgets/empty_state.dart';
 
-class OrdersPage extends StatefulWidget {
+class OrdersPage extends ConsumerStatefulWidget {
   const OrdersPage({super.key});
 
   @override
-  State<OrdersPage> createState() => _OrdersPageState();
+  ConsumerState<OrdersPage> createState() => _OrdersPageState();
 }
 
-class _OrdersPageState extends State<OrdersPage> {
+class _OrdersPageState extends ConsumerState<OrdersPage> {
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<OrderProvider>().loadOrders(refresh: true);
-    });
-
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 200) {
-        context.read<OrderProvider>().loadMoreOrders();
-      }
+      ref.read(ordersNotifierProvider.notifier).loadOrders();
     });
   }
 
@@ -78,7 +72,8 @@ class _OrdersPageState extends State<OrdersPage> {
 
   @override
   Widget build(BuildContext context) {
-    final orderProvider = context.watch<OrderProvider>();
+    final ordersState = ref.watch(ordersNotifierProvider);
+    final orders = ordersState.data ?? [];
 
     return Scaffold(
       backgroundColor: AppColors.slate50,
@@ -91,13 +86,13 @@ class _OrdersPageState extends State<OrdersPage> {
         ),
         title: const Text('My Orders', style: AppTypography.headingSmall),
       ),
-      body: orderProvider.isLoading && orderProvider.orders.isEmpty
+      body: ordersState.isLoading && orders.isEmpty
           ? const Center(
               child: CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
               ),
             )
-          : orderProvider.orders.isEmpty
+          : orders.isEmpty
               ? EmptyStateView(
                   icon: Icons.receipt_long_outlined,
                   title: 'No orders yet',
@@ -113,26 +108,14 @@ class _OrdersPageState extends State<OrdersPage> {
                 )
               : RefreshIndicator(
                   color: AppColors.primary,
-                  onRefresh: () => orderProvider.refreshOrders(),
+                  onRefresh: () => ref.read(ordersNotifierProvider.notifier).loadOrders(),
                   child: ListView.separated(
                     controller: _scrollController,
                     padding: const EdgeInsets.all(16),
-                    itemCount: orderProvider.orders.length +
-                        (orderProvider.isLoadingMore ? 1 : 0),
+                    itemCount: orders.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
-                      if (index == orderProvider.orders.length) {
-                        return const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(16),
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.2,
-                              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-                            ),
-                          ),
-                        );
-                      }
-                      final order = orderProvider.orders[index];
+                      final order = orders[index];
                       return _buildOrderCard(context, order);
                     },
                   ),

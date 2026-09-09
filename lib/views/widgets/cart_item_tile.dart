@@ -6,11 +6,11 @@ import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
-import 'package:shopp_app/data/models/cart_model.dart';
+import 'package:shopp_app/features/cart/domain/entities/cart_entity.dart';
 import 'package:shopp_app/views/widgets/app_network_image.dart';
 
 class CartItemTile extends StatelessWidget {
-  final CartItemModel item;
+  final CartItemEntity item;
   final Function(int) onQuantityChanged;
   final VoidCallback onRemove;
 

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/data/models/order_model.dart';
-import 'package:shopp_app/providers/admin_provider.dart';
+import 'package:shopp_app/features/admin/presentation/providers/admin_providers.dart';
 
-class AdminOrdersPage extends StatefulWidget {
+class AdminOrdersPage extends ConsumerStatefulWidget {
   const AdminOrdersPage({super.key});
 
   @override
-  State<AdminOrdersPage> createState() => _AdminOrdersPageState();
+  ConsumerState<AdminOrdersPage> createState() => _AdminOrdersPageState();
 }
 
-class _AdminOrdersPageState extends State<AdminOrdersPage> {
+class _AdminOrdersPageState extends ConsumerState<AdminOrdersPage> {
   final List<String> _statusTabs = [
     'ALL',
     'CONFIRMED',
@@ -24,7 +24,7 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AdminProvider>().loadOrders();
+      ref.read(adminOrdersNotifierProvider.notifier).loadOrders();
     });
   }
 
@@ -98,8 +98,8 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
                   label: const Text('Move to Processing'),
                   onPressed: () async {
                     Navigator.pop(sheetCtx);
-                    await context
-                        .read<AdminProvider>()
+                    await ref
+                        .read(adminOrdersNotifierProvider.notifier)
                         .updateOrderStatus(order.id, status: 'PROCESSING');
                   },
                 ),
@@ -131,8 +131,8 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
                   label: const Text('Mark as Delivered'),
                   onPressed: () async {
                     Navigator.pop(sheetCtx);
-                    await context
-                        .read<AdminProvider>()
+                    await ref
+                        .read(adminOrdersNotifierProvider.notifier)
                         .updateOrderStatus(order.id, status: 'DELIVERED');
                   },
                 ),
@@ -149,7 +149,9 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
                   label: const Text('Cancel Order & Restock'),
                   onPressed: () async {
                     Navigator.pop(sheetCtx);
-                    await context.read<AdminProvider>().updateOrderStatus(
+                    await ref
+                        .read(adminOrdersNotifierProvider.notifier)
+                        .updateOrderStatus(
                           order.id,
                           status: 'CANCELLED',
                           note: 'Cancelled by administrator',
@@ -201,7 +203,9 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(dialogCtx);
-              await context.read<AdminProvider>().updateOrderStatus(
+              await ref
+                  .read(adminOrdersNotifierProvider.notifier)
+                  .updateOrderStatus(
                     order.id,
                     status: 'SHIPPED',
                     carrier: carrierController.text.trim(),
@@ -217,7 +221,8 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
 
   @override
   Widget build(BuildContext context) {
-    final admin = context.watch<AdminProvider>();
+    final ordersState = ref.watch(adminOrdersNotifierProvider);
+    final ordersNotifier = ref.read(adminOrdersNotifierProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -238,13 +243,13 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
               separatorBuilder: (_, __) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final tab = _statusTabs[index];
-                final isSelected = admin.selectedOrderStatus == tab;
+                final isSelected = ordersState.selectedStatus == tab;
 
                 return ChoiceChip(
                   label: Text(tab),
                   selected: isSelected,
                   onSelected: (_) {
-                    admin.loadOrders(status: tab);
+                    ordersNotifier.loadOrders(status: tab);
                   },
                 );
               },
@@ -254,9 +259,9 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
 
           // Orders List
           Expanded(
-            child: admin.isLoadingOrders && admin.orders.isEmpty
+            child: ordersState.isLoading && ordersState.orders.isEmpty
                 ? const Center(child: CircularProgressIndicator())
-                : admin.orders.isEmpty
+                : ordersState.orders.isEmpty
                     ? const Center(
                         child: Text(
                           'No orders found for selected status',
@@ -264,14 +269,14 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
                         ),
                       )
                     : RefreshIndicator(
-                        onRefresh: () => admin.loadOrders(),
+                        onRefresh: () => ordersNotifier.loadOrders(),
                         child: ListView.separated(
                           padding: const EdgeInsets.all(12),
-                          itemCount: admin.orders.length,
+                          itemCount: ordersState.orders.length,
                           separatorBuilder: (_, __) =>
                               const SizedBox(height: 8),
                           itemBuilder: (context, index) {
-                            final o = admin.orders[index];
+                            final o = ordersState.orders[index];
                             return Card(
                               elevation: 0.5,
                               shape: RoundedRectangleBorder(

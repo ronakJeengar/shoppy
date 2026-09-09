@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:shopp_app/providers/catalog_provider.dart';
-import 'package:shopp_app/providers/search_provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shopp_app/features/catalog/presentation/providers/catalog_providers.dart';
+import 'package:shopp_app/features/search/presentation/providers/search_providers.dart';
 
-class FilterBottomSheet extends StatefulWidget {
+class FilterBottomSheet extends ConsumerStatefulWidget {
   const FilterBottomSheet({super.key});
 
   @override
-  State<FilterBottomSheet> createState() => _FilterBottomSheetState();
+  ConsumerState<FilterBottomSheet> createState() => _FilterBottomSheetState();
 }
 
-class _FilterBottomSheetState extends State<FilterBottomSheet> {
+class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
   String? _tempCategoryId;
   double? _tempMinPrice;
   double? _tempMaxPrice;
@@ -23,12 +23,12 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   @override
   void initState() {
     super.initState();
-    final searchProvider = context.read<SearchProvider>();
-    _tempCategoryId = searchProvider.selectedCategoryId;
-    _tempMinPrice = searchProvider.minPrice;
-    _tempMaxPrice = searchProvider.maxPrice;
-    _tempMinRating = searchProvider.minRating;
-    _tempInStockOnly = searchProvider.inStockOnly;
+    final search = ref.read(searchNotifierProvider);
+    _tempCategoryId = search.selectedCategoryId;
+    _tempMinPrice = search.minPrice;
+    _tempMaxPrice = search.maxPrice;
+    _tempMinRating = search.minRating;
+    _tempInStockOnly = search.inStockOnly;
 
     if (_tempMinPrice != null) {
       _minPriceController.text = _tempMinPrice!.toStringAsFixed(0);
@@ -61,7 +61,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     final double? minP = double.tryParse(_minPriceController.text.trim());
     final double? maxP = double.tryParse(_maxPriceController.text.trim());
 
-    context.read<SearchProvider>().setFilters(
+    ref.read(searchNotifierProvider.notifier).setFilters(
           categoryId: _tempCategoryId,
           minPrice: minP,
           maxPrice: maxP,
@@ -74,7 +74,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final categories = context.watch<CatalogProvider>().categories;
+    final categories = ref.watch(categoriesNotifierProvider).data ?? [];
 
     return Container(
       padding: EdgeInsets.only(

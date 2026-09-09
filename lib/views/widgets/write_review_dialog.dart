@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/data/models/review_model.dart';
-import 'package:shopp_app/providers/review_provider.dart';
+import 'package:shopp_app/features/reviews/presentation/providers/review_providers.dart';
 
-class WriteReviewDialog extends StatefulWidget {
+class WriteReviewDialog extends ConsumerStatefulWidget {
   final String productId;
   final String productName;
   final ReviewModel? existingReview;
@@ -16,14 +16,15 @@ class WriteReviewDialog extends StatefulWidget {
   });
 
   @override
-  State<WriteReviewDialog> createState() => _WriteReviewDialogState();
+  ConsumerState<WriteReviewDialog> createState() => _WriteReviewDialogState();
 }
 
-class _WriteReviewDialogState extends State<WriteReviewDialog> {
+class _WriteReviewDialogState extends ConsumerState<WriteReviewDialog> {
   late int _rating;
   late TextEditingController _titleController;
   late TextEditingController _commentController;
   final _formKey = GlobalKey<FormState>();
+  bool _isSubmitting = false;
 
   final List<String> _ratingLabels = [
     'Select a rating',
@@ -53,7 +54,6 @@ class _WriteReviewDialogState extends State<WriteReviewDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final reviewProvider = context.watch<ReviewProvider>();
     final isEditing = widget.existingReview != null;
 
     return AlertDialog(
@@ -90,8 +90,8 @@ class _WriteReviewDialogState extends State<WriteReviewDialog> {
                       icon: Icon(
                         starNum <= _rating ? Icons.star : Icons.star_border,
                         color: Colors.amber,
-                        size: 32,
                       ),
+                      iconSize: 32,
                       onPressed: () {
                         setState(() {
                           _rating = starNum;
@@ -150,9 +150,7 @@ class _WriteReviewDialogState extends State<WriteReviewDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: reviewProvider.isSubmittingReview
-              ? null
-              : () => Navigator.pop(context),
+          onPressed: _isSubmitting ? null : () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
         ElevatedButton(
@@ -160,45 +158,53 @@ class _WriteReviewDialogState extends State<WriteReviewDialog> {
             backgroundColor: Colors.blue,
             foregroundColor: Colors.white,
           ),
-          onPressed: reviewProvider.isSubmittingReview
+          onPressed: _isSubmitting
               ? null
               : () async {
                   if (!_formKey.currentState!.validate()) return;
 
+                  setState(() => _isSubmitting = true);
                   bool success = false;
+                  String? errorMsg;
+
                   if (isEditing) {
-                    success = await reviewProvider.updateReview(
-                      widget.existingReview!.id,
-                      widget.productId,
+                    final res = await ref.read(updateReviewUseCaseProvider)(
+                      reviewId: widget.existingReview!.id,
                       rating: _rating,
                       title: _titleController.text.trim(),
                       comment: _commentController.text.trim(),
                     );
+                    success = res.isSuccess;
+                    if (!success) errorMsg = res.failureOrNull?.message;
                   } else {
-                    success = await reviewProvider.submitReview(
-                      widget.productId,
+                    final res = await ref.read(submitReviewUseCaseProvider)(
+                      productId: widget.productId,
                       rating: _rating,
                       title: _titleController.text.trim(),
                       comment: _commentController.text.trim(),
                     );
+                    success = res.isSuccess;
+                    if (!success) errorMsg = res.failureOrNull?.message;
                   }
 
+                  ref.invalidate(productReviewsProvider(widget.productId));
+
                   if (context.mounted) {
-                    Navigator.pop(context);
+                    setState(() => _isSubmitting = false);
+                    Navigator.pop(context, success);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(success
                             ? (isEditing
                                 ? 'Review updated successfully!'
                                 : 'Review submitted successfully!')
-                            : (reviewProvider.reviewsError ??
-                                'Failed to submit review')),
+                            : (errorMsg ?? 'Failed to submit review')),
                         backgroundColor: success ? Colors.green : Colors.red,
                       ),
                     );
                   }
                 },
-          child: reviewProvider.isSubmittingReview
+          child: _isSubmitting
               ? const SizedBox(
                   width: 18,
                   height: 18,

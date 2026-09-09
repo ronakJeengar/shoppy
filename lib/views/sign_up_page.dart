@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/constants/app_strings.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_dimensions.dart';
 import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
-import 'package:shopp_app/data/models/user_model.dart';
-import 'package:shopp_app/providers/user_provider.dart';
-import 'package:shopp_app/views/widgets/app_button.dart';
-import 'package:shopp_app/views/widgets/app_text_field.dart';
+import 'package:shopp_app/core/widgets/app_button.dart';
+import 'package:shopp_app/core/widgets/app_text_field.dart';
+import 'package:shopp_app/features/auth/presentation/providers/auth_providers.dart';
 
-class SignUpPage extends StatefulWidget {
+class SignUpPage extends ConsumerStatefulWidget {
   const SignUpPage({super.key});
 
   @override
-  State<SignUpPage> createState() => _SignUpPageState();
+  ConsumerState<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _SignUpPageState extends ConsumerState<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -40,19 +39,26 @@ class _SignUpPageState extends State<SignUpPage> {
   void _submitRegister() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final userProvider = context.read<UserProvider>();
-    final User newUser = User(
-      name: _nameController.text.trim(),
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-    );
+    final success = await ref.read(authStateProvider.notifier).signUp(
+          name: _nameController.text.trim(),
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        );
 
-    await userProvider.userSignUp(context: context, user: newUser);
+    if (success && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Account created successfully! Please log in.'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Navigator.of(context).pop();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = context.watch<UserProvider>();
+    final authState = ref.watch(authStateProvider);
 
     return Scaffold(
       backgroundColor: AppColors.surface,
@@ -66,7 +72,8 @@ class _SignUpPageState extends State<SignUpPage> {
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.xxl, vertical: AppDimensions.md),
+          padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.xxl, vertical: AppDimensions.md),
           child: Form(
             key: _formKey,
             child: Column(
@@ -98,26 +105,30 @@ class _SignUpPageState extends State<SignUpPage> {
                 Text(
                   AppStrings.auth.registerTitle,
                   textAlign: TextAlign.center,
-                  style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+                  style: AppTypography.bodySmall
+                      .copyWith(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 28),
 
-                if (userProvider.errorMessage != null) ...[
+                if (authState.errorMessage != null) ...[
                   Container(
                     padding: AppDimensions.paddingMd,
                     decoration: BoxDecoration(
                       color: AppColors.errorLight,
                       borderRadius: AppRadius.borderMd,
-                      border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
+                      border: Border.all(
+                          color: AppColors.error.withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.error_outline_rounded, size: AppIconSizes.sm + 2, color: AppColors.error),
+                        const Icon(Icons.error_outline_rounded,
+                            size: AppIconSizes.sm + 2, color: AppColors.error),
                         const SizedBox(width: AppDimensions.sm),
                         Expanded(
                           child: Text(
-                            userProvider.errorMessage!,
-                            style: AppTypography.caption.copyWith(color: AppColors.error),
+                            authState.errorMessage!,
+                            style: AppTypography.caption
+                                .copyWith(color: AppColors.error),
                           ),
                         ),
                       ],
@@ -170,7 +181,9 @@ class _SignUpPageState extends State<SignUpPage> {
                   prefixIcon: Icons.lock_outline_rounded,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                      _obscurePassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
                       size: AppIconSizes.md,
                       color: AppColors.slate500,
                     ),
@@ -195,13 +208,15 @@ class _SignUpPageState extends State<SignUpPage> {
                 // Confirm Password
                 AppTextField(
                   label: AppStrings.auth.confirmPassword,
-                  hintText: AppStrings.auth.enterConfirmPassword,
+                  hintText: AppStrings.auth.confirmPassword,
                   controller: _confirmPasswordController,
                   obscureText: _obscureConfirmPassword,
-                  prefixIcon: Icons.lock_reset_rounded,
+                  prefixIcon: Icons.lock_clock_outlined,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                      _obscureConfirmPassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
                       size: AppIconSizes.md,
                       color: AppColors.slate500,
                     ),
@@ -221,25 +236,26 @@ class _SignUpPageState extends State<SignUpPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: AppDimensions.xxl),
 
                 // Submit Button
                 AppButton(
-                  label: AppStrings.auth.register,
+                  label: AppStrings.auth.createAccount,
                   icon: Icons.check_circle_outline_rounded,
-                  isLoading: userProvider.isLoading,
+                  isLoading: authState.isLoading,
                   isFullWidth: true,
-                  onPressed: userProvider.isLoading ? null : _submitRegister,
+                  onPressed: authState.isLoading ? null : _submitRegister,
                 ),
-                const SizedBox(height: AppDimensions.xxl),
+                const SizedBox(height: AppDimensions.xl),
 
                 // Back to Login
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      AppStrings.auth.alreadyHaveAccountPrompt,
-                      style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+                      AppStrings.auth.alreadyHaveAccount,
+                      style: AppTypography.bodySmall
+                          .copyWith(color: AppColors.textSecondary),
                     ),
                     TextButton(
                       onPressed: () => Navigator.pop(context),

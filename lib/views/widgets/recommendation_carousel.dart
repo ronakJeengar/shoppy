@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/data/models/recommendation_model.dart';
+import 'package:shopp_app/features/catalog/data/mappers/catalog_mappers.dart';
 import 'package:shopp_app/views/widgets/product_card.dart';
 import 'package:shopp_app/views/widgets/skeleton_loader.dart';
 
@@ -122,7 +123,7 @@ class RecommendationCarousel extends StatelessWidget {
                 final recItem = items[index];
                 return SizedBox(
                   width: 164,
-                  child: ProductCard(product: recItem.product),
+                  child: ProductCard(product: recItem.product.toEntity()),
                 );
               },
             ),

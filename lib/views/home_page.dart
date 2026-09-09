@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
-import 'package:shopp_app/data/models/currrent_user_model.dart';
-import 'package:shopp_app/providers/cart_provider.dart';
-import 'package:shopp_app/providers/catalog_provider.dart';
-import 'package:shopp_app/providers/notification_provider.dart';
-import 'package:shopp_app/providers/recommendation_provider.dart';
-import 'package:shopp_app/providers/user_provider.dart';
-import 'package:shopp_app/providers/wishlist_provider.dart';
+import 'package:shopp_app/features/auth/presentation/providers/auth_providers.dart';
+import 'package:shopp_app/features/cart/presentation/providers/cart_providers.dart';
+import 'package:shopp_app/features/catalog/presentation/providers/catalog_providers.dart';
+import 'package:shopp_app/features/notifications/presentation/providers/notification_providers.dart';
+import 'package:shopp_app/features/recommendations/presentation/providers/recommendation_providers.dart';
+import 'package:shopp_app/features/wishlist/presentation/providers/wishlist_providers.dart';
 import 'package:shopp_app/views/assistant_page.dart';
 import 'package:shopp_app/views/cart_page.dart';
 import 'package:shopp_app/views/notifications_page.dart';
@@ -24,14 +23,14 @@ import 'package:shopp_app/views/widgets/product_card.dart';
 import 'package:shopp_app/views/widgets/recommendation_carousel.dart';
 import 'package:shopp_app/views/widgets/skeleton_loader.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   final ScrollController _scrollController = ScrollController();
   final PageController _bannerController = PageController();
   int _activeBannerIndex = 0;
@@ -63,16 +62,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<UserProvider>().getCurrentUser();
-      context.read<CatalogProvider>().loadInitialData();
-      context.read<RecommendationProvider>().fetchPersonalized();
-      context.read<RecommendationProvider>().fetchTrending();
-      context.read<CartProvider>().loadCart();
-      context.read<WishlistProvider>().loadWishlist();
-      context.read<NotificationProvider>().loadNotifications();
-    });
-
     _scrollController.addListener(_onScroll);
   }
 
@@ -87,19 +76,22 @@ class _HomePageState extends State<HomePage> {
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 300) {
-      context.read<CatalogProvider>().loadMoreProducts();
+      // Catalog pagination if needed
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = context.watch<UserProvider>();
-    final catalogProvider = context.watch<CatalogProvider>();
-    final cartProvider = context.watch<CartProvider>();
-    final wishlistProvider = context.watch<WishlistProvider>();
-    final notifProvider = context.watch<NotificationProvider>();
-    final recProvider = context.watch<RecommendationProvider>();
-    final CurrentUserModel? currentUser = userProvider.currentUser;
+    final currentUser = ref.watch(currentUserProvider);
+    final productsState = ref.watch(productsNotifierProvider);
+    final products = productsState.productsState.data ?? [];
+    final isLoadingProducts = productsState.productsState.isLoading;
+    final productsError = productsState.productsState.error;
+    final cartCount = ref.watch(cartItemCountProvider);
+    final wishlistCount = ref.watch(wishlistNotifierProvider).data?.length ?? 0;
+    final unreadNotifs = ref.watch(notificationUnreadCountProvider);
+    final personalizedRecs = ref.watch(personalizedRecommendationsProvider).valueOrNull?.items ?? [];
+    final trendingRecs = ref.watch(trendingRecommendationsProvider).valueOrNull?.items ?? [];
 
     return Scaffold(
       backgroundColor: AppColors.slate50,
@@ -202,7 +194,7 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
               ),
-              if (notifProvider.unreadCount > 0)
+              if (unreadNotifs > 0)
                 Positioned(
                   top: 10,
                   right: 10,
@@ -213,7 +205,7 @@ class _HomePageState extends State<HomePage> {
                       shape: BoxShape.circle,
                     ),
                     child: Text(
-                      '${notifProvider.unreadCount}',
+                      '$unreadNotifs',
                       style: const TextStyle(
                         color: AppColors.white,
                         fontSize: 9,
@@ -240,7 +232,7 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
               ),
-              if (wishlistProvider.itemCount > 0)
+              if (wishlistCount > 0)
                 Positioned(
                   top: 10,
                   right: 10,
@@ -251,7 +243,7 @@ class _HomePageState extends State<HomePage> {
                       shape: BoxShape.circle,
                     ),
                     child: Text(
-                      '${wishlistProvider.itemCount}',
+                      '$wishlistCount',
                       style: const TextStyle(
                         color: AppColors.white,
                         fontSize: 9,
@@ -278,7 +270,7 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
               ),
-              if (cartProvider.totalItemCount > 0)
+              if (cartCount > 0)
                 Positioned(
                   top: 10,
                   right: 10,
@@ -289,7 +281,7 @@ class _HomePageState extends State<HomePage> {
                       shape: BoxShape.circle,
                     ),
                     child: Text(
-                      '${cartProvider.totalItemCount}',
+                      '$cartCount',
                       style: const TextStyle(
                         color: AppColors.white,
                         fontSize: 9,
@@ -320,12 +312,13 @@ class _HomePageState extends State<HomePage> {
         color: AppColors.primary,
         onRefresh: () async {
           await Future.wait([
-            catalogProvider.refreshCatalog(),
-            context.read<RecommendationProvider>().fetchPersonalized(force: true),
-            context.read<RecommendationProvider>().fetchTrending(force: true),
-            context.read<CartProvider>().loadCart(),
-            context.read<WishlistProvider>().loadWishlist(),
+            ref.read(productsNotifierProvider.notifier).fetchProducts(),
+            ref.read(cartNotifierProvider.notifier).loadCart(),
+            ref.read(wishlistNotifierProvider.notifier).loadWishlist(),
+            ref.read(notificationNotifierProvider.notifier).loadNotifications(),
           ]);
+          ref.invalidate(personalizedRecommendationsProvider);
+          ref.invalidate(trendingRecommendationsProvider);
         },
         child: CustomScrollView(
           controller: _scrollController,
@@ -542,29 +535,24 @@ class _HomePageState extends State<HomePage> {
             ),
 
             // AI Recommendations: Recommended For You
-            if (recProvider.personalized.isNotEmpty ||
-                recProvider.isLoadingPersonalized)
+            if (personalizedRecs.isNotEmpty)
               SliverToBoxAdapter(
                 child: RecommendationCarousel(
                   title: 'Curated For You',
-                  subtitle: recProvider.personalizedReason,
-                  items: recProvider.personalized,
-                  isLoading: recProvider.isLoadingPersonalized,
-                  onRefresh: () =>
-                      recProvider.fetchPersonalized(force: true),
+                  subtitle: 'Based on your shopping trends',
+                  items: personalizedRecs,
+                  onRefresh: () => ref.refresh(personalizedRecommendationsProvider),
                 ),
               ),
 
             // AI Recommendations: Trending Now
-            if (recProvider.trending.isNotEmpty ||
-                recProvider.isLoadingTrending)
+            if (trendingRecs.isNotEmpty)
               SliverToBoxAdapter(
                 child: RecommendationCarousel(
                   title: 'Trending Right Now',
-                  subtitle: recProvider.trendingReason,
-                  items: recProvider.trending,
-                  isLoading: recProvider.isLoadingTrending,
-                  onRefresh: () => recProvider.fetchTrending(force: true),
+                  subtitle: 'Most popular with shoppers today',
+                  items: trendingRecs,
+                  onRefresh: () => ref.refresh(trendingRecommendationsProvider),
                 ),
               ),
 
@@ -576,13 +564,13 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      catalogProvider.selectedCategoryId == null
-                          ? 'All Products (${catalogProvider.products.length})'
-                          : 'Filtered Results (${catalogProvider.products.length})',
+                      productsState.selectedCategory == null
+                          ? 'All Products (${products.length})'
+                          : 'Filtered Results (${products.length})',
                       style: AppTypography.headingSmall,
                     ),
                     PopupMenuButton<String>(
-                      initialValue: catalogProvider.selectedSort,
+                      initialValue: productsState.sort,
                       shape: const RoundedRectangleBorder(
                         borderRadius: AppRadius.borderMd,
                       ),
@@ -616,7 +604,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       onSelected: (sort) {
-                        catalogProvider.setSort(sort);
+                        ref.read(productsNotifierProvider.notifier).setSort(sort);
                       },
                       itemBuilder: (context) => [
                         const PopupMenuItem(
@@ -643,8 +631,7 @@ class _HomePageState extends State<HomePage> {
             ),
 
             // Main Catalog Grid / Skeletons / Empty / Error States
-            if (catalogProvider.isLoadingProducts &&
-                catalogProvider.products.isEmpty)
+            if (isLoadingProducts && products.isEmpty)
               SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 sliver: SliverGrid(
@@ -660,16 +647,15 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               )
-            else if (catalogProvider.errorMessage != null &&
-                catalogProvider.products.isEmpty)
+            else if (productsError != null && products.isEmpty)
               SliverFillRemaining(
                 hasScrollBody: false,
                 child: ErrorStateView(
-                  message: catalogProvider.errorMessage!,
-                  onRetry: () => catalogProvider.loadInitialData(),
+                  message: productsError,
+                  onRetry: () => ref.read(productsNotifierProvider.notifier).fetchProducts(),
                 ),
               )
-            else if (catalogProvider.products.isEmpty)
+            else if (products.isEmpty)
               SliverFillRemaining(
                 hasScrollBody: false,
                 child: EmptyStateView(
@@ -679,7 +665,7 @@ class _HomePageState extends State<HomePage> {
                       'Try switching categories or check back later for new inventory.',
                   buttonText: 'View All Products',
                   onButtonPressed: () {
-                    context.read<CatalogProvider>().selectCategory(null);
+                    ref.read(productsNotifierProvider.notifier).selectCategory(null);
                   },
                 ),
               )
@@ -695,30 +681,10 @@ class _HomePageState extends State<HomePage> {
                   ),
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final product = catalogProvider.products[index];
+                      final product = products[index];
                       return ProductCard(product: product);
                     },
-                    childCount: catalogProvider.products.length,
-                  ),
-                ),
-              ),
-
-            // Pagination loading indicator
-            if (catalogProvider.isLoadingMore)
-              const SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 24),
-                  child: Center(
-                    child: SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.2,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.primary,
-                        ),
-                      ),
-                    ),
+                    childCount: products.length,
                   ),
                 ),
               ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/constants/app_strings.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_dimensions.dart';
@@ -7,32 +7,26 @@ import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/data/models/notification_model.dart';
-import 'package:shopp_app/providers/notification_provider.dart';
+import 'package:shopp_app/domain/models/ui_state.dart';
+import 'package:shopp_app/features/notifications/presentation/providers/notification_providers.dart';
 import 'package:shopp_app/views/order_detail_page.dart';
 import 'package:shopp_app/views/widgets/empty_state.dart';
 
-class NotificationsPage extends StatefulWidget {
+class NotificationsPage extends ConsumerStatefulWidget {
   const NotificationsPage({super.key});
 
   @override
-  State<NotificationsPage> createState() => _NotificationsPageState();
+  ConsumerState<NotificationsPage> createState() => _NotificationsPageState();
 }
 
-class _NotificationsPageState extends State<NotificationsPage> {
+class _NotificationsPageState extends ConsumerState<NotificationsPage> {
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<NotificationProvider>().loadNotifications(refresh: true);
-    });
-
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 200) {
-        context.read<NotificationProvider>().loadMoreNotifications();
-      }
+      ref.read(notificationNotifierProvider.notifier).loadNotifications();
     });
   }
 
@@ -78,7 +72,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final notifProvider = context.watch<NotificationProvider>();
+    final notifState = ref.watch(notificationNotifierProvider);
+    final unreadCount = ref.watch(notificationUnreadCountProvider);
+    final notifications = notifState.data ?? [];
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -91,9 +87,10 @@ class _NotificationsPageState extends State<NotificationsPage> {
         ),
         title: Text(AppStrings.notifications.title, style: AppTypography.headingSmall),
         actions: [
-          if (notifProvider.unreadCount > 0)
+          if (unreadCount > 0)
             TextButton(
-              onPressed: () => notifProvider.markAllAsRead(),
+              onPressed: () =>
+                  ref.read(notificationNotifierProvider.notifier).markAllAsRead(),
               child: Text(
                 AppStrings.notifications.markAllAsRead,
                 style: AppTypography.caption.copyWith(
@@ -104,13 +101,13 @@ class _NotificationsPageState extends State<NotificationsPage> {
             ),
         ],
       ),
-      body: notifProvider.isLoading && notifProvider.notifications.isEmpty
+      body: notifState.isLoading && notifications.isEmpty
           ? const Center(
               child: CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
               ),
             )
-          : notifProvider.notifications.isEmpty
+          : notifications.isEmpty
               ? EmptyStateView(
                   icon: Icons.notifications_off_outlined,
                   title: AppStrings.notifications.empty,
@@ -118,27 +115,16 @@ class _NotificationsPageState extends State<NotificationsPage> {
                 )
               : RefreshIndicator(
                   color: AppColors.primary,
-                  onRefresh: () => notifProvider.refreshNotifications(),
+                  onRefresh: () =>
+                      ref.read(notificationNotifierProvider.notifier).loadNotifications(),
                   child: ListView.separated(
                     controller: _scrollController,
                     padding: AppDimensions.paddingVerticalSm,
-                    itemCount: notifProvider.notifications.length +
-                        (notifProvider.isLoadingMore ? 1 : 0),
+                    itemCount: notifications.length,
                     separatorBuilder: (_, __) =>
                         const Divider(height: 1, color: AppColors.divider, indent: 68),
                     itemBuilder: (context, index) {
-                      if (index == notifProvider.notifications.length) {
-                        return const Center(
-                          child: Padding(
-                            padding: AppDimensions.paddingLg,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.2,
-                              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-                            ),
-                          ),
-                        );
-                      }
-                      final notif = notifProvider.notifications[index];
+                      final notif = notifications[index];
                       return _buildNotificationTile(context, notif);
                     },
                   ),
@@ -155,7 +141,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
     return InkWell(
       onTap: () {
-        context.read<NotificationProvider>().markAsRead(notif.id);
+        ref.read(notificationNotifierProvider.notifier).markAsRead(notif.id);
         if (notif.orderId != null && notif.orderId!.isNotEmpty) {
           Navigator.push(
             context,

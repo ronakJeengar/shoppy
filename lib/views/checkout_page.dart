@@ -1,35 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
-import 'package:shopp_app/providers/address_provider.dart';
-import 'package:shopp_app/providers/cart_provider.dart';
-import 'package:shopp_app/providers/checkout_provider.dart';
+import 'package:shopp_app/domain/models/ui_state.dart';
+import 'package:shopp_app/features/addresses/domain/entities/address_entity.dart';
+import 'package:shopp_app/features/addresses/presentation/providers/address_providers.dart';
+import 'package:shopp_app/features/cart/domain/entities/cart_entity.dart';
+import 'package:shopp_app/features/cart/presentation/providers/cart_providers.dart';
+import 'package:shopp_app/features/checkout/presentation/providers/checkout_providers.dart';
 import 'package:shopp_app/views/order_confirmation_page.dart';
 import 'package:shopp_app/views/widgets/address_form_dialog.dart';
 import 'package:shopp_app/views/widgets/app_button.dart';
 
-class CheckoutPage extends StatefulWidget {
+class CheckoutPage extends ConsumerStatefulWidget {
   const CheckoutPage({super.key});
 
   @override
-  State<CheckoutPage> createState() => _CheckoutPageState();
+  ConsumerState<CheckoutPage> createState() => _CheckoutPageState();
 }
 
-class _CheckoutPageState extends State<CheckoutPage> {
+class _CheckoutPageState extends ConsumerState<CheckoutPage> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final addressProvider = context.read<AddressProvider>();
-      final checkoutProvider = context.read<CheckoutProvider>();
-
-      if (addressProvider.selectedAddress != null) {
-        checkoutProvider.validateCheckout(
-          addressProvider.selectedAddress!.id,
-        );
+      final selected = ref.read(selectedAddressProvider);
+      if (selected != null) {
+        ref.read(checkoutNotifierProvider.notifier).validateCheckout(selected.id);
       }
     });
   }
@@ -43,62 +42,60 @@ class _CheckoutPageState extends State<CheckoutPage> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (ctx) {
-        return Consumer2<AddressProvider, CheckoutProvider>(
-          builder: (context, addrProv, checkoutProv, _) {
-            return Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+        final addresses = ref.watch(addressNotifierProvider).dataOrNull ?? [];
+        final selected = ref.watch(selectedAddressProvider);
+
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Select Delivery Address',
-                        style: AppTypography.headingSmall,
-                      ),
-                      TextButton.icon(
-                        icon: const Icon(Icons.add_rounded, size: 18),
-                        label: const Text('New'),
-                        onPressed: () {
-                          Navigator.pop(ctx);
-                          _openAddressForm(context);
-                        },
-                      ),
-                    ],
+                  const Text(
+                    'Select Delivery Address',
+                    style: AppTypography.headingSmall,
                   ),
-                  const SizedBox(height: 12),
-                  if (addrProv.addresses.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 24),
-                      child: Center(
-                        child: Text(
-                          'No saved addresses. Tap New to add one.',
-                          style: AppTypography.bodySmall.copyWith(color: AppColors.slate500),
-                        ),
-                      ),
-                    )
-                  else
-                    ...addrProv.addresses.map((addr) {
-                      final isSelected =
-                          addrProv.selectedAddress?.id == addr.id;
-                      return _buildSelectionTile(
-                        title: addr.fullName,
-                        subtitle:
-                            '${addr.formattedAddress}\nPhone: ${addr.phone}',
-                        isSelected: isSelected,
-                        onTap: () {
-                          addrProv.selectAddress(addr);
-                          checkoutProv.validateCheckout(addr.id);
-                          Navigator.pop(ctx);
-                        },
-                      );
-                    }),
+                  TextButton.icon(
+                    icon: const Icon(Icons.add_rounded, size: 18),
+                    label: const Text('New'),
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      _openAddressForm(context);
+                    },
+                  ),
                 ],
               ),
-            );
-          },
+              const SizedBox(height: 12),
+              if (addresses.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  child: Center(
+                    child: Text(
+                      'No saved addresses. Tap New to add one.',
+                      style: AppTypography.bodySmall.copyWith(color: AppColors.slate500),
+                    ),
+                  ),
+                )
+              else
+                ...addresses.map((addr) {
+                  final isSelected = selected?.id == addr.id;
+                  return _buildSelectionTile(
+                    title: addr.fullName,
+                    subtitle:
+                        '${addr.formattedAddress}\nPhone: ${addr.phone}',
+                    isSelected: isSelected,
+                    onTap: () {
+                      ref.read(selectedAddressProvider.notifier).state = addr;
+                      ref.read(checkoutNotifierProvider.notifier).validateCheckout(addr.id);
+                      Navigator.pop(ctx);
+                    },
+                  );
+                }),
+            ],
+          ),
         );
       },
     );
@@ -109,21 +106,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
       context: context,
       builder: (_) => const AddressFormBottomSheet(),
     ).then((_) {
-      if (!context.mounted) return;
-      final addrProv = context.read<AddressProvider>();
-      if (addrProv.selectedAddress != null) {
-        context
-            .read<CheckoutProvider>()
-            .validateCheckout(addrProv.selectedAddress!.id);
+      if (!mounted) return;
+      final selected = ref.read(selectedAddressProvider);
+      if (selected != null) {
+        ref.read(checkoutNotifierProvider.notifier).validateCheckout(selected.id);
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final checkoutProvider = context.watch<CheckoutProvider>();
-    final addressProvider = context.watch<AddressProvider>();
-    final cartProvider = context.watch<CartProvider>();
+    final selectedAddress = ref.watch(selectedAddressProvider);
+    final checkoutState = ref.watch(checkoutNotifierProvider);
+    final cart = ref.watch(cartNotifierProvider).dataOrNull ?? const CartEntity.empty();
 
     return Scaffold(
       backgroundColor: AppColors.slate50,
@@ -141,32 +136,27 @@ class _CheckoutPageState extends State<CheckoutPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildAddressSection(addressProvider, checkoutProvider),
+            _buildAddressSection(selectedAddress),
             const SizedBox(height: 16),
-            _buildShippingMethodSection(checkoutProvider, addressProvider),
+            _buildShippingMethodSection(checkoutState, selectedAddress),
             const SizedBox(height: 16),
-            _buildPaymentMethodSection(checkoutProvider),
+            _buildPaymentMethodSection(checkoutState),
             const SizedBox(height: 16),
-            _buildOrderReviewSection(cartProvider, checkoutProvider),
+            _buildOrderReviewSection(cart, checkoutState),
             const SizedBox(height: 32),
           ],
         ),
       ),
       bottomNavigationBar: _buildBottomBar(
         context,
-        addressProvider,
-        cartProvider,
-        checkoutProvider,
+        selectedAddress,
+        cart,
+        checkoutState,
       ),
     );
   }
 
-  Widget _buildAddressSection(
-    AddressProvider addressProvider,
-    CheckoutProvider checkoutProvider,
-  ) {
-    final selected = addressProvider.selectedAddress;
-
+  Widget _buildAddressSection(AddressEntity? selected) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -239,10 +229,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Widget _buildShippingMethodSection(
-    CheckoutProvider checkoutProvider,
-    AddressProvider addressProvider,
+    CheckoutState checkoutState,
+    AddressEntity? selectedAddress,
   ) {
-    final isStandard = checkoutProvider.shippingMethod == 'STANDARD';
+    final isStandard = checkoutState.selectedShippingMethod == 'STANDARD';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -275,10 +265,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
             subtitle: 'Free on orders over \$100.00, otherwise \$15.00',
             isSelected: isStandard,
             onTap: () {
-              checkoutProvider.setShippingMethod(
-                'STANDARD',
-                addressProvider.selectedAddress?.id ?? '',
-              );
+              ref.read(checkoutNotifierProvider.notifier).setShippingMethod('STANDARD');
+              if (selectedAddress != null) {
+                ref.read(checkoutNotifierProvider.notifier).validateCheckout(selectedAddress.id);
+              }
             },
           ),
           _buildSelectionTile(
@@ -286,10 +276,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
             subtitle: 'Flat rate \$25.00 with priority fulfillment',
             isSelected: !isStandard,
             onTap: () {
-              checkoutProvider.setShippingMethod(
-                'EXPRESS',
-                addressProvider.selectedAddress?.id ?? '',
-              );
+              ref.read(checkoutNotifierProvider.notifier).setShippingMethod('EXPRESS');
+              if (selectedAddress != null) {
+                ref.read(checkoutNotifierProvider.notifier).validateCheckout(selectedAddress.id);
+              }
             },
           ),
         ],
@@ -297,8 +287,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
-  Widget _buildPaymentMethodSection(CheckoutProvider checkoutProvider) {
-    final currentMethod = checkoutProvider.paymentMethod;
+  Widget _buildPaymentMethodSection(CheckoutState checkoutState) {
+    final currentMethod = checkoutState.selectedPaymentMethod;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -331,14 +321,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
             subtitle: 'Instant secure checkout via Stripe',
             isSelected: currentMethod == 'CARD',
             icon: Icons.credit_card_rounded,
-            onTap: () => checkoutProvider.setPaymentMethod('CARD'),
+            onTap: () => ref.read(checkoutNotifierProvider.notifier).setPaymentMethod('CARD'),
           ),
           _buildSelectionTile(
             title: 'Cash on Delivery (COD)',
             subtitle: 'Pay with cash upon receipt of order',
             isSelected: currentMethod == 'COD',
             icon: Icons.money_rounded,
-            onTap: () => checkoutProvider.setPaymentMethod('COD'),
+            onTap: () => ref.read(checkoutNotifierProvider.notifier).setPaymentMethod('COD'),
           ),
         ],
       ),
@@ -346,13 +336,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Widget _buildOrderReviewSection(
-    CartProvider cartProvider,
-    CheckoutProvider checkoutProvider,
+    CartEntity cart,
+    CheckoutState checkoutState,
   ) {
-    final subtotal = checkoutProvider.subtotal > 0 ? checkoutProvider.subtotal : cartProvider.subtotal;
-    final shipping = checkoutProvider.shippingFee;
-    final tax = checkoutProvider.tax > 0 ? checkoutProvider.tax : cartProvider.tax;
-    final total = checkoutProvider.grandTotal > 0 ? checkoutProvider.grandTotal : cartProvider.totalAmount;
+    final validation = checkoutState.validation;
+    final subtotal = validation?.subtotal ?? cart.subtotal;
+    final shipping = validation?.shippingFee ?? (checkoutState.selectedShippingMethod == 'EXPRESS' ? 25.0 : (subtotal >= 100 ? 0.0 : 15.0));
+    final tax = validation?.tax ?? cart.tax;
+    final total = validation?.grandTotal ?? (subtotal + shipping + tax);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -501,12 +492,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Widget _buildBottomBar(
     BuildContext context,
-    AddressProvider addressProvider,
-    CartProvider cartProvider,
-    CheckoutProvider checkoutProvider,
+    AddressEntity? selectedAddress,
+    CartEntity cart,
+    CheckoutState checkoutState,
   ) {
-    final displayTotal = checkoutProvider.grandTotal > 0 ? checkoutProvider.grandTotal : cartProvider.totalAmount;
-    final canPlace = addressProvider.selectedAddress != null && !checkoutProvider.isProcessingOrder;
+    final validation = checkoutState.validation;
+    final subtotal = validation?.subtotal ?? cart.subtotal;
+    final shipping = validation?.shippingFee ?? (checkoutState.selectedShippingMethod == 'EXPRESS' ? 25.0 : (subtotal >= 100 ? 0.0 : 15.0));
+    final tax = validation?.tax ?? cart.tax;
+    final displayTotal = validation?.grandTotal ?? (subtotal + shipping + tax);
+    final canPlace = selectedAddress != null && !checkoutState.isPlacingOrder;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
@@ -535,27 +530,27 @@ class _CheckoutPageState extends State<CheckoutPage> {
             const SizedBox(width: 20),
             Expanded(
               child: AppButton(
-                label: checkoutProvider.isProcessingOrder ? 'Processing...' : 'Place Order',
+                label: checkoutState.isPlacingOrder ? 'Processing...' : 'Place Order',
                 icon: Icons.lock_outline_rounded,
-                isLoading: checkoutProvider.isProcessingOrder,
+                isLoading: checkoutState.isPlacingOrder,
                 isFullWidth: true,
                 onPressed: canPlace
                     ? () async {
-                        final order = await checkoutProvider.placeOrderAndPay(
-                          addressId: addressProvider.selectedAddress!.id,
-                          cartProvider: context.read<CartProvider>(),
+                        final order = await ref.read(checkoutNotifierProvider.notifier).placeOrder(
+                          addressId: selectedAddress.id,
                         );
                         if (order != null && context.mounted) {
+                          ref.read(cartNotifierProvider.notifier).loadCart();
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (_) => OrderConfirmationPage(order: order),
                             ),
                           );
-                        } else if (context.mounted && checkoutProvider.errorMessage != null) {
+                        } else if (context.mounted && checkoutState.error != null) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text(checkoutProvider.errorMessage!),
+                              content: Text(checkoutState.error!),
                               backgroundColor: AppColors.error,
                               behavior: SnackBarBehavior.floating,
                             ),

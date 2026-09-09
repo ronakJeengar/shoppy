@@ -1,29 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/data/models/order_model.dart';
-import 'package:shopp_app/providers/order_provider.dart';
+import 'package:shopp_app/features/orders/presentation/providers/order_providers.dart';
 import 'package:shopp_app/views/widgets/app_network_image.dart';
 import 'package:shopp_app/views/widgets/order_timeline.dart';
 import 'package:shopp_app/views/widgets/write_review_dialog.dart';
 
-class OrderDetailPage extends StatefulWidget {
+class OrderDetailPage extends ConsumerStatefulWidget {
   final String orderId;
 
   const OrderDetailPage({super.key, required this.orderId});
 
   @override
-  State<OrderDetailPage> createState() => _OrderDetailPageState();
+  ConsumerState<OrderDetailPage> createState() => _OrderDetailPageState();
 }
 
-class _OrderDetailPageState extends State<OrderDetailPage> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<OrderProvider>().loadOrderDetails(widget.orderId);
-    });
-  }
+class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
+  bool _isCancelling = false;
 
   Color _getStatusColor(String status) {
     switch (status) {
@@ -42,7 +37,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     }
   }
 
-  void _showCancelDialog(BuildContext context, OrderModel order) {
+  void _showCancelDialog(OrderModel order) {
     final reasons = [
       'Found a better price elsewhere',
       'Ordered by mistake',
@@ -109,29 +104,28 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   ),
                   onPressed: () async {
                     Navigator.pop(dialogCtx);
-                    final success = await context
-                        .read<OrderProvider>()
+                    setState(() => _isCancelling = true);
+                    final success = await ref
+                        .read(ordersNotifierProvider.notifier)
                         .cancelOrder(order.id, reason: selectedReason);
 
-                    if (context.mounted) {
-                      if (success) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Order cancelled successfully'),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                      } else {
-                        final errMsg =
-                            context.read<OrderProvider>().errorMessage ??
-                                'Failed to cancel order';
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(errMsg),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
+                    if (!mounted) return;
+                    setState(() => _isCancelling = false);
+                    if (success) {
+                      ref.invalidate(orderDetailProvider(order.id));
+                      ScaffoldMessenger.of(this.context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Order cancelled successfully'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(this.context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Failed to cancel order'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
                     }
                   },
                   child: const Text('Cancel Order'),
@@ -146,8 +140,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final orderProvider = context.watch<OrderProvider>();
-    final order = orderProvider.selectedOrder;
+    final orderAsync = ref.watch(orderDetailProvider(widget.orderId));
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -157,84 +150,88 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
-      body: orderProvider.isLoading && order == null
-          ? const Center(child: CircularProgressIndicator())
-          : order == null
-              ? Center(
-                  child: Text(
-                    orderProvider.errorMessage ?? 'Order not found',
-                    style: const TextStyle(color: Colors.red),
+      body: orderAsync.when(
+        loading: () => const Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+          ),
+        ),
+        error: (err, _) => Center(
+          child: Text(
+            err.toString().replaceAll('Exception: ', ''),
+            style: const TextStyle(color: Colors.red),
+          ),
+        ),
+        data: (order) => ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            // 1. Order Header Card
+            _buildHeaderCard(context, order),
+            const SizedBox(height: 16),
+
+            // 2. Tracking Timeline Card
+            OrderTimeline(order: order),
+            const SizedBox(height: 16),
+
+            // 3. Shipping Address Card
+            if (order.shippingAddress != null)
+              _buildAddressCard(order),
+            if (order.shippingAddress != null)
+              const SizedBox(height: 16),
+
+            // 4. Purchased Items Snapshot Card
+            _buildItemsCard(order),
+            const SizedBox(height: 16),
+
+            // 5. Payment Details Card
+            _buildPaymentCard(order),
+            const SizedBox(height: 16),
+
+            // 6. Price Breakdown Card
+            _buildPriceBreakdownCard(order, theme),
+            const SizedBox(height: 24),
+
+            // 7. Cancel Order Action Button (if eligible)
+            if (order.canCancel && !order.isCancelled)
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    foregroundColor: Colors.red,
+                    side: const BorderSide(color: Colors.red),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
-                )
-              : ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    // 1. Order Header Card
-                    _buildHeaderCard(context, order),
-                    const SizedBox(height: 16),
-
-                    // 2. Tracking Timeline Card
-                    OrderTimeline(order: order),
-                    const SizedBox(height: 16),
-
-                    // 3. Shipping Address Card
-                    if (order.shippingAddress != null)
-                      _buildAddressCard(order),
-                    if (order.shippingAddress != null)
-                      const SizedBox(height: 16),
-
-                    // 4. Purchased Items Snapshot Card
-                    _buildItemsCard(order),
-                    const SizedBox(height: 16),
-
-                    // 5. Payment Details Card
-                    _buildPaymentCard(order),
-                    const SizedBox(height: 16),
-
-                    // 6. Price Breakdown Card
-                    _buildPriceBreakdownCard(order, theme),
-                    const SizedBox(height: 24),
-
-                    // 7. Cancel Order Action Button (if eligible)
-                    if (order.canCancel && !order.isCancelled)
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            foregroundColor: Colors.red,
-                            side: const BorderSide(color: Colors.red),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                  icon: _isCancelling
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.red,
                           ),
-                          icon: orderProvider.isCancelling
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.red,
-                                  ),
-                                )
-                              : const Icon(Icons.cancel_outlined),
-                          label: Text(
-                            orderProvider.isCancelling
-                                ? 'Cancelling Order...'
-                                : 'Cancel Order',
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          onPressed: orderProvider.isCancelling
-                              ? null
-                              : () => _showCancelDialog(context, order),
-                        ),
-                      ),
-                    const SizedBox(height: 40),
-                  ],
+                        )
+                      : const Icon(Icons.cancel_outlined),
+                  label: Text(
+                    _isCancelling
+                        ? 'Cancelling Order...'
+                        : 'Cancel Order',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onPressed: _isCancelling
+                      ? null
+                      : () => _showCancelDialog(order),
                 ),
+              ),
+            const SizedBox(height: 40),
+          ],
+        ),
+      ),
     );
   }
 

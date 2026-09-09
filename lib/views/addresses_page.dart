@@ -1,26 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:shopp_app/data/models/address_model.dart';
-import 'package:shopp_app/providers/address_provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shopp_app/core/theme/app_colors.dart';
+import 'package:shopp_app/domain/models/ui_state.dart';
+import 'package:shopp_app/features/addresses/domain/entities/address_entity.dart';
+import 'package:shopp_app/features/addresses/presentation/providers/address_providers.dart';
 import 'package:shopp_app/views/widgets/address_form_dialog.dart';
 
-class AddressesPage extends StatefulWidget {
+class AddressesPage extends ConsumerStatefulWidget {
   const AddressesPage({super.key});
 
   @override
-  State<AddressesPage> createState() => _AddressesPageState();
+  ConsumerState<AddressesPage> createState() => _AddressesPageState();
 }
 
-class _AddressesPageState extends State<AddressesPage> {
+class _AddressesPageState extends ConsumerState<AddressesPage> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AddressProvider>().loadAddresses();
+      ref.read(addressNotifierProvider.notifier).loadAddresses();
     });
   }
 
-  void _openAddressForm({AddressModel? address}) {
+  void _openAddressForm({AddressEntity? address}) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -29,7 +31,7 @@ class _AddressesPageState extends State<AddressesPage> {
     );
   }
 
-  void _confirmDelete(BuildContext context, AddressModel address) {
+  void _confirmDelete(AddressEntity address) {
     showDialog(
       context: context,
       builder: (dialogCtx) => AlertDialog(
@@ -49,10 +51,11 @@ class _AddressesPageState extends State<AddressesPage> {
             ),
             onPressed: () async {
               Navigator.pop(dialogCtx);
-              final success = await context
-                  .read<AddressProvider>()
+              final success = await ref
+                  .read(addressNotifierProvider.notifier)
                   .deleteAddress(address.id);
-              if (context.mounted && success) {
+              if (!mounted) return;
+              if (success) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Address deleted successfully'),
@@ -70,7 +73,8 @@ class _AddressesPageState extends State<AddressesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final addressProvider = context.watch<AddressProvider>();
+    final addressState = ref.watch(addressNotifierProvider);
+    final addresses = addressState.data ?? [];
 
     return Scaffold(
       appBar: AppBar(
@@ -86,30 +90,36 @@ class _AddressesPageState extends State<AddressesPage> {
           ),
         ],
       ),
-      body: addressProvider.isLoading && addressProvider.addresses.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : addressProvider.addresses.isEmpty
+      body: addressState.isLoading && addresses.isEmpty
+          ? const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+              ),
+            )
+          : addresses.isEmpty
               ? _buildEmptyState(context)
               : RefreshIndicator(
-                  onRefresh: () => addressProvider.loadAddresses(),
+                  color: AppColors.primary,
+                  onRefresh: () =>
+                      ref.read(addressNotifierProvider.notifier).loadAddresses(),
                   child: ListView.separated(
                     padding: const EdgeInsets.all(16),
-                    itemCount: addressProvider.addresses.length,
+                    itemCount: addresses.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
-                      final addr = addressProvider.addresses[index];
+                      final addr = addresses[index];
                       return _buildAddressCard(context, addr);
                     },
                   ),
                 ),
-      bottomNavigationBar: addressProvider.addresses.isNotEmpty
+      bottomNavigationBar: addresses.isNotEmpty
           ? SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    backgroundColor: Colors.blue,
+                    backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -156,7 +166,7 @@ class _AddressesPageState extends State<AddressesPage> {
               style: ElevatedButton.styleFrom(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                backgroundColor: Colors.blue,
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -172,13 +182,13 @@ class _AddressesPageState extends State<AddressesPage> {
     );
   }
 
-  Widget _buildAddressCard(BuildContext context, AddressModel addr) {
+  Widget _buildAddressCard(BuildContext context, AddressEntity addr) {
     return Card(
       elevation: 0.5,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: addr.isDefault ? Colors.blue.shade300 : Colors.grey.shade200,
+          color: addr.isDefault ? AppColors.primary : Colors.grey.shade200,
           width: addr.isDefault ? 1.5 : 1.0,
         ),
       ),
@@ -208,16 +218,16 @@ class _AddressesPageState extends State<AddressesPage> {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.blue.shade50,
+                          color: AppColors.primary50,
                           borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: Colors.blue.shade200),
+                          border: Border.all(color: AppColors.primaryLight),
                         ),
-                        child: Text(
+                        child: const Text(
                           'DEFAULT',
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color: Colors.blue.shade700,
+                            color: AppColors.primary,
                           ),
                         ),
                       ),
@@ -230,11 +240,11 @@ class _AddressesPageState extends State<AddressesPage> {
                     if (val == 'edit') {
                       _openAddressForm(address: addr);
                     } else if (val == 'delete') {
-                      _confirmDelete(context, addr);
+                      _confirmDelete(addr);
                     } else if (val == 'default') {
-                      await context
-                          .read<AddressProvider>()
-                          .updateAddress(addr.id, {'isDefault': true});
+                      await ref
+                          .read(addressNotifierProvider.notifier)
+                          .setDefault(addr.id);
                     }
                   },
                   itemBuilder: (ctx) => [
@@ -274,9 +284,9 @@ class _AddressesPageState extends State<AddressesPage> {
                 if (!addr.isDefault)
                   TextButton(
                     onPressed: () async {
-                      await context
-                          .read<AddressProvider>()
-                          .updateAddress(addr.id, {'isDefault': true});
+                      await ref
+                          .read(addressNotifierProvider.notifier)
+                          .setDefault(addr.id);
                     },
                     child: const Text('Set as Default'),
                   ),
@@ -285,7 +295,7 @@ class _AddressesPageState extends State<AddressesPage> {
                   child: const Text('Edit'),
                 ),
                 TextButton(
-                  onPressed: () => _confirmDelete(context, addr),
+                  onPressed: () => _confirmDelete(addr),
                   style: TextButton.styleFrom(foregroundColor: Colors.red),
                   child: const Text('Delete'),
                 ),

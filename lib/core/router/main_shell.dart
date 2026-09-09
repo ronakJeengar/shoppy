@@ -11,7 +11,7 @@ import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
-import 'package:shopp_app/riverpod/cart_riverpod_provider.dart';
+import 'package:shopp_app/features/cart/presentation/providers/cart_providers.dart';
 
 /// The responsive, polished bottom shell navigation for the core commerce tabs.
 /// Consumes centralized design tokens, strings, and route names.

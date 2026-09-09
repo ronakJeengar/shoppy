@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/data/models/assistant_message_model.dart';
-import 'package:shopp_app/providers/assistant_provider.dart';
+import 'package:shopp_app/features/assistant/presentation/providers/assistant_providers.dart';
+import 'package:shopp_app/features/catalog/data/mappers/catalog_mappers.dart';
 import 'package:shopp_app/views/product_detail_page.dart';
 import 'package:shopp_app/views/widgets/app_network_image.dart';
 
-class AssistantPage extends StatefulWidget {
+class AssistantPage extends ConsumerStatefulWidget {
   const AssistantPage({super.key});
 
   @override
-  State<AssistantPage> createState() => _AssistantPageState();
+  ConsumerState<AssistantPage> createState() => _AssistantPageState();
 }
 
-class _AssistantPageState extends State<AssistantPage> {
+class _AssistantPageState extends ConsumerState<AssistantPage> {
   final TextEditingController _inputController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
@@ -37,19 +38,20 @@ class _AssistantPageState extends State<AssistantPage> {
     });
   }
 
-  void _sendMessage(AssistantProvider provider) {
+  void _sendMessage(AssistantNotifier notifier) {
     final text = _inputController.text.trim();
-    if (text.isEmpty || provider.isLoading) return;
+    if (text.isEmpty) return;
 
     _inputController.clear();
-    provider.sendMessage(text, context: context);
+    notifier.sendMessage(text);
     _scrollToBottom();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final provider = context.watch<AssistantProvider>();
+    final state = ref.watch(assistantNotifierProvider);
+    final notifier = ref.read(assistantNotifierProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -89,7 +91,7 @@ class _AssistantPageState extends State<AssistantPage> {
             icon: const Icon(Icons.add_comment_outlined),
             tooltip: 'New Conversation',
             onPressed: () {
-              provider.startNewConversation();
+              notifier.startNewConversation();
             },
           ),
         ],
@@ -98,7 +100,7 @@ class _AssistantPageState extends State<AssistantPage> {
         child: Column(
           children: [
             // Error banner if any
-            if (provider.errorMessage != null)
+            if (state.errorMessage != null)
               Container(
                 width: double.infinity,
                 color: Colors.red.shade50,
@@ -109,13 +111,13 @@ class _AssistantPageState extends State<AssistantPage> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        provider.errorMessage!,
+                        state.errorMessage!,
                         style: const TextStyle(color: Colors.red, fontSize: 13),
                       ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.close, size: 18, color: Colors.red),
-                      onPressed: () => provider.clearError(),
+                      onPressed: () => notifier.clearError(),
                     ),
                   ],
                 ),
@@ -123,13 +125,13 @@ class _AssistantPageState extends State<AssistantPage> {
 
             // Main chat message list or empty state
             Expanded(
-              child: provider.messages.isEmpty
-                  ? _buildEmptyState(provider)
-                  : _buildMessageList(provider),
+              child: state.messages.isEmpty
+                  ? _buildEmptyState(state, notifier)
+                  : _buildMessageList(state, notifier),
             ),
 
             // Loading / Thinking indicator
-            if (provider.isLoading)
+            if (state.isLoading)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 child: Row(
@@ -153,14 +155,14 @@ class _AssistantPageState extends State<AssistantPage> {
               ),
 
             // Bottom input bar
-            _buildInputBar(provider),
+            _buildInputBar(state, notifier),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildEmptyState(AssistantProvider provider) {
+  Widget _buildEmptyState(AssistantState state, AssistantNotifier notifier) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -200,7 +202,7 @@ class _AssistantPageState extends State<AssistantPage> {
             ),
           ),
           const SizedBox(height: 10),
-          ...provider.suggestedPrompts.map(
+          ...state.suggestedPrompts.map(
             (prompt) => Container(
               width: double.infinity,
               margin: const EdgeInsets.only(bottom: 8),
@@ -214,7 +216,7 @@ class _AssistantPageState extends State<AssistantPage> {
                 ),
                 onPressed: () {
                   _inputController.text = prompt;
-                  _sendMessage(provider);
+                  _sendMessage(notifier);
                 },
                 child: Row(
                   children: [
@@ -237,21 +239,22 @@ class _AssistantPageState extends State<AssistantPage> {
     );
   }
 
-  Widget _buildMessageList(AssistantProvider provider) {
+  Widget _buildMessageList(AssistantState state, AssistantNotifier notifier) {
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      itemCount: provider.messages.length,
+      itemCount: state.messages.length,
       itemBuilder: (context, index) {
-        final message = provider.messages[index];
-        return _buildMessageItem(message, provider);
+        final message = state.messages[index];
+        return _buildMessageItem(message, state, notifier);
       },
     );
   }
 
   Widget _buildMessageItem(
     AssistantMessageModel message,
-    AssistantProvider provider,
+    AssistantState state,
+    AssistantNotifier notifier,
   ) {
     final isUser = message.isUser;
     final theme = Theme.of(context);
@@ -315,13 +318,13 @@ class _AssistantPageState extends State<AssistantPage> {
           // Pending Consequential Action Confirmation Card
           if (message.hasPendingConfirmation) ...[
             const SizedBox(height: 10),
-            _buildConfirmationCard(message.pendingConfirmation!, provider, theme),
+            _buildConfirmationCard(message.pendingConfirmation!, state, notifier, theme),
           ],
 
           // Embedded Product Cards
           if (message.hasProducts) ...[
             const SizedBox(height: 10),
-            _buildProductsCarousel(message.products, provider),
+            _buildProductsCarousel(message.products),
           ],
 
           // Grounded Knowledge Citations
@@ -333,7 +336,7 @@ class _AssistantPageState extends State<AssistantPage> {
           // Contextual Interactive Actions
           if (message.hasActions) ...[
             const SizedBox(height: 8),
-            _buildActionButtons(message.actions, provider),
+            _buildActionButtons(message.actions, notifier),
           ],
         ],
       ),
@@ -342,7 +345,8 @@ class _AssistantPageState extends State<AssistantPage> {
 
   Widget _buildConfirmationCard(
     AssistantConfirmationModel confirmation,
-    AssistantProvider provider,
+    AssistantState state,
+    AssistantNotifier notifier,
     ThemeData theme,
   ) {
     return Container(
@@ -395,13 +399,22 @@ class _AssistantPageState extends State<AssistantPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
-                onPressed: provider.isLoading
+                onPressed: state.isLoading
                     ? null
-                    : () {
-                        provider.confirmPendingAction(
-                          confirmation.confirmationId,
-                          context: context,
-                        );
+                    : () async {
+                        final success = await notifier
+                            .confirmPendingAction(confirmation.confirmationId);
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(success
+                                  ? 'Action confirmed successfully'
+                                  : 'Failed to confirm action'),
+                              backgroundColor:
+                                  success ? Colors.green : Colors.red,
+                            ),
+                          );
+                        }
                       },
                 icon: const Icon(Icons.check_circle_outline, size: 16),
                 label: const Text('Confirm', style: TextStyle(fontSize: 13)),
@@ -412,13 +425,16 @@ class _AssistantPageState extends State<AssistantPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
-                onPressed: provider.isLoading
+                onPressed: state.isLoading
                     ? null
-                    : () {
-                        provider.cancelPendingAction(
-                          confirmation.confirmationId,
-                          context: context,
-                        );
+                    : () async {
+                        final success = await notifier
+                            .cancelPendingAction(confirmation.confirmationId);
+                        if (mounted && success) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Action cancelled')),
+                          );
+                        }
                       },
                 child: const Text('Cancel', style: TextStyle(fontSize: 13)),
               ),
@@ -431,7 +447,6 @@ class _AssistantPageState extends State<AssistantPage> {
 
   Widget _buildProductsCarousel(
     List<AssistantProductCardModel> products,
-    AssistantProvider provider,
   ) {
     return SizedBox(
       height: 220,
@@ -525,7 +540,10 @@ class _AssistantPageState extends State<AssistantPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => ProductDetailPage(product: p.toProduct()),
+                                builder: (_) => ProductDetailPage(
+                                  product: p.toProduct().toEntity(),
+                                  productId: p.id,
+                                ),
                               ),
                             );
                           },
@@ -575,7 +593,7 @@ class _AssistantPageState extends State<AssistantPage> {
 
   Widget _buildActionButtons(
     List<AssistantActionModel> actions,
-    AssistantProvider provider,
+    AssistantNotifier notifier,
   ) {
     return Wrap(
       spacing: 8,
@@ -590,7 +608,7 @@ class _AssistantPageState extends State<AssistantPage> {
           ),
           icon: Icon(_getActionIcon(act.type), size: 14),
           label: Text(act.label, style: const TextStyle(fontSize: 12)),
-          onPressed: () => provider.executeAction(act, context),
+          onPressed: () => notifier.executeAction(act, context),
         );
       }).toList(),
     );
@@ -612,7 +630,7 @@ class _AssistantPageState extends State<AssistantPage> {
     }
   }
 
-  Widget _buildInputBar(AssistantProvider provider) {
+  Widget _buildInputBar(AssistantState state, AssistantNotifier notifier) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
@@ -632,7 +650,7 @@ class _AssistantPageState extends State<AssistantPage> {
               controller: _inputController,
               focusNode: _focusNode,
               textInputAction: TextInputAction.send,
-              onSubmitted: (_) => _sendMessage(provider),
+              onSubmitted: (_) => _sendMessage(notifier),
               decoration: InputDecoration(
                 hintText: 'Ask anything about products, orders, returns...',
                 hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13),
@@ -655,7 +673,7 @@ class _AssistantPageState extends State<AssistantPage> {
           const SizedBox(width: 8),
           IconButton.filled(
             icon: const Icon(Icons.send, size: 18),
-            onPressed: provider.isLoading ? null : () => _sendMessage(provider),
+            onPressed: state.isLoading ? null : () => _sendMessage(notifier),
           ),
         ],
       ),

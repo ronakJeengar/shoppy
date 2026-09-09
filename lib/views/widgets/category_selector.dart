@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
-import 'package:shopp_app/providers/catalog_provider.dart';
+import 'package:shopp_app/features/catalog/presentation/providers/catalog_providers.dart';
 import 'package:shopp_app/views/widgets/skeleton_loader.dart';
 
-class CategorySelector extends StatelessWidget {
+class CategorySelector extends ConsumerWidget {
   const CategorySelector({super.key});
 
   IconData _getCategoryIcon(String name) {
@@ -21,12 +21,12 @@ class CategorySelector extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final catalogProvider = context.watch<CatalogProvider>();
-    final categories = catalogProvider.categories;
-    final selectedId = catalogProvider.selectedCategoryId;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final categoriesState = ref.watch(categoriesNotifierProvider);
+    final categories = categoriesState.data ?? [];
+    final selectedId = ref.watch(productsNotifierProvider.select((s) => s.selectedCategory));
 
-    if (catalogProvider.isLoadingCategories && categories.isEmpty) {
+    if (categoriesState.isLoading && categories.isEmpty) {
       return SizedBox(
         height: 38,
         child: ListView.separated(
@@ -69,7 +69,8 @@ class CategorySelector extends StatelessWidget {
             child: InkWell(
               onTap: () {
                 final newId = isAll ? null : categories[index - 1].id;
-                context.read<CatalogProvider>().selectCategory(newId);
+                ref.read(productsNotifierProvider.notifier).selectCategory(newId);
+                ref.read(selectedCategoryProvider.notifier).state = newId;
               },
               borderRadius: AppRadius.borderFull,
               child: Container(

@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/data/models/admin_user_model.dart';
-import 'package:shopp_app/providers/admin_provider.dart';
+import 'package:shopp_app/features/admin/presentation/providers/admin_providers.dart';
 
-class AdminUsersPage extends StatefulWidget {
+class AdminUsersPage extends ConsumerStatefulWidget {
   const AdminUsersPage({super.key});
 
   @override
-  State<AdminUsersPage> createState() => _AdminUsersPageState();
+  ConsumerState<AdminUsersPage> createState() => _AdminUsersPageState();
 }
 
-class _AdminUsersPageState extends State<AdminUsersPage> {
+class _AdminUsersPageState extends ConsumerState<AdminUsersPage> {
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AdminProvider>().loadUsers();
+      ref.read(adminUsersNotifierProvider.notifier).loadUsers();
     });
   }
 
@@ -50,11 +50,12 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
             ),
             onPressed: () async {
               Navigator.pop(dialogCtx);
-              final success = await context
-                  .read<AdminProvider>()
+              final success = await ref
+                  .read(adminUsersNotifierProvider.notifier)
                   .updateUserStatus(user.id, newStatus);
-              if (context.mounted && success) {
-                ScaffoldMessenger.of(context).showSnackBar(
+              if (!mounted) return;
+              if (success) {
+                ScaffoldMessenger.of(this.context).showSnackBar(
                   SnackBar(
                     content: Text(newStatus
                         ? 'User activated successfully'
@@ -88,11 +89,12 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(dialogCtx);
-              final success = await context
-                  .read<AdminProvider>()
+              final success = await ref
+                  .read(adminUsersNotifierProvider.notifier)
                   .updateUserRole(user.id, newRole);
-              if (context.mounted && success) {
-                ScaffoldMessenger.of(context).showSnackBar(
+              if (!mounted) return;
+              if (success) {
+                ScaffoldMessenger.of(this.context).showSnackBar(
                   SnackBar(
                     content: Text('Role updated to $newRole successfully'),
                     backgroundColor: Colors.blue,
@@ -109,7 +111,8 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
 
   @override
   Widget build(BuildContext context) {
-    final admin = context.watch<AdminProvider>();
+    final usersState = ref.watch(adminUsersNotifierProvider);
+    final usersNotifier = ref.read(adminUsersNotifierProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -137,22 +140,22 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                         icon: const Icon(Icons.clear, size: 18),
                         onPressed: () {
                           _searchController.clear();
-                          admin.loadUsers(search: '');
+                          usersNotifier.loadUsers(search: '');
                         },
                       )
                     : null,
               ),
               onSubmitted: (query) {
-                admin.loadUsers(search: query);
+                usersNotifier.loadUsers(search: query);
               },
             ),
           ),
 
           // User Directory List
           Expanded(
-            child: admin.isLoadingUsers && admin.users.isEmpty
+            child: usersState.isLoading && usersState.users.isEmpty
                 ? const Center(child: CircularProgressIndicator())
-                : admin.users.isEmpty
+                : usersState.users.isEmpty
                     ? const Center(
                         child: Text(
                           'No users found matching search criteria',
@@ -160,14 +163,14 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                         ),
                       )
                     : RefreshIndicator(
-                        onRefresh: () => admin.loadUsers(),
+                        onRefresh: () => usersNotifier.loadUsers(),
                         child: ListView.separated(
                           padding: const EdgeInsets.all(12),
-                          itemCount: admin.users.length,
+                          itemCount: usersState.users.length,
                           separatorBuilder: (_, __) =>
                               const SizedBox(height: 8),
                           itemBuilder: (context, index) {
-                            final u = admin.users[index];
+                            final u = usersState.users[index];
 
                             return Card(
                               elevation: 0.5,

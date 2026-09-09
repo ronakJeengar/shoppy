@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/data/models/review_model.dart';
-import 'package:shopp_app/providers/review_provider.dart';
+import 'package:shopp_app/features/admin/presentation/providers/admin_providers.dart';
 
-class AdminReviewsPage extends StatefulWidget {
+class AdminReviewsPage extends ConsumerStatefulWidget {
   const AdminReviewsPage({super.key});
 
   @override
-  State<AdminReviewsPage> createState() => _AdminReviewsPageState();
+  ConsumerState<AdminReviewsPage> createState() => _AdminReviewsPageState();
 }
 
-class _AdminReviewsPageState extends State<AdminReviewsPage> {
+class _AdminReviewsPageState extends ConsumerState<AdminReviewsPage> {
   final TextEditingController _searchController = TextEditingController();
   final List<String> _statusFilters = ['ALL', 'PUBLISHED', 'HIDDEN'];
 
@@ -18,7 +18,7 @@ class _AdminReviewsPageState extends State<AdminReviewsPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ReviewProvider>().loadAdminReviews();
+      ref.read(adminReviewsNotifierProvider.notifier).loadReviews();
     });
   }
 
@@ -74,13 +74,16 @@ class _AdminReviewsPageState extends State<AdminReviewsPage> {
             ),
             onPressed: () async {
               Navigator.pop(dialogCtx);
-              final success = await context.read<ReviewProvider>().moderateReview(
+              final success = await ref
+                  .read(adminReviewsNotifierProvider.notifier)
+                  .moderateReview(
                     review.id,
                     status: targetStatus,
                     reason: reasonController.text.trim(),
                   );
-              if (context.mounted && success) {
-                ScaffoldMessenger.of(context).showSnackBar(
+              if (!mounted) return;
+              if (success) {
+                ScaffoldMessenger.of(this.context).showSnackBar(
                   SnackBar(
                     content: Text(willHide
                         ? 'Review hidden successfully'
@@ -99,8 +102,9 @@ class _AdminReviewsPageState extends State<AdminReviewsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final reviewProvider = context.watch<ReviewProvider>();
-    final adminReviews = reviewProvider.adminReviews;
+    final reviewsState = ref.watch(adminReviewsNotifierProvider);
+    final reviewsNotifier = ref.read(adminReviewsNotifierProvider.notifier);
+    final adminReviews = reviewsState.reviews;
 
     return Scaffold(
       appBar: AppBar(
@@ -111,7 +115,7 @@ class _AdminReviewsPageState extends State<AdminReviewsPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => reviewProvider.loadAdminReviews(),
+            onPressed: () => reviewsNotifier.loadReviews(),
           ),
         ],
       ),
@@ -134,13 +138,13 @@ class _AdminReviewsPageState extends State<AdminReviewsPage> {
                         icon: const Icon(Icons.clear, size: 18),
                         onPressed: () {
                           _searchController.clear();
-                          reviewProvider.loadAdminReviews(search: '');
+                          reviewsNotifier.loadReviews(search: '');
                         },
                       )
                     : null,
               ),
               onSubmitted: (query) {
-                reviewProvider.loadAdminReviews(search: query);
+                reviewsNotifier.loadReviews(search: query);
               },
             ),
           ),
@@ -153,12 +157,12 @@ class _AdminReviewsPageState extends State<AdminReviewsPage> {
               separatorBuilder: (_, __) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final status = _statusFilters[index];
-                final isSelected = reviewProvider.adminStatusFilter == status;
+                final isSelected = reviewsState.statusFilter == status;
                 return ChoiceChip(
                   label: Text(status),
                   selected: isSelected,
                   onSelected: (_) {
-                    reviewProvider.loadAdminReviews(status: status);
+                    reviewsNotifier.loadReviews(status: status);
                   },
                 );
               },
@@ -168,7 +172,7 @@ class _AdminReviewsPageState extends State<AdminReviewsPage> {
 
           // Reviews List
           Expanded(
-            child: reviewProvider.isLoadingAdminReviews && adminReviews.isEmpty
+            child: reviewsState.isLoading && adminReviews.isEmpty
                 ? const Center(child: CircularProgressIndicator())
                 : adminReviews.isEmpty
                     ? const Center(
@@ -178,7 +182,7 @@ class _AdminReviewsPageState extends State<AdminReviewsPage> {
                         ),
                       )
                     : RefreshIndicator(
-                        onRefresh: () => reviewProvider.loadAdminReviews(),
+                        onRefresh: () => reviewsNotifier.loadReviews(),
                         child: ListView.separated(
                           padding: const EdgeInsets.all(12),
                           itemCount: adminReviews.length,

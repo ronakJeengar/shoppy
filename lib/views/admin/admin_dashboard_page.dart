@@ -1,33 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/data/models/admin_dashboard_model.dart';
-import 'package:shopp_app/providers/admin_provider.dart';
+import 'package:shopp_app/features/admin/presentation/providers/admin_providers.dart';
 import 'package:shopp_app/views/admin/admin_audit_logs_page.dart';
 import 'package:shopp_app/views/admin/admin_orders_page.dart';
 import 'package:shopp_app/views/admin/admin_products_page.dart';
 import 'package:shopp_app/views/admin/admin_reviews_page.dart';
 import 'package:shopp_app/views/admin/admin_users_page.dart';
 
-class AdminDashboardPage extends StatefulWidget {
+class AdminDashboardPage extends ConsumerWidget {
   const AdminDashboardPage({super.key});
 
   @override
-  State<AdminDashboardPage> createState() => _AdminDashboardPageState();
-}
-
-class _AdminDashboardPageState extends State<AdminDashboardPage> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AdminProvider>().loadDashboard();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final adminProvider = context.watch<AdminProvider>();
-    final metrics = adminProvider.metrics;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final dashboardState = ref.watch(adminDashboardNotifierProvider);
+    final metrics = dashboardState.metrics;
     final displayMetrics = metrics ??
         AdminDashboardMetrics(
           totalUsers: 0,
@@ -49,18 +36,20 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Refresh Metrics',
-            onPressed: () => adminProvider.loadDashboard(),
+            onPressed: () =>
+                ref.read(adminDashboardNotifierProvider.notifier).loadDashboard(),
           ),
         ],
       ),
-      body: adminProvider.isLoadingMetrics && metrics == null
+      body: dashboardState.isLoading && metrics == null
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
-              onRefresh: () => adminProvider.loadDashboard(),
+              onRefresh: () =>
+                  ref.read(adminDashboardNotifierProvider.notifier).loadDashboard(),
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  if (adminProvider.metricsError != null && metrics == null) ...[
+                  if (dashboardState.error != null && metrics == null) ...[
                     Card(
                       color: Colors.orange.shade50,
                       elevation: 0,
@@ -77,7 +66,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
-                                adminProvider.metricsError!,
+                                dashboardState.error!,
                                 style: TextStyle(
                                   color: Colors.orange.shade900,
                                   fontSize: 12,

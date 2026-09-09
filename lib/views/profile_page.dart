@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
-import 'package:shopp_app/data/models/currrent_user_model.dart';
-import 'package:shopp_app/providers/notification_provider.dart';
-import 'package:shopp_app/providers/user_provider.dart';
+import 'package:shopp_app/features/auth/domain/entities/user_entity.dart';
+import 'package:shopp_app/features/auth/presentation/providers/auth_providers.dart';
+import 'package:shopp_app/features/notifications/presentation/providers/notification_providers.dart';
 import 'package:shopp_app/views/addresses_page.dart';
 import 'package:shopp_app/views/admin/admin_dashboard_page.dart';
 import 'package:shopp_app/views/login_page.dart';
@@ -16,15 +16,15 @@ import 'package:shopp_app/views/wishlist_page.dart';
 import 'package:shopp_app/views/widgets/app_button.dart';
 import 'package:shopp_app/views/widgets/app_text_field.dart';
 
-class ProfilePage extends StatefulWidget {
+class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  ConsumerState<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
-  void _openEditProfileDialog(BuildContext context, CurrentUserModel user) {
+class _ProfilePageState extends ConsumerState<ProfilePage> {
+  void _openEditProfileDialog(UserEntity user) {
     final nameController = TextEditingController(text: user.name);
     final phoneController = TextEditingController(text: user.phone);
     final formKey = GlobalKey<FormState>();
@@ -69,24 +69,23 @@ class _ProfilePageState extends State<ProfilePage> {
               onPressed: () async {
                 if (!formKey.currentState!.validate()) return;
                 Navigator.pop(dialogCtx);
-                final success = await context.read<UserProvider>().updateProfile(
+                final success = await ref.read(authStateProvider.notifier).updateProfile(
                       fullName: nameController.text.trim(),
                       phone: phoneController.text.trim(),
                     );
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        success
-                            ? 'Profile updated successfully'
-                            : (context.read<UserProvider>().errorMessage ??
-                                'Failed to update profile'),
-                      ),
-                      backgroundColor: success ? AppColors.success : AppColors.error,
-                      behavior: SnackBarBehavior.floating,
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success
+                          ? 'Profile updated successfully'
+                          : (ref.read(authStateProvider).errorMessage ??
+                              'Failed to update profile'),
                     ),
-                  );
-                }
+                    backgroundColor: success ? AppColors.success : AppColors.error,
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
               },
             ),
           ],
@@ -95,7 +94,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void _openChangePasswordDialog(BuildContext context) {
+  void _openChangePasswordDialog() {
     final currentPasswordController = TextEditingController();
     final newPasswordController = TextEditingController();
     final confirmPasswordController = TextEditingController();
@@ -156,24 +155,23 @@ class _ProfilePageState extends State<ProfilePage> {
               onPressed: () async {
                 if (!formKey.currentState!.validate()) return;
                 Navigator.pop(dialogCtx);
-                final success = await context.read<UserProvider>().changePassword(
+                final success = await ref.read(authStateProvider.notifier).changePassword(
                       currentPassword: currentPasswordController.text,
                       newPassword: newPasswordController.text,
                     );
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        success
-                            ? 'Password changed successfully'
-                            : (context.read<UserProvider>().errorMessage ??
-                                'Failed to change password'),
-                      ),
-                      backgroundColor: success ? AppColors.success : AppColors.error,
-                      behavior: SnackBarBehavior.floating,
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success
+                          ? 'Password changed successfully'
+                          : (ref.read(authStateProvider).errorMessage ??
+                              'Failed to change password'),
                     ),
-                  );
-                }
+                    backgroundColor: success ? AppColors.success : AppColors.error,
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
               },
             ),
           ],
@@ -182,7 +180,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void _confirmLogout(BuildContext context) {
+  void _confirmLogout() {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -204,14 +202,13 @@ class _ProfilePageState extends State<ProfilePage> {
             height: 38,
             onPressed: () async {
               Navigator.pop(ctx);
-              await context.read<UserProvider>().logout(context);
-              if (context.mounted) {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginPage()),
-                  (route) => false,
-                );
-              }
+              await ref.read(authStateProvider.notifier).logout();
+              if (!mounted) return;
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginPage()),
+                (route) => false,
+              );
             },
           ),
         ],
@@ -221,9 +218,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = context.watch<UserProvider>();
-    final notifProvider = context.watch<NotificationProvider>();
-    final user = userProvider.currentUser;
+    final user = ref.watch(currentUserProvider);
+    final unreadCount = ref.watch(notificationUnreadCountProvider);
 
     return Scaffold(
       backgroundColor: AppColors.slate50,
@@ -250,7 +246,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 const SizedBox(height: 20),
 
                 // Store Administration (Visible only to ADMIN role)
-                if (user.role == 'ADMIN') ...[
+                if (user.isAdmin) ...[
                   const Text(
                     'Store Administration',
                     style: AppTypography.label,
@@ -338,7 +334,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         iconColor: AppColors.accent,
                         title: 'Notifications',
                         subtitle: 'Order updates and promotional offers',
-                        trailingBadgeCount: notifProvider.unreadCount,
+                        trailingBadgeCount: unreadCount,
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -371,7 +367,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         iconColor: AppColors.primary,
                         title: 'Edit Profile',
                         subtitle: 'Update your display name and contact phone',
-                        onTap: () => _openEditProfileDialog(context, user),
+                        onTap: () => _openEditProfileDialog(user),
                       ),
                       const Divider(height: 1, color: AppColors.slate200, indent: 56),
                       _buildTile(
@@ -379,7 +375,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         iconColor: AppColors.slate700,
                         title: 'Change Password',
                         subtitle: 'Keep your Shoppy account secure',
-                        onTap: () => _openChangePasswordDialog(context),
+                        onTap: () => _openChangePasswordDialog(),
                       ),
                       const Divider(height: 1, color: AppColors.slate200, indent: 56),
                       _buildTile(
@@ -414,7 +410,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     iconColor: AppColors.error,
                     title: 'Log Out',
                     subtitle: 'Safely sign out of this device',
-                    onTap: () => _confirmLogout(context),
+                    onTap: () => _confirmLogout(),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -423,7 +419,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildProfileHeader(CurrentUserModel user) {
+  Widget _buildProfileHeader(UserEntity user) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -464,13 +460,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: user.role == 'ADMIN' ? AppColors.violetLight : AppColors.primary50,
+                        color: user.isAdmin ? AppColors.violetLight : AppColors.primary50,
                         borderRadius: AppRadius.borderFull,
                       ),
                       child: Text(
                         user.role,
                         style: AppTypography.label.copyWith(
-                          color: user.role == 'ADMIN' ? AppColors.violet : AppColors.primary,
+                          color: user.isAdmin ? AppColors.violet : AppColors.primary,
                         ),
                       ),
                     ),

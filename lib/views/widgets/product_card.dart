@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/constants/app_strings.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_dimensions.dart';
@@ -7,16 +7,16 @@ import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
-import 'package:shopp_app/data/models/product_model.dart';
-import 'package:shopp_app/providers/cart_provider.dart';
-import 'package:shopp_app/providers/wishlist_provider.dart';
+import 'package:shopp_app/features/cart/presentation/providers/cart_providers.dart';
+import 'package:shopp_app/features/catalog/domain/entities/product_entity.dart';
+import 'package:shopp_app/features/wishlist/presentation/providers/wishlist_providers.dart';
 import 'package:shopp_app/views/product_detail_page.dart';
 import 'package:shopp_app/views/widgets/app_network_image.dart';
 
 /// A modern, Figma-quality e-commerce product card with ratings, wishlist toggle,
 /// stock urgency badge, and instant add-to-cart button.
-class ProductCard extends StatelessWidget {
-  final Product product;
+class ProductCard extends ConsumerWidget {
+  final ProductEntity product;
 
   const ProductCard({
     super.key,
@@ -24,7 +24,9 @@ class ProductCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isWishlisted = ref.watch(isWishlistedProvider(product.id));
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -66,35 +68,31 @@ class ProductCard extends StatelessWidget {
                     Positioned(
                       top: AppDimensions.sm,
                       left: AppDimensions.sm,
-                      child: Consumer<WishlistProvider>(
-                        builder: (context, wishlistProvider, _) {
-                          final isWishlisted =
-                              wishlistProvider.isInWishlist(product.id);
-                          return Material(
-                            color: AppColors.white.withValues(alpha: 0.92),
-                            shape: const CircleBorder(),
-                            elevation: 2,
-                            shadowColor: Colors.black.withValues(alpha: 0.1),
-                            child: InkWell(
-                              customBorder: const CircleBorder(),
-                              onTap: () {
-                                wishlistProvider.toggleWishlist(product);
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(6.0),
-                                child: Icon(
-                                  isWishlisted
-                                      ? Icons.favorite_rounded
-                                      : Icons.favorite_border,
-                                  color: isWishlisted
-                                      ? AppColors.error
-                                      : AppColors.slate600,
-                                  size: AppIconSizes.sm,
-                                ),
-                              ),
+                      child: Material(
+                        color: AppColors.white.withValues(alpha: 0.92),
+                        shape: const CircleBorder(),
+                        elevation: 2,
+                        shadowColor: Colors.black.withValues(alpha: 0.1),
+                        child: InkWell(
+                          customBorder: const CircleBorder(),
+                          onTap: () {
+                            ref
+                                .read(wishlistNotifierProvider.notifier)
+                                .toggle(product);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(6.0),
+                            child: Icon(
+                              isWishlisted
+                                  ? Icons.favorite_rounded
+                                  : Icons.favorite_border,
+                              color: isWishlisted
+                                  ? AppColors.error
+                                  : AppColors.slate600,
+                              size: AppIconSizes.sm,
                             ),
-                          );
-                        },
+                          ),
+                        ),
                       ),
                     ),
 
@@ -215,19 +213,22 @@ class ProductCard extends StatelessWidget {
                             borderRadius: AppRadius.borderSm,
                             onTap: product.stock > 0
                                 ? () async {
-                                    final cart = context.read<CartProvider>();
-                                    await cart.addToCart(product);
+                                    await ref
+                                        .read(cartNotifierProvider.notifier)
+                                        .addToCart(product.id, quantity: 1);
                                     if (context.mounted) {
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
                                           content: Text(
-                                            AppStrings.product.addedToCart(product.productName),
+                                            AppStrings.product
+                                                .addedToCart(product.productName),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           backgroundColor: AppColors.slate900,
                                           behavior: SnackBarBehavior.floating,
-                                          duration: const Duration(seconds: 2),
+                                          duration:
+                                              const Duration(seconds: 2),
                                         ),
                                       );
                                     }

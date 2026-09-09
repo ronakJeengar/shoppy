@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/constants/app_strings.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_dimensions.dart';
@@ -7,21 +7,23 @@ import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
-import 'package:shopp_app/providers/cart_provider.dart';
-import 'package:shopp_app/providers/wishlist_provider.dart';
+import 'package:shopp_app/domain/models/ui_state.dart';
+import 'package:shopp_app/features/cart/presentation/providers/cart_providers.dart';
+import 'package:shopp_app/features/catalog/domain/entities/product_entity.dart';
+import 'package:shopp_app/features/wishlist/presentation/providers/wishlist_providers.dart';
 import 'package:shopp_app/views/home_page.dart';
 import 'package:shopp_app/views/product_detail_page.dart';
 import 'package:shopp_app/views/widgets/app_button.dart';
 import 'package:shopp_app/views/widgets/app_network_image.dart';
 import 'package:shopp_app/views/widgets/empty_state.dart';
 
-class WishlistPage extends StatelessWidget {
+class WishlistPage extends ConsumerWidget {
   const WishlistPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final wishlistProvider = context.watch<WishlistProvider>();
-    final cartProvider = context.read<CartProvider>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final wishlistState = ref.watch(wishlistNotifierProvider);
+    final items = wishlistState.dataOrNull ?? [];
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -33,20 +35,21 @@ class WishlistPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          '${AppStrings.wishlist.title} (${wishlistProvider.itemCount})',
+          '${AppStrings.wishlist.title} (${items.length})',
           style: AppTypography.headingSmall,
         ),
       ),
-      body: _buildBody(context, wishlistProvider, cartProvider),
+      body: _buildBody(context, ref, wishlistState, items),
     );
   }
 
   Widget _buildBody(
     BuildContext context,
-    WishlistProvider wishlistProvider,
-    CartProvider cartProvider,
+    WidgetRef ref,
+    UiState<List<ProductEntity>> wishlistState,
+    List<ProductEntity> items,
   ) {
-    if (wishlistProvider.isLoading && wishlistProvider.items.isEmpty) {
+    if (wishlistState.isLoading && items.isEmpty) {
       return const Center(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
@@ -54,7 +57,7 @@ class WishlistPage extends StatelessWidget {
       );
     }
 
-    if (wishlistProvider.items.isEmpty) {
+    if (items.isEmpty) {
       return EmptyStateView(
         icon: Icons.favorite_border_rounded,
         iconColor: AppColors.coral,
@@ -73,7 +76,7 @@ class WishlistPage extends StatelessWidget {
 
     return RefreshIndicator(
       color: AppColors.primary,
-      onRefresh: () => wishlistProvider.loadWishlist(),
+      onRefresh: () => ref.read(wishlistNotifierProvider.notifier).loadWishlist(),
       child: GridView.builder(
         padding: AppDimensions.cardPadding,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -82,9 +85,9 @@ class WishlistPage extends StatelessWidget {
           crossAxisSpacing: AppDimensions.md,
           mainAxisSpacing: AppDimensions.md,
         ),
-        itemCount: wishlistProvider.items.length,
+        itemCount: items.length,
         itemBuilder: (context, index) {
-          final product = wishlistProvider.items[index];
+          final product = items[index];
 
           return Container(
             decoration: BoxDecoration(
@@ -135,7 +138,7 @@ class WishlistPage extends StatelessWidget {
                               child: InkWell(
                                 customBorder: const CircleBorder(),
                                 onTap: () {
-                                  wishlistProvider.removeFromWishlist(product.id);
+                                  ref.read(wishlistNotifierProvider.notifier).remove(product.id);
                                 },
                                 child: const Padding(
                                   padding: EdgeInsets.all(6.0),
@@ -180,10 +183,11 @@ class WishlistPage extends StatelessWidget {
                             variant: AppButtonVariant.outline,
                             isFullWidth: true,
                             onPressed: () async {
-                              final success =
-                                  await cartProvider.addToCart(product);
+                              final success = await ref
+                                  .read(cartNotifierProvider.notifier)
+                                  .addToCart(product.id, quantity: 1);
                               if (success && context.mounted) {
-                                wishlistProvider.removeFromWishlist(product.id);
+                                ref.read(wishlistNotifierProvider.notifier).remove(product.id);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(

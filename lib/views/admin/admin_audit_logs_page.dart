@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:shopp_app/providers/admin_provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shopp_app/features/admin/presentation/providers/admin_providers.dart';
 
-class AdminAuditLogsPage extends StatefulWidget {
+class AdminAuditLogsPage extends ConsumerStatefulWidget {
   const AdminAuditLogsPage({super.key});
 
   @override
-  State<AdminAuditLogsPage> createState() => _AdminAuditLogsPageState();
+  ConsumerState<AdminAuditLogsPage> createState() => _AdminAuditLogsPageState();
 }
 
-class _AdminAuditLogsPageState extends State<AdminAuditLogsPage> {
+class _AdminAuditLogsPageState extends ConsumerState<AdminAuditLogsPage> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AdminProvider>().loadAuditLogs();
+      ref.read(adminAuditLogsNotifierProvider.notifier).loadAuditLogs();
     });
   }
 
@@ -28,7 +28,8 @@ class _AdminAuditLogsPageState extends State<AdminAuditLogsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final admin = context.watch<AdminProvider>();
+    final auditState = ref.watch(adminAuditLogsNotifierProvider);
+    final auditNotifier = ref.read(adminAuditLogsNotifierProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -39,13 +40,13 @@ class _AdminAuditLogsPageState extends State<AdminAuditLogsPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => admin.loadAuditLogs(),
+            onPressed: () => auditNotifier.loadAuditLogs(),
           ),
         ],
       ),
-      body: admin.isLoadingAuditLogs && admin.auditLogs.isEmpty
+      body: auditState.isLoading && auditState.logs.isEmpty
           ? const Center(child: CircularProgressIndicator())
-          : admin.auditLogs.isEmpty
+          : auditState.logs.isEmpty
               ? const Center(
                   child: Text(
                     'No administrative actions logged yet',
@@ -53,13 +54,13 @@ class _AdminAuditLogsPageState extends State<AdminAuditLogsPage> {
                   ),
                 )
               : RefreshIndicator(
-                  onRefresh: () => admin.loadAuditLogs(),
+                  onRefresh: () => auditNotifier.loadAuditLogs(),
                   child: ListView.separated(
                     padding: const EdgeInsets.all(12),
-                    itemCount: admin.auditLogs.length,
+                    itemCount: auditState.logs.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 8),
                     itemBuilder: (context, index) {
-                      final log = admin.auditLogs[index];
+                      final log = auditState.logs[index];
                       final color = _getActionColor(log.action);
 
                       return Card(

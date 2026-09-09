@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/data/models/product_model.dart';
-import 'package:shopp_app/providers/admin_provider.dart';
+import 'package:shopp_app/features/admin/presentation/providers/admin_providers.dart';
 
-class AdminProductsPage extends StatefulWidget {
+class AdminProductsPage extends ConsumerStatefulWidget {
   final bool initialLowStockOnly;
 
   const AdminProductsPage({super.key, this.initialLowStockOnly = false});
 
   @override
-  State<AdminProductsPage> createState() => _AdminProductsPageState();
+  ConsumerState<AdminProductsPage> createState() => _AdminProductsPageState();
 }
 
-class _AdminProductsPageState extends State<AdminProductsPage> {
+class _AdminProductsPageState extends ConsumerState<AdminProductsPage> {
   final TextEditingController _searchController = TextEditingController();
   late bool _lowStockOnly;
 
@@ -21,9 +21,10 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
     super.initState();
     _lowStockOnly = widget.initialLowStockOnly;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final admin = context.read<AdminProvider>();
-      admin.loadCategories();
-      admin.loadProducts(lowStock: _lowStockOnly);
+      ref.read(adminProductsNotifierProvider.notifier).loadCategories();
+      ref
+          .read(adminProductsNotifierProvider.notifier)
+          .loadProducts(lowStock: _lowStockOnly);
     });
   }
 
@@ -44,9 +45,9 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
         text: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e');
     final formKey = GlobalKey<FormState>();
 
-    final admin = context.read<AdminProvider>();
+    final adminState = ref.read(adminProductsNotifierProvider);
     String? selectedCatId =
-        admin.categories.isNotEmpty ? admin.categories.first.id : null;
+        adminState.categories.isNotEmpty ? adminState.categories.first.id : null;
 
     showDialog(
       context: context,
@@ -121,7 +122,7 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
                       initialValue: selectedCatId,
                       decoration:
                           const InputDecoration(labelText: 'Category *'),
-                      items: admin.categories.map((c) {
+                      items: adminState.categories.map((c) {
                         return DropdownMenuItem(
                           value: c.id,
                           child: Text(c.name),
@@ -158,12 +159,14 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
               ElevatedButton(
                 onPressed: () async {
                   if (!formKey.currentState!.validate()) return;
-                  if (selectedCatId == null && admin.categories.isNotEmpty) {
-                    selectedCatId = admin.categories.first.id;
+                  if (selectedCatId == null && adminState.categories.isNotEmpty) {
+                    selectedCatId = adminState.categories.first.id;
                   }
 
                   Navigator.pop(dialogCtx);
-                  final success = await context.read<AdminProvider>().createProduct({
+                  final success = await ref
+                      .read(adminProductsNotifierProvider.notifier)
+                      .createProduct({
                     'productName': nameController.text.trim(),
                     'sellerName': sellerController.text.trim(),
                     'description': descController.text.trim(),
@@ -173,16 +176,15 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
                     'category': selectedCatId ?? '64f1a2b3c4d5e6f7a8b9c001',
                   });
 
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(success
-                            ? 'Product created successfully'
-                            : 'Failed to create product'),
-                        backgroundColor: success ? Colors.green : Colors.red,
-                      ),
-                    );
-                  }
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(this.context).showSnackBar(
+                    SnackBar(
+                      content: Text(success
+                          ? 'Product created successfully'
+                          : 'Failed to create product'),
+                      backgroundColor: success ? Colors.green : Colors.red,
+                    ),
+                  );
                 },
                 child: const Text('Create'),
               ),
@@ -245,20 +247,19 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
                   if (val == null || val < 0) return;
 
                   Navigator.pop(dialogCtx);
-                  final success = await context
-                      .read<AdminProvider>()
+                  final success = await ref
+                      .read(adminProductsNotifierProvider.notifier)
                       .updateStock(product.id, val, selectedOp);
 
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(success
-                            ? 'Stock adjusted successfully'
-                            : 'Failed to adjust stock'),
-                        backgroundColor: success ? Colors.green : Colors.red,
-                      ),
-                    );
-                  }
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(this.context).showSnackBar(
+                    SnackBar(
+                      content: Text(success
+                          ? 'Stock adjusted successfully'
+                          : 'Failed to adjust stock'),
+                      backgroundColor: success ? Colors.green : Colors.red,
+                    ),
+                  );
                 },
                 child: const Text('Apply'),
               ),
@@ -289,11 +290,12 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
             ),
             onPressed: () async {
               Navigator.pop(dialogCtx);
-              final success = await context
-                  .read<AdminProvider>()
+              final success = await ref
+                  .read(adminProductsNotifierProvider.notifier)
                   .deleteProduct(product.id);
-              if (context.mounted && success) {
-                ScaffoldMessenger.of(context).showSnackBar(
+              if (!mounted) return;
+              if (success) {
+                ScaffoldMessenger.of(this.context).showSnackBar(
                   const SnackBar(
                     content: Text('Product deactivated successfully'),
                     backgroundColor: Colors.green,
@@ -310,7 +312,8 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final admin = context.watch<AdminProvider>();
+    final adminState = ref.watch(adminProductsNotifierProvider);
+    final adminNotifier = ref.read(adminProductsNotifierProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -348,13 +351,13 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
                               icon: const Icon(Icons.clear, size: 18),
                               onPressed: () {
                                 _searchController.clear();
-                                admin.loadProducts(search: '');
+                                adminNotifier.loadProducts(search: '');
                               },
                             )
                           : null,
                     ),
                     onSubmitted: (query) {
-                      admin.loadProducts(search: query);
+                      adminNotifier.loadProducts(search: query);
                     },
                   ),
                 ),
@@ -364,7 +367,7 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
                   selected: _lowStockOnly,
                   onSelected: (val) {
                     setState(() => _lowStockOnly = val);
-                    admin.loadProducts(lowStock: val);
+                    adminNotifier.loadProducts(lowStock: val);
                   },
                 ),
               ],
@@ -373,9 +376,9 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
 
           // Products List
           Expanded(
-            child: admin.isLoadingProducts && admin.products.isEmpty
+            child: adminState.isLoading && adminState.products.isEmpty
                 ? const Center(child: CircularProgressIndicator())
-                : admin.products.isEmpty
+                : adminState.products.isEmpty
                     ? const Center(
                         child: Text(
                           'No products found matching criteria',
@@ -383,14 +386,14 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
                         ),
                       )
                     : RefreshIndicator(
-                        onRefresh: () => admin.loadProducts(),
+                        onRefresh: () => adminNotifier.loadProducts(),
                         child: ListView.separated(
                           padding: const EdgeInsets.all(12),
-                          itemCount: admin.products.length,
+                          itemCount: adminState.products.length,
                           separatorBuilder: (_, __) =>
                               const SizedBox(height: 8),
                           itemBuilder: (context, index) {
-                            final p = admin.products[index];
+                            final p = adminState.products[index];
                             final isLowStock = p.stock <= 10;
 
                             return Card(

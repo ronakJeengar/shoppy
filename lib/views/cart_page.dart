@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/constants/app_strings.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_dimensions.dart';
@@ -7,17 +7,19 @@ import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
-import 'package:shopp_app/providers/cart_provider.dart';
+import 'package:shopp_app/domain/models/ui_state.dart';
+import 'package:shopp_app/features/cart/domain/entities/cart_entity.dart';
+import 'package:shopp_app/features/cart/presentation/providers/cart_providers.dart';
 import 'package:shopp_app/views/checkout_page.dart';
 import 'package:shopp_app/views/widgets/app_button.dart';
 import 'package:shopp_app/views/widgets/cart_item_tile.dart';
 import 'package:shopp_app/views/widgets/empty_state.dart';
 import 'package:shopp_app/views/widgets/error_state.dart';
 
-class CartPage extends StatelessWidget {
+class CartPage extends ConsumerWidget {
   const CartPage({super.key});
 
-  void _confirmClearCart(BuildContext context) {
+  void _confirmClearCart(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -34,7 +36,7 @@ class CartPage extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              context.read<CartProvider>().clearCart();
+              ref.read(cartNotifierProvider.notifier).clearCart();
             },
             child: Text(AppStrings.common.delete, style: const TextStyle(color: AppColors.error, fontWeight: FontWeight.bold)),
           ),
@@ -44,8 +46,9 @@ class CartPage extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final cartProvider = context.watch<CartProvider>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cartState = ref.watch(cartNotifierProvider);
+    final cart = cartState.dataOrNull ?? const CartEntity.empty();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -57,27 +60,32 @@ class CartPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          '${AppStrings.cart.title} (${cartProvider.totalItemCount})',
+          '${AppStrings.cart.title} (${cart.itemCount})',
           style: AppTypography.headingSmall,
         ),
         actions: [
-          if (cartProvider.items.isNotEmpty)
+          if (cart.items.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.delete_sweep_outlined, color: AppColors.textSecondary),
               tooltip: AppStrings.cart.clearCart,
-              onPressed: () => _confirmClearCart(context),
+              onPressed: () => _confirmClearCart(context, ref),
             ),
         ],
       ),
-      body: _buildBody(context, cartProvider),
-      bottomNavigationBar: cartProvider.items.isNotEmpty
-          ? _buildCheckoutBar(context, cartProvider)
+      body: _buildBody(context, ref, cartState, cart),
+      bottomNavigationBar: cart.items.isNotEmpty
+          ? _buildCheckoutBar(context, cart)
           : null,
     );
   }
 
-  Widget _buildBody(BuildContext context, CartProvider cartProvider) {
-    if (cartProvider.isLoading && cartProvider.items.isEmpty) {
+  Widget _buildBody(
+    BuildContext context,
+    WidgetRef ref,
+    UiState<CartEntity> cartState,
+    CartEntity cart,
+  ) {
+    if (cartState.isLoading && cart.items.isEmpty) {
       return const Center(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
@@ -85,14 +93,14 @@ class CartPage extends StatelessWidget {
       );
     }
 
-    if (cartProvider.errorMessage != null && cartProvider.items.isEmpty) {
+    if (cartState.error != null && cart.items.isEmpty) {
       return ErrorStateView(
-        message: cartProvider.errorMessage!,
-        onRetry: () => cartProvider.loadCart(),
+        message: cartState.error!,
+        onRetry: () => ref.read(cartNotifierProvider.notifier).loadCart(),
       );
     }
 
-    if (cartProvider.items.isEmpty) {
+    if (cart.items.isEmpty) {
       return EmptyStateView(
         icon: Icons.shopping_cart_outlined,
         title: AppStrings.cart.empty,
@@ -103,14 +111,14 @@ class CartPage extends StatelessWidget {
     }
 
     const double freeShippingThreshold = 100.0;
-    final double currentSubtotal = cartProvider.subtotal;
+    final double currentSubtotal = cart.subtotal;
     final bool qualifiesForFreeShipping = currentSubtotal >= freeShippingThreshold;
     final double neededForFreeShipping = (freeShippingThreshold - currentSubtotal).clamp(0.0, freeShippingThreshold);
     final double freeShippingProgress = (currentSubtotal / freeShippingThreshold).clamp(0.0, 1.0);
 
     return RefreshIndicator(
       color: AppColors.primary,
-      onRefresh: () => cartProvider.loadCart(),
+      onRefresh: () => ref.read(cartNotifierProvider.notifier).loadCart(),
       child: ListView(
         padding: AppDimensions.paddingVerticalMd,
         children: [
@@ -167,14 +175,14 @@ class CartPage extends StatelessWidget {
           const SizedBox(height: 6),
 
           // Cart Items List
-          ...cartProvider.items.map((item) {
+          ...cart.items.map((item) {
             return CartItemTile(
               item: item,
               onQuantityChanged: (qty) {
-                cartProvider.updateQuantity(item.productId, qty);
+                ref.read(cartNotifierProvider.notifier).updateQuantity(item.productId, qty);
               },
               onRemove: () {
-                cartProvider.removeItem(item.productId);
+                ref.read(cartNotifierProvider.notifier).removeFromCart(item.productId);
               },
             );
           }),
@@ -196,19 +204,19 @@ class CartPage extends StatelessWidget {
               children: [
                 Text(AppStrings.cart.orderSummary, style: AppTypography.headingSmall),
                 const SizedBox(height: 14),
-                _summaryRow(AppStrings.cart.subtotal, '\$${cartProvider.subtotal.toStringAsFixed(2)}'),
+                _summaryRow(AppStrings.cart.subtotal, '\$${cart.subtotal.toStringAsFixed(2)}'),
                 const SizedBox(height: AppDimensions.sm),
                 _summaryRow(
                   AppStrings.cart.shipping,
-                  cartProvider.shipping == 0 ? AppStrings.cart.shippingFree : '\$${cartProvider.shipping.toStringAsFixed(2)}',
-                  valueColor: cartProvider.shipping == 0 ? AppColors.success : null,
+                  cart.shipping == 0 ? AppStrings.cart.shippingFree : '\$${cart.shipping.toStringAsFixed(2)}',
+                  valueColor: cart.shipping == 0 ? AppColors.success : null,
                 ),
                 const SizedBox(height: AppDimensions.sm),
-                _summaryRow(AppStrings.cart.tax, '\$${cartProvider.tax.toStringAsFixed(2)}'),
+                _summaryRow(AppStrings.cart.tax, '\$${cart.tax.toStringAsFixed(2)}'),
                 const Divider(height: AppDimensions.xxl, color: AppColors.divider),
                 _summaryRow(
                   AppStrings.cart.estimatedTotal,
-                  '\$${cartProvider.totalAmount.toStringAsFixed(2)}',
+                  '\$${cart.total.toStringAsFixed(2)}',
                   isBold: true,
                 ),
               ],
@@ -244,7 +252,7 @@ class CartPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCheckoutBar(BuildContext context, CartProvider cartProvider) {
+  Widget _buildCheckoutBar(BuildContext context, CartEntity cart) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
       decoration: const BoxDecoration(
@@ -265,7 +273,7 @@ class CartPage extends StatelessWidget {
                 style: AppTypography.caption.copyWith(color: AppColors.textSecondary),
               ),
               Text(
-                '\$${cartProvider.totalAmount.toStringAsFixed(2)}',
+                '\$${cart.total.toStringAsFixed(2)}',
                 style: AppTypography.priceCard.copyWith(fontSize: 20),
               ),
             ],

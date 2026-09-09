@@ -18,4 +18,7 @@ extension UiStateX<T> on UiState<T> {
   bool get isEmpty => this is _Empty<T>;
   bool get isError => this is _Error<T>;
   T? get dataOrNull => whenOrNull(success: (data) => data);
+  T? get data => whenOrNull(success: (data) => data);
+  String? get error => whenOrNull(error: (msg, _) => msg);
+  String? get emptyMessage => whenOrNull(empty: (msg) => msg);
 }

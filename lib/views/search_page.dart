@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/constants/app_strings.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_dimensions.dart';
 import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
-import 'package:shopp_app/providers/catalog_provider.dart';
-import 'package:shopp_app/providers/search_provider.dart';
+import 'package:shopp_app/features/catalog/domain/entities/category_entity.dart';
+import 'package:shopp_app/features/catalog/presentation/providers/catalog_providers.dart';
+import 'package:shopp_app/features/search/presentation/providers/search_providers.dart';
 import 'package:shopp_app/views/widgets/empty_state.dart';
 import 'package:shopp_app/views/widgets/error_state.dart';
 import 'package:shopp_app/views/widgets/filter_bottom_sheet.dart';
 import 'package:shopp_app/views/widgets/product_card.dart';
 import 'package:shopp_app/views/widgets/skeleton_loader.dart';
 
-class SearchPage extends StatefulWidget {
+class SearchPage extends ConsumerStatefulWidget {
   final String? initialQuery;
 
   const SearchPage({
@@ -23,10 +24,10 @@ class SearchPage extends StatefulWidget {
   });
 
   @override
-  State<SearchPage> createState() => _SearchPageState();
+  ConsumerState<SearchPage> createState() => _SearchPageState();
 }
 
-class _SearchPageState extends State<SearchPage> {
+class _SearchPageState extends ConsumerState<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
 
@@ -36,7 +37,7 @@ class _SearchPageState extends State<SearchPage> {
     if (widget.initialQuery != null && widget.initialQuery!.isNotEmpty) {
       _searchController.text = widget.initialQuery!;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<SearchProvider>().executeSearch(widget.initialQuery!);
+        ref.read(searchNotifierProvider.notifier).executeSearch(widget.initialQuery!);
       });
     } else {
       _searchFocusNode.requestFocus();
@@ -61,9 +62,11 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    final searchProvider = context.watch<SearchProvider>();
-    final catalogProvider = context.watch<CatalogProvider>();
-    final filterCount = searchProvider.activeFilterCount;
+    final searchState = ref.watch(searchNotifierProvider);
+    final searchNotifier = ref.read(searchNotifierProvider.notifier);
+    final categoriesState = ref.watch(categoriesNotifierProvider);
+    final categories = categoriesState.data ?? [];
+    final filterCount = searchState.activeFilterCount;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -106,7 +109,7 @@ class _SearchPageState extends State<SearchPage> {
                       icon: const Icon(Icons.close_rounded, size: AppIconSizes.sm + 2, color: AppColors.slate500),
                       onPressed: () {
                         _searchController.clear();
-                        searchProvider.clearSearch();
+                        searchNotifier.clearSearch();
                         setState(() {});
                       },
                     )
@@ -114,10 +117,10 @@ class _SearchPageState extends State<SearchPage> {
             ),
             onChanged: (val) {
               setState(() {});
-              searchProvider.onQueryChanged(val);
+              searchNotifier.onQueryChanged(val);
             },
             onSubmitted: (val) {
-              searchProvider.executeSearch(val);
+              searchNotifier.executeSearch(val);
             },
           ),
         ),
@@ -155,17 +158,18 @@ class _SearchPageState extends State<SearchPage> {
           const SizedBox(width: 6),
         ],
       ),
-      body: _buildBody(context, searchProvider, catalogProvider),
+      body: _buildBody(context, searchState, searchNotifier, categories),
     );
   }
 
   Widget _buildBody(
     BuildContext context,
-    SearchProvider searchProvider,
-    CatalogProvider catalogProvider,
+    SearchState searchState,
+    SearchNotifier searchNotifier,
+    List<CategoryEntity> categories,
   ) {
     // 1. Loading State with Product Skeletons
-    if (searchProvider.isSearching) {
+    if (searchState.resultsState.isLoading) {
       return GridView.builder(
         padding: AppDimensions.cardPadding,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -180,25 +184,26 @@ class _SearchPageState extends State<SearchPage> {
     }
 
     // 2. Error State
-    if (searchProvider.errorMessage != null &&
-        searchProvider.searchResults.isEmpty) {
+    if (searchState.resultsState.isError &&
+        (searchState.resultsState.data?.isEmpty ?? true)) {
       return ErrorStateView(
-        message: searchProvider.errorMessage!,
-        onRetry: () => searchProvider.executeSearch(_searchController.text),
+        message: searchState.resultsState.error ?? 'An error occurred during search',
+        onRetry: () => searchNotifier.executeSearch(_searchController.text),
       );
     }
 
     // 3. Search Results View
-    if (searchProvider.hasExecutedSearch) {
-      if (searchProvider.searchResults.isEmpty) {
+    if (searchState.hasExecutedSearch) {
+      final searchResults = searchState.resultsState.data ?? [];
+      if (searchResults.isEmpty) {
         return EmptyStateView(
           icon: Icons.search_off_rounded,
           title: AppStrings.search.noResults,
           description:
-              'No products matched "${searchProvider.currentQuery}". Try different keywords or clear filters.',
-          buttonText: searchProvider.activeFilterCount > 0 ? AppStrings.search.clearFilters : null,
+              'No products matched "${searchState.query}". Try different keywords or clear filters.',
+          buttonText: searchState.activeFilterCount > 0 ? AppStrings.search.clearFilters : null,
           onButtonPressed: () {
-            searchProvider.resetFilters();
+            searchNotifier.resetFilters();
           },
         );
       }
@@ -213,14 +218,14 @@ class _SearchPageState extends State<SearchPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  AppStrings.search.productsFound(searchProvider.searchResults.length),
+                  AppStrings.search.productsFound(searchResults.length),
                   style: AppTypography.caption.copyWith(
                     fontWeight: FontWeight.w700,
                     color: AppColors.slate700,
                   ),
                 ),
                 PopupMenuButton<String>(
-                  initialValue: searchProvider.selectedSort,
+                  initialValue: searchState.selectedSort,
                   shape: const RoundedRectangleBorder(
                     borderRadius: AppRadius.borderMd,
                   ),
@@ -239,7 +244,7 @@ class _SearchPageState extends State<SearchPage> {
                     ],
                   ),
                   onSelected: (sort) {
-                    searchProvider.setSort(sort);
+                    searchNotifier.setSort(sort);
                   },
                   itemBuilder: (context) => [
                     PopupMenuItem(
@@ -274,9 +279,9 @@ class _SearchPageState extends State<SearchPage> {
                 crossAxisSpacing: AppDimensions.md,
                 mainAxisSpacing: AppDimensions.md,
               ),
-              itemCount: searchProvider.searchResults.length,
+              itemCount: searchResults.length,
               itemBuilder: (context, index) {
-                final product = searchProvider.searchResults[index];
+                final product = searchResults[index];
                 return ProductCard(product: product);
               },
             ),
@@ -287,13 +292,13 @@ class _SearchPageState extends State<SearchPage> {
 
     // 4. Live Suggestions (while typing)
     if (_searchController.text.trim().isNotEmpty &&
-        searchProvider.suggestions.isNotEmpty) {
+        searchState.suggestions.isNotEmpty) {
       return ListView.separated(
-        itemCount: searchProvider.suggestions.length,
+        itemCount: searchState.suggestions.length,
         separatorBuilder: (_, __) => const Divider(height: 1, color: AppColors.divider),
         itemBuilder: (context, index) {
-          final item = searchProvider.suggestions[index];
-          final text = item['text']?.toString() ?? '';
+          final item = searchState.suggestions[index];
+          final text = item['name']?.toString() ?? item['text']?.toString() ?? '';
           final type = item['type']?.toString() ?? 'product';
 
           return ListTile(
@@ -313,7 +318,7 @@ class _SearchPageState extends State<SearchPage> {
             ),
             onTap: () {
               _searchController.text = text;
-              searchProvider.executeSearch(text);
+              searchNotifier.executeSearch(text);
             },
           );
         },
@@ -321,7 +326,7 @@ class _SearchPageState extends State<SearchPage> {
     }
 
     // 5. Default Screen: Recent Searches & Categories
-    final recents = searchProvider.recentSearches;
+    final recents = searchState.recentSearches;
 
     return SingleChildScrollView(
       padding: AppDimensions.cardPadding,
@@ -338,7 +343,7 @@ class _SearchPageState extends State<SearchPage> {
                   style: AppTypography.headingSmall,
                 ),
                 TextButton(
-                  onPressed: () => searchProvider.clearRecentSearches(),
+                  onPressed: () => searchNotifier.clearRecentSearches(),
                   child: Text(
                     AppStrings.search.clearAll,
                     style: AppTypography.caption.copyWith(
@@ -362,7 +367,7 @@ class _SearchPageState extends State<SearchPage> {
                     style: AppTypography.bodySmall.copyWith(color: AppColors.slate800),
                   ),
                   deleteIcon: const Icon(Icons.close_rounded, size: 14, color: AppColors.textMuted),
-                  onDeleted: () => searchProvider.removeRecentSearch(term),
+                  onDeleted: () => searchNotifier.removeRecentSearch(term),
                 );
               }).toList(),
             ),
@@ -378,22 +383,22 @@ class _SearchPageState extends State<SearchPage> {
           Wrap(
             spacing: AppDimensions.sm,
             runSpacing: AppDimensions.sm,
-            children: catalogProvider.categories.map((cat) {
+            children: categories.map((cat) {
               return ActionChip(
                 backgroundColor: AppColors.surface,
                 side: const BorderSide(color: AppColors.border),
                 avatar: const Icon(Icons.category_rounded, size: AppIconSizes.sm, color: AppColors.primary),
                 label: Text(
-                  cat.displayName,
+                  cat.name,
                   style: AppTypography.bodySmall.copyWith(
                     fontWeight: FontWeight.w500,
                     color: AppColors.slate800,
                   ),
                 ),
                 onPressed: () {
-                  _searchController.text = cat.displayName;
-                  searchProvider.setFilters(categoryId: cat.id);
-                  searchProvider.executeSearch(cat.displayName);
+                  _searchController.text = cat.name;
+                  searchNotifier.setFilters(categoryId: cat.id);
+                  searchNotifier.executeSearch(cat.name);
                 },
               );
             }).toList(),

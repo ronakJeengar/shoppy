@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/constants/app_strings.dart';
+import 'package:shopp_app/core/constants/route_names.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_dimensions.dart';
 import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
-import 'package:shopp_app/providers/user_provider.dart';
+import 'package:shopp_app/core/widgets/app_button.dart';
+import 'package:shopp_app/core/widgets/app_text_field.dart';
+import 'package:shopp_app/features/auth/presentation/providers/auth_providers.dart';
 import 'package:shopp_app/views/sign_up_page.dart';
-import 'package:shopp_app/views/widgets/app_button.dart';
-import 'package:shopp_app/views/widgets/app_text_field.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -34,13 +36,14 @@ class _LoginPageState extends State<LoginPage> {
   void _submitLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final userProvider = context.read<UserProvider>();
-    final Map<String, dynamic> credentials = {
-      'email': _emailController.text.trim(),
-      'password': _passwordController.text,
-    };
+    final success = await ref.read(authStateProvider.notifier).signIn(
+          _emailController.text.trim(),
+          _passwordController.text,
+        );
 
-    await userProvider.userSignIn(context: context, data: credentials);
+    if (success && mounted) {
+      context.go(RouteNames.home);
+    }
   }
 
   void _fillDemoCredentials(String email, String password) {
@@ -52,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = context.watch<UserProvider>();
+    final authState = ref.watch(authStateProvider);
 
     return Scaffold(
       backgroundColor: AppColors.surface,
@@ -62,7 +65,8 @@ class _LoginPageState extends State<LoginPage> {
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.xxl, vertical: AppDimensions.md),
+          padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.xxl, vertical: AppDimensions.md),
           child: Form(
             key: _formKey,
             child: Column(
@@ -95,27 +99,31 @@ class _LoginPageState extends State<LoginPage> {
                 Text(
                   AppStrings.auth.loginSubtitle,
                   textAlign: TextAlign.center,
-                  style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+                  style: AppTypography.bodySmall
+                      .copyWith(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 14),
 
                 // Error Banner
-                if (userProvider.errorMessage != null) ...[
+                if (authState.errorMessage != null) ...[
                   Container(
                     padding: AppDimensions.paddingMd,
                     decoration: BoxDecoration(
                       color: AppColors.errorLight,
                       borderRadius: AppRadius.borderMd,
-                      border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
+                      border: Border.all(
+                          color: AppColors.error.withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.error_outline_rounded, size: AppIconSizes.sm + 2, color: AppColors.error),
+                        const Icon(Icons.error_outline_rounded,
+                            size: AppIconSizes.sm + 2, color: AppColors.error),
                         const SizedBox(width: AppDimensions.sm),
                         Expanded(
                           child: Text(
-                            userProvider.errorMessage!,
-                            style: AppTypography.bodySmall.copyWith(color: AppColors.error),
+                            authState.errorMessage!,
+                            style: AppTypography.bodySmall
+                                .copyWith(color: AppColors.error),
                           ),
                         ),
                       ],
@@ -153,7 +161,9 @@ class _LoginPageState extends State<LoginPage> {
                   prefixIcon: Icons.lock_outline_rounded,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                      _obscurePassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
                       size: AppIconSizes.md,
                       color: AppColors.slate500,
                     ),
@@ -176,9 +186,9 @@ class _LoginPageState extends State<LoginPage> {
                 AppButton(
                   label: AppStrings.auth.login,
                   icon: Icons.login_rounded,
-                  isLoading: userProvider.isLoading,
+                  isLoading: authState.isLoading,
                   isFullWidth: true,
-                  onPressed: userProvider.isLoading ? null : _submitLogin,
+                  onPressed: authState.isLoading ? null : _submitLogin,
                 ),
                 const SizedBox(height: 10),
 
@@ -195,7 +205,8 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       Text(
                         AppStrings.auth.quickDemo,
-                        style: AppTypography.label.copyWith(color: AppColors.textSecondary),
+                        style: AppTypography.label
+                            .copyWith(color: AppColors.textSecondary),
                       ),
                       const SizedBox(height: 6),
                       Row(
@@ -203,30 +214,36 @@ class _LoginPageState extends State<LoginPage> {
                           Expanded(
                             child: OutlinedButton(
                               style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 6),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 6),
                                 side: const BorderSide(color: AppColors.border),
-                                shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderSm),
+                                shape: const RoundedRectangleBorder(
+                                    borderRadius: AppRadius.borderSm),
                               ),
                               onPressed: () => _fillDemoCredentials(
                                 'customer@shoppy.com',
                                 'Customer@12345',
                               ),
-                              child: Text(AppStrings.auth.demoCustomer, style: const TextStyle(fontSize: 12)),
+                              child: Text(AppStrings.auth.demoCustomer,
+                                  style: const TextStyle(fontSize: 12)),
                             ),
                           ),
                           const SizedBox(width: AppDimensions.sm),
                           Expanded(
                             child: OutlinedButton(
                               style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 6),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 6),
                                 side: const BorderSide(color: AppColors.border),
-                                shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderSm),
+                                shape: const RoundedRectangleBorder(
+                                    borderRadius: AppRadius.borderSm),
                               ),
                               onPressed: () => _fillDemoCredentials(
                                 'admin@shoppy.com',
                                 'Admin@12345',
                               ),
-                              child: Text(AppStrings.auth.demoAdmin, style: const TextStyle(fontSize: 12)),
+                              child: Text(AppStrings.auth.demoAdmin,
+                                  style: const TextStyle(fontSize: 12)),
                             ),
                           ),
                         ],
@@ -242,7 +259,8 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     Text(
                       AppStrings.auth.noAccountPrompt,
-                      style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+                      style: AppTypography.bodySmall
+                          .copyWith(color: AppColors.textSecondary),
                     ),
                     TextButton(
                       onPressed: () {

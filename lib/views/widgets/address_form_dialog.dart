@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:shopp_app/data/models/address_model.dart';
-import 'package:shopp_app/providers/address_provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shopp_app/features/addresses/domain/entities/address_entity.dart';
+import 'package:shopp_app/features/addresses/presentation/providers/address_providers.dart';
 
-class AddressFormBottomSheet extends StatefulWidget {
-  final AddressModel? existingAddress;
+class AddressFormBottomSheet extends ConsumerStatefulWidget {
+  final AddressEntity? existingAddress;
 
   const AddressFormBottomSheet({super.key, this.existingAddress});
 
   @override
-  State<AddressFormBottomSheet> createState() => _AddressFormBottomSheetState();
+  ConsumerState<AddressFormBottomSheet> createState() => _AddressFormBottomSheetState();
 }
 
-class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
+class _AddressFormBottomSheetState extends ConsumerState<AddressFormBottomSheet> {
   final _formKey = GlobalKey<FormState>();
 
   late TextEditingController _nameController;
@@ -55,27 +55,27 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
       _isSaving = true;
     });
 
-    final addressData = {
-      'fullName': _nameController.text.trim(),
-      'phone': _phoneController.text.trim(),
-      'streetAddress': _streetController.text.trim(),
-      'city': _cityController.text.trim(),
-      'state': _stateController.text.trim(),
-      'postalCode': _postalController.text.trim(),
-      'country': 'US',
-      'isDefault': _isDefault,
-    };
+    final address = AddressEntity(
+      id: widget.existingAddress?.id ?? '',
+      fullName: _nameController.text.trim(),
+      phone: _phoneController.text.trim(),
+      streetAddress: _streetController.text.trim(),
+      city: _cityController.text.trim(),
+      state: _stateController.text.trim(),
+      postalCode: _postalController.text.trim(),
+      country: 'US',
+      isDefault: _isDefault,
+    );
 
-    final provider = context.read<AddressProvider>();
     bool success = false;
 
     if (widget.existingAddress != null) {
-      success = await provider.updateAddress(
+      success = await ref.read(addressNotifierProvider.notifier).updateAddress(
         widget.existingAddress!.id,
-        addressData,
+        address,
       );
     } else {
-      success = await provider.addAddress(addressData);
+      success = await ref.read(addressNotifierProvider.notifier).addAddress(address);
     }
 
     if (mounted) {
@@ -97,10 +97,8 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              provider.errorMessage ?? 'Failed to save address',
-            ),
+          const SnackBar(
+            content: Text('Failed to save address'),
             backgroundColor: Colors.red,
           ),
         );
