@@ -14,11 +14,15 @@ import 'package:video_player/video_player.dart';
 class ProductMediaGallery extends StatefulWidget {
   final Product product;
   final double height;
+  final bool enableVideo;
+  final bool enable3d;
 
   const ProductMediaGallery({
     super.key,
     required this.product,
     this.height = 360,
+    this.enableVideo = true,
+    this.enable3d = true,
   });
 
   @override
@@ -27,7 +31,7 @@ class ProductMediaGallery extends StatefulWidget {
 
 class _ProductMediaGalleryState extends State<ProductMediaGallery> {
   late final PageController _pageController;
-  late final List<ProductMedia> _mediaList;
+  late List<ProductMedia> _mediaList;
   int _currentIndex = 0;
 
   // Video controller state
@@ -42,16 +46,25 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
   double _rotationY = 0.0;
   double _zoomScale = 1.0;
 
+  List<ProductMedia> _computeMediaList() {
+    return widget.product.allMedia.where((m) {
+      if (m.type == ProductMediaType.video && !widget.enableVideo) return false;
+      if (m.type == ProductMediaType.model3d && !widget.enable3d) return false;
+      return true;
+    }).toList();
+  }
+
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
-    _mediaList = widget.product.allMedia;
+    _mediaList = _computeMediaList();
 
     _initVideoIfAvailable();
   }
 
   void _initVideoIfAvailable() {
+    if (!widget.enableVideo) return;
     if (widget.product.hasVideo && widget.product.videoUrl != null) {
       try {
         final uri = Uri.parse(widget.product.videoUrl!);
@@ -83,6 +96,21 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
       } catch (_) {
         _hasVideoError = true;
       }
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant ProductMediaGallery oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.enableVideo != widget.enableVideo ||
+        oldWidget.enable3d != widget.enable3d ||
+        oldWidget.product != widget.product) {
+      setState(() {
+        _mediaList = _computeMediaList();
+        if (_currentIndex >= _mediaList.length && _mediaList.isNotEmpty) {
+          _currentIndex = 0;
+        }
+      });
     }
   }
 

@@ -92,8 +92,21 @@ class _HomeStrings {
   final String discoverNow = 'Discover Now';
   final String shopCollection = 'Shop Collection';
   final String seasonHighlight = 'SEASON HIGHLIGHT';
-  final String newArrivals = 'NEW ARRIVALS';
-  final String limitedOffer = 'LIMITED OFFER';
+  final String offers = 'Special Offers';
+  final String curatedForYou = 'Curated For You';
+  final String basedOnShoppingTrends = 'Based on your shopping trends';
+  final String mostPopularToday = 'Most popular with shoppers today';
+  final String searchPlaceholder = 'Search products, brands and categories...';
+  final String sort = 'Sort';
+  final String newestFirst = 'Newest First';
+  final String priceLowHigh = 'Price: Low to High';
+  final String priceHighLow = 'Price: High to Low';
+  final String highestRated = 'Highest Rated';
+  final String noProductsCategory = 'No products in this category';
+  final String noProductsCategorySubtitle =
+      'Try switching categories or check back later for new inventory.';
+  final String viewAllProducts = 'View All Products';
+  final String aiCopilot = 'AI Copilot';
 }
 
 class _ProductStrings {

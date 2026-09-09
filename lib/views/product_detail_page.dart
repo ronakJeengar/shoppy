@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shopp_app/core/constants/app_strings.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
@@ -8,6 +9,7 @@ import 'package:shopp_app/features/cart/presentation/providers/cart_providers.da
 import 'package:shopp_app/features/catalog/data/mappers/catalog_mappers.dart';
 import 'package:shopp_app/features/catalog/domain/entities/product_entity.dart';
 import 'package:shopp_app/features/catalog/presentation/providers/catalog_providers.dart';
+import 'package:shopp_app/features/config/presentation/providers/app_config_providers.dart';
 import 'package:shopp_app/features/recommendations/presentation/providers/recommendation_providers.dart';
 import 'package:shopp_app/features/reviews/domain/entities/review_entity.dart';
 import 'package:shopp_app/features/reviews/presentation/providers/review_providers.dart';
@@ -93,6 +95,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
       _currentProduct = updated;
     });
 
+    final featureFlags = ref.watch(featureFlagsProvider);
     final inStock = _currentProduct.stock > 0;
     final isWishlisted = ref.watch(isWishlistedProvider(_currentProduct.id));
     final cartCount = ref.watch(cartItemCountProvider);
@@ -126,24 +129,25 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
               )
             : null,
         actions: [
-          IconButton(
-            icon: Icon(
-              isWishlisted
-                  ? Icons.favorite_rounded
-                  : Icons.favorite_border,
-              color: isWishlisted ? AppColors.error : AppColors.slate700,
+          if (featureFlags.wishlist)
+            IconButton(
+              icon: Icon(
+                isWishlisted
+                    ? Icons.favorite_rounded
+                    : Icons.favorite_border,
+                color: isWishlisted ? AppColors.error : AppColors.slate700,
+              ),
+              tooltip: AppStrings.nav.wishlist,
+              onPressed: () {
+                ref.read(wishlistNotifierProvider.notifier).toggle(_currentProduct);
+              },
             ),
-            tooltip: 'Wishlist',
-            onPressed: () {
-              ref.read(wishlistNotifierProvider.notifier).toggle(_currentProduct);
-            },
-          ),
           Stack(
             alignment: Alignment.center,
             children: [
               IconButton(
                 icon: const Icon(Icons.shopping_cart_outlined, color: AppColors.slate700),
-                tooltip: 'Cart',
+                tooltip: AppStrings.nav.cart,
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -184,6 +188,8 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
             ProductMediaGallery(
               product: _currentProduct.toModel(),
               height: 360,
+              enableVideo: featureFlags.productVideo,
+              enable3d: featureFlags.product3D,
             ),
 
             Padding(
@@ -282,7 +288,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                     style: AppTypography.bodyLarge.copyWith(height: 1.6),
                   ),
 
-                  if (fbtItems.isNotEmpty) ...[
+                  if (featureFlags.recommendations && fbtItems.isNotEmpty) ...[
                     const SizedBox(height: 24),
                     const Divider(color: AppColors.slate200),
                     const SizedBox(height: 20),
@@ -293,12 +299,14 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                     ),
                   ],
 
-                  const SizedBox(height: 24),
-                  const Divider(color: AppColors.slate200),
-                  const SizedBox(height: 20),
+                  if (featureFlags.reviews) ...[
+                    const SizedBox(height: 24),
+                    const Divider(color: AppColors.slate200),
+                    const SizedBox(height: 20),
 
-                  // Customer Reviews Section
-                  _buildReviewsSection(context, reviewsResult),
+                    // Customer Reviews Section
+                    _buildReviewsSection(context, reviewsResult),
+                  ],
 
                   const SizedBox(height: 40),
                 ],
@@ -321,7 +329,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
           ],
         ),
         child: AppButton(
-          label: inStock ? 'Add to Cart' : 'Out of Stock',
+          label: inStock ? AppStrings.product.addToCart : AppStrings.product.outOfStock,
           isLoading: _isAddingToCart,
           onPressed: inStock ? _handleAddToCart : null,
           icon: inStock ? Icons.shopping_bag_outlined : null,
@@ -339,10 +347,10 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Customer Reviews', style: AppTypography.headingSmall),
+            Text(AppStrings.product.reviews, style: AppTypography.headingSmall),
             TextButton.icon(
               icon: const Icon(Icons.rate_review_outlined, size: 16),
-              label: const Text('Write Review'),
+              label: Text(AppStrings.reviews.writeReview),
               onPressed: () {
                 showDialog(
                   context: context,
@@ -368,7 +376,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
             ),
             child: Center(
               child: Text(
-                'No customer reviews yet. Be the first verified buyer to review!',
+                AppStrings.reviews.noReviews,
                 textAlign: TextAlign.center,
                 style: AppTypography.bodySmall.copyWith(color: AppColors.slate500),
               ),

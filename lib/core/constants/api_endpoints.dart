@@ -67,4 +67,8 @@ class ApiEndpoints {
   static const String adminUsers = 'admin/users';
   static const String adminAuditLogs = 'admin/audit-logs';
   static const String adminReviews = 'admin/reviews';
+  static const String adminConfig = 'admin/config';
+
+  // App Bootstrap & Remote Configuration
+  static const String appBootstrap = 'app/bootstrap';
 }

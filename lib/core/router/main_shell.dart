@@ -12,6 +12,9 @@ import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/features/cart/presentation/providers/cart_providers.dart';
+import 'package:shopp_app/features/config/presentation/providers/app_config_providers.dart';
+import 'package:shopp_app/features/config/presentation/widgets/maintenance_view.dart';
+import 'package:shopp_app/features/config/presentation/widgets/update_required_dialog.dart';
 
 /// The responsive, polished bottom shell navigation for the core commerce tabs.
 /// Consumes centralized design tokens, strings, and route names.
@@ -56,8 +59,27 @@ class MainShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isMaintenance = ref.watch(isMaintenanceModeProvider);
+    if (isMaintenance) {
+      return const MaintenanceView();
+    }
+
+    final appVersion = ref.watch(appVersionCompatibilityProvider);
+    if (appVersion.forceUpdateRequired) {
+      return Scaffold(
+        backgroundColor: AppColors.surface,
+        body: Center(
+          child: UpdateRequiredDialog(
+            minimumVersion: appVersion.minimumSupported,
+            updateUrl: appVersion.updateUrl,
+          ),
+        ),
+      );
+    }
+
     final selectedIndex = _calculateSelectedIndex(location);
     final cartCount = ref.watch(cartItemCountProvider);
+    final features = ref.watch(featureFlagsProvider);
 
     return Scaffold(
       body: child,
@@ -101,14 +123,15 @@ class MainShell extends ConsumerWidget {
                   label: AppStrings.nav.cart,
                   badgeCount: cartCount,
                 ),
-                _buildNavItem(
-                  context,
-                  index: 3,
-                  selectedIndex: selectedIndex,
-                  icon: AppIcons.wishlist,
-                  activeIcon: AppIcons.wishlistFilled,
-                  label: AppStrings.nav.wishlist,
-                ),
+                if (features.wishlist)
+                  _buildNavItem(
+                    context,
+                    index: 3,
+                    selectedIndex: selectedIndex,
+                    icon: AppIcons.wishlist,
+                    activeIcon: AppIcons.wishlistFilled,
+                    label: AppStrings.nav.wishlist,
+                  ),
                 _buildNavItem(
                   context,
                   index: 4,
