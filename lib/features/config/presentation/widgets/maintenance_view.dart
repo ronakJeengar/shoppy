@@ -50,7 +50,7 @@ class MaintenanceView extends ConsumerWidget {
                   child: const Center(
                     child: AppIcon(
                       AppIcons.maintenance,
-                      size: AppIconSizes.xxl + 12,
+                      size: AppIconSizes.hero,
                       color: AppColors.warning,
                     ),
                   ),

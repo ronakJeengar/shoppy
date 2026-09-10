@@ -5,6 +5,7 @@ import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
 import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/constants/app_icon_sizes.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/features/auth/domain/entities/user_entity.dart';
 import 'package:shopp_app/features/auth/presentation/providers/auth_providers.dart';
@@ -509,7 +510,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           color: iconColor.withValues(alpha: 0.1),
           borderRadius: AppRadius.borderSm,
         ),
-        child: AppIcon(icon, color: iconColor, size: 20),
+        child: AppIcon(icon, color: iconColor, size: AppIconSizes.medium),
       ),
       title: Text(
         title,

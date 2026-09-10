@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/constants/app_icon_sizes.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/data/models/order_model.dart';
@@ -96,7 +97,7 @@ class _AdminOrdersPageState extends ConsumerState<AdminOrdersPage> {
                     foregroundColor: Colors.white,
                     minimumSize: const Size.fromHeight(44),
                   ),
-                  icon: const AppIcon(AppIcons.refresh, size: 18),
+                  icon: const AppIcon(AppIcons.refresh, size: AppIconSizes.action),
                   label: const Text('Move to Processing'),
                   onPressed: () async {
                     Navigator.pop(sheetCtx);
@@ -113,7 +114,7 @@ class _AdminOrdersPageState extends ConsumerState<AdminOrdersPage> {
                     foregroundColor: Colors.white,
                     minimumSize: const Size.fromHeight(44),
                   ),
-                  icon: const AppIcon(AppIcons.shipping, size: 18),
+                  icon: const AppIcon(AppIcons.shipping, size: AppIconSizes.action),
                   label: const Text('Dispatch / Ship Order'),
                   onPressed: () {
                     Navigator.pop(sheetCtx);
@@ -129,7 +130,7 @@ class _AdminOrdersPageState extends ConsumerState<AdminOrdersPage> {
                     foregroundColor: Colors.white,
                     minimumSize: const Size.fromHeight(44),
                   ),
-                  icon: const AppIcon(AppIcons.checkCircleOutline, size: 18),
+                  icon: const AppIcon(AppIcons.checkCircleOutline, size: AppIconSizes.action),
                   label: const Text('Mark as Delivered'),
                   onPressed: () async {
                     Navigator.pop(sheetCtx);
@@ -147,7 +148,7 @@ class _AdminOrdersPageState extends ConsumerState<AdminOrdersPage> {
                     side: const BorderSide(color: Colors.red),
                     minimumSize: const Size.fromHeight(44),
                   ),
-                  icon: const AppIcon(AppIcons.cancel, size: 18),
+                  icon: const AppIcon(AppIcons.cancel, size: AppIconSizes.action),
                   label: const Text('Cancel Order & Restock'),
                   onPressed: () async {
                     Navigator.pop(sheetCtx);

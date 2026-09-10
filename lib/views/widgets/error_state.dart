@@ -44,7 +44,7 @@ class ErrorStateView extends StatelessWidget {
               child: const Center(
                 child: AppIcon(
                   AppIcons.cloudOff,
-                  size: AppIconSizes.xxl + 4,
+                  size: AppIconSizes.display,
                   color: AppColors.error,
                 ),
               ),

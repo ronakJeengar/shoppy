@@ -126,7 +126,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                     child: Row(
                       children: [
                         const AppIcon(AppIcons.errorOutline,
-                            size: AppIconSizes.sm + 2, color: AppColors.error),
+                            size: AppIconSizes.action, color: AppColors.error),
                         const SizedBox(width: AppDimensions.sm),
                         Expanded(
                           child: Text(

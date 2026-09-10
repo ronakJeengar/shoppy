@@ -7,6 +7,7 @@ import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
 import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/constants/app_icon_sizes.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/data/models/product_media_model.dart';
 import 'package:shopp_app/data/models/product_model.dart';
@@ -629,7 +630,7 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AppIcon(icon, color: Colors.white, size: 13),
+          AppIcon(icon, color: Colors.white, size: AppIconSizes.badge),
           const SizedBox(width: 4),
           Text(
             label,

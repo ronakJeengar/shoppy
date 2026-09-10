@@ -224,7 +224,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                         const SizedBox.shrink(),
                       Row(
                         children: [
-                          const AppIcon(AppIcons.star, color: AppColors.accent, size: 20),
+                          const AppIcon(AppIcons.star, color: AppColors.accent, size: AppIconSizes.medium),
                           const SizedBox(width: 4),
                           Text(
                             _currentProduct.productRating.toStringAsFixed(1),
@@ -353,7 +353,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
           children: [
             Text(AppStrings.product.reviews, style: AppTypography.headingSmall),
             TextButton.icon(
-              icon: const AppIcon(AppIcons.rateReview, size: 16),
+              icon: const AppIcon(AppIcons.rateReview, size: AppIconSizes.button),
               label: Text(AppStrings.reviews.writeReview),
               onPressed: () {
                 showDialog(
@@ -432,12 +432,23 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: const BoxDecoration(
-                      color: AppColors.successLight,
-                      borderRadius: AppRadius.borderFull,
-                    ),
-                    child: Text(
-                      '✓ Verified',
-                      style: AppTypography.label.copyWith(color: AppColors.success),
+                       color: AppColors.successLight,
+                       borderRadius: AppRadius.borderFull,
+                     ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const AppIcon(
+                          AppIcons.verified,
+                          size: AppIconSizes.xs,
+                          color: AppColors.success,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Verified',
+                          style: AppTypography.label.copyWith(color: AppColors.success),
+                        ),
+                      ],
                     ),
                   ),
                 ],

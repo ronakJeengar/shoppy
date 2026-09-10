@@ -151,7 +151,7 @@ class _CartStrings {
   final String orderSummary = 'Order Summary';
   final String proceedToCheckout = 'Proceed to Checkout';
   final String removeItem = 'Remove';
-  final String freeShippingUnlocked = '🎉 You unlocked FREE Standard Shipping!';
+  final String freeShippingUnlocked = 'You unlocked FREE Standard Shipping!';
   String freeShippingAddMore(double amount) =>
       'Add \$${amount.toStringAsFixed(2)} more for FREE Delivery';
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/constants/app_icon_sizes.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/data/models/recommendation_model.dart';
 import 'package:shopp_app/features/catalog/data/mappers/catalog_mappers.dart';
@@ -105,7 +106,7 @@ class RecommendationCarousel extends StatelessWidget {
                 ),
                 if (onRefresh != null)
                   IconButton(
-                    icon: const AppIcon(AppIcons.refresh, size: 18, color: AppColors.slate500),
+                    icon: const AppIcon(AppIcons.refresh, size: AppIconSizes.action, color: AppColors.slate500),
                     onPressed: onRefresh,
                     tooltip: 'Refresh',
                   ),

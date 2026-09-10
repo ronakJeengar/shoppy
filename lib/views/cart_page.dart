@@ -141,7 +141,7 @@ class CartPage extends ConsumerWidget {
                   children: [
                     AppIcon(
                       qualifiesForFreeShipping ? AppIcons.checkCircle : AppIcons.shipping,
-                      size: AppIconSizes.sm + 2,
+                      size: AppIconSizes.action,
                       color: qualifiesForFreeShipping ? AppColors.success : AppColors.primary,
                     ),
                     const SizedBox(width: AppDimensions.sm),

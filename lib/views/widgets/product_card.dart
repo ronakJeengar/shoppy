@@ -124,7 +124,7 @@ class ProductCard extends ConsumerWidget {
                             children: [
                               const AppIcon(
                                 AppIcons.star,
-                                size: AppIconSizes.xs + 2,
+                                size: AppIconSizes.rating,
                                 color: AppColors.accent,
                               ),
                               const SizedBox(width: AppDimensions.xxs),

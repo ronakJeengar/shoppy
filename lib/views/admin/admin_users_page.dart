@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/constants/app_icon_sizes.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/data/models/admin_user_model.dart';
@@ -134,7 +135,7 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage> {
                 hintText: 'Search users by name or email...',
                 prefixIcon: const Padding(
                   padding: EdgeInsets.all(12),
-                  child: AppIcon(AppIcons.search, size: 20),
+                  child: AppIcon(AppIcons.search, size: AppIconSizes.medium),
                 ),
                 isDense: true,
                 border: OutlineInputBorder(
@@ -142,7 +143,7 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage> {
                 ),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: const AppIcon(AppIcons.close, size: 18),
+                        icon: const AppIcon(AppIcons.close, size: AppIconSizes.action),
                         onPressed: () {
                           _searchController.clear();
                           usersNotifier.loadUsers(search: '');

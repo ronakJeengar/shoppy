@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/constants/app_icon_sizes.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/data/models/admin_dashboard_model.dart';
@@ -36,7 +37,7 @@ class AdminDashboardPage extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-            icon: const AppIcon(AppIcons.refresh, size: 20),
+            icon: const AppIcon(AppIcons.refresh, size: AppIconSizes.medium),
             tooltip: 'Refresh Metrics',
             onPressed: () =>
                 ref.read(adminDashboardNotifierProvider.notifier).loadDashboard(),
@@ -221,7 +222,7 @@ class AdminDashboardPage extends ConsumerWidget {
                 CircleAvatar(
                   radius: 14,
                   backgroundColor: color.withValues(alpha: 0.1),
-                  child: Center(child: AppIcon(icon, size: 16, color: color)),
+                  child: Center(child: AppIcon(icon, size: AppIconSizes.sm, color: color)),
                 ),
               ],
             ),
@@ -250,7 +251,7 @@ class AdminDashboardPage extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
           children: [
-            const AppIcon(AppIcons.warning, color: Colors.red, size: 20),
+            const AppIcon(AppIcons.warning, color: Colors.red, size: AppIconSizes.medium),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -387,7 +388,7 @@ class AdminDashboardPage extends ConsumerWidget {
             CircleAvatar(
               radius: 16,
               backgroundColor: color.withValues(alpha: 0.1),
-              child: Center(child: AppIcon(icon, size: 18, color: color)),
+              child: Center(child: AppIcon(icon, size: AppIconSizes.action, color: color)),
             ),
             const SizedBox(height: 6),
             Text(

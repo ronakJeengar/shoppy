@@ -5,6 +5,7 @@ import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_spacing.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/constants/app_icon_sizes.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/data/models/order_model.dart';
 
@@ -222,7 +223,7 @@ class OrderTimeline extends StatelessWidget {
         children: [
           Row(
             children: [
-              const AppIcon(AppIcons.cancel, color: AppColors.error, size: 24),
+              const AppIcon(AppIcons.cancel, color: AppColors.error, size: AppIconSizes.large),
               const SizedBox(width: AppSpacing.sm),
               Text(
                 'Order Cancelled',
@@ -261,7 +262,7 @@ class OrderTimeline extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const AppIcon(AppIcons.trackOrder, size: 16, color: AppColors.primary),
+          const AppIcon(AppIcons.trackOrder, size: AppIconSizes.button, color: AppColors.primary),
           const SizedBox(width: AppSpacing.xs),
           Expanded(
             child: Text(
@@ -285,7 +286,7 @@ class OrderTimeline extends StatelessWidget {
             },
             child: const Padding(
               padding: EdgeInsets.all(4.0),
-              child: AppIcon(AppIcons.copy, size: 14, color: AppColors.primary),
+              child: AppIcon(AppIcons.copy, size: AppIconSizes.sm, color: AppColors.primary),
             ),
           ),
         ],

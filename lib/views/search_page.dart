@@ -111,7 +111,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               ),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
-                      icon: const AppIcon(AppIcons.close, size: AppIconSizes.sm + 2, color: AppColors.slate500),
+                      icon: const AppIcon(AppIcons.close, size: AppIconSizes.action, color: AppColors.slate500),
                       onPressed: () {
                         _searchController.clear();
                         searchNotifier.clearSearch();
@@ -371,7 +371,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     term,
                     style: AppTypography.bodySmall.copyWith(color: AppColors.slate800),
                   ),
-                  deleteIcon: const AppIcon(AppIcons.close, size: 14, color: AppColors.textMuted),
+                  deleteIcon: const AppIcon(AppIcons.close, size: AppIconSizes.sm, color: AppColors.textMuted),
                   onDeleted: () => searchNotifier.removeRecentSearch(term),
                 );
               }).toList(),

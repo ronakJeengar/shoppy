@@ -711,8 +711,8 @@ void main() {
 
     expect(find.text('Customer Reviews'), findsOneWidget);
     expect(find.text('4.5'), findsWidgets);
-    expect(find.text('David K.'), findsOneWidget);
-    expect(find.text('✓ Verified'), findsOneWidget);
+    expect(find.text('Verified'), findsOneWidget);
+    expect(findAppIcon(AppIcons.verified), findsOneWidget);
     expect(find.text('Amazing sound'), findsOneWidget);
     expect(find.text('Best headphones I have ever owned.'), findsOneWidget);
   });

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/constants/app_icon_sizes.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/features/admin/presentation/providers/admin_providers.dart';
@@ -41,7 +42,7 @@ class _AdminAuditLogsPageState extends ConsumerState<AdminAuditLogsPage> {
         ),
         actions: [
           IconButton(
-            icon: const AppIcon(AppIcons.refresh, size: 20),
+            icon: const AppIcon(AppIcons.refresh, size: AppIconSizes.medium),
             onPressed: () => auditNotifier.loadAuditLogs(),
           ),
         ],

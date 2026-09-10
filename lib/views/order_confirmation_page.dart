@@ -5,6 +5,7 @@ import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
 import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/constants/app_icon_sizes.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/data/models/order_model.dart';
 import 'package:shopp_app/views/home_page.dart';
@@ -126,7 +127,7 @@ class OrderConfirmationPage extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 4),
-                            const AppIcon(AppIcons.copy, size: 14, color: AppColors.primary),
+                            const AppIcon(AppIcons.copy, size: AppIconSizes.sm, color: AppColors.primary),
                           ],
                         ),
                       ),
@@ -192,7 +193,7 @@ class OrderConfirmationPage extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const AppIcon(AppIcons.address, size: 18, color: AppColors.primary),
+                        const AppIcon(AppIcons.address, size: AppIconSizes.action, color: AppColors.primary),
                         const SizedBox(width: 8),
                         Text(
                           'Shipping Address',

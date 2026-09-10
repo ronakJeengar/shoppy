@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/constants/app_icon_sizes.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/data/models/review_model.dart';
@@ -116,7 +117,7 @@ class _AdminReviewsPageState extends ConsumerState<AdminReviewsPage> {
         ),
         actions: [
           IconButton(
-            icon: const AppIcon(AppIcons.refresh, size: 20),
+            icon: const AppIcon(AppIcons.refresh, size: AppIconSizes.medium),
             onPressed: () => reviewsNotifier.loadReviews(),
           ),
         ],
@@ -132,7 +133,7 @@ class _AdminReviewsPageState extends ConsumerState<AdminReviewsPage> {
                 hintText: 'Search reviews by comment text...',
                 prefixIcon: const Padding(
                   padding: EdgeInsets.all(12),
-                  child: AppIcon(AppIcons.search, size: 20),
+                  child: AppIcon(AppIcons.search, size: AppIconSizes.medium),
                 ),
                 isDense: true,
                 border: OutlineInputBorder(
@@ -140,7 +141,7 @@ class _AdminReviewsPageState extends ConsumerState<AdminReviewsPage> {
                 ),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: const AppIcon(AppIcons.close, size: 18),
+                        icon: const AppIcon(AppIcons.close, size: AppIconSizes.action),
                         onPressed: () {
                           _searchController.clear();
                           reviewsNotifier.loadReviews(search: '');

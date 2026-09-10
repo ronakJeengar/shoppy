@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/constants/app_icon_sizes.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/features/catalog/presentation/providers/catalog_providers.dart';
@@ -213,7 +214,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
                   label: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      AppIcon(AppIcons.star, size: 14, color: Colors.amber),
+                      AppIcon(AppIcons.star, size: AppIconSizes.sm, color: Colors.amber),
                       SizedBox(width: 4),
                       Text('4.0+'),
                     ],
@@ -229,7 +230,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
                   label: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      AppIcon(AppIcons.star, size: 14, color: Colors.amber),
+                      AppIcon(AppIcons.star, size: AppIconSizes.sm, color: Colors.amber),
                       SizedBox(width: 4),
                       Text('4.5+'),
                     ],

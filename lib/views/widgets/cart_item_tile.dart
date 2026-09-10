@@ -78,7 +78,7 @@ class CartItemTile extends StatelessWidget {
                         constraints: const BoxConstraints(),
                         icon: const AppIcon(
                           AppIcons.close,
-                          size: AppIconSizes.sm + 2,
+                          size: AppIconSizes.action,
                           color: AppColors.textMuted,
                         ),
                         onPressed: onRemove,

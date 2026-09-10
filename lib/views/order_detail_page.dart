@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/constants/app_icon_sizes.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -215,7 +216,7 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
                             color: Colors.red,
                           ),
                         )
-                      : const AppIcon(AppIcons.cancel, size: 18),
+                      : const AppIcon(AppIcons.cancel, size: AppIconSizes.action),
                   label: Text(
                     _isCancelling
                         ? 'Cancelling Order...'
@@ -277,7 +278,7 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const AppIcon(AppIcons.copy, size: 14, color: Colors.blue),
+                      const AppIcon(AppIcons.copy, size: AppIconSizes.sm, color: Colors.blue),
                     ],
                   ),
                 ),
@@ -464,7 +465,7 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
                         visualDensity: VisualDensity.compact,
                         foregroundColor: Colors.amber.shade800,
                       ),
-                      icon: const AppIcon(AppIcons.starEmpty, size: 16),
+                      icon: const AppIcon(AppIcons.starEmpty, size: AppIconSizes.button),
                       label: const Text(
                         'Review Item',
                         style: TextStyle(fontSize: 12),
@@ -506,7 +507,7 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
           children: [
             const Row(
               children: [
-                AppIcon(AppIcons.payment, color: Colors.blue, size: 20),
+                AppIcon(AppIcons.payment, color: Colors.blue, size: AppIconSizes.medium),
                 SizedBox(width: 8),
                 Text(
                   'Payment Details',

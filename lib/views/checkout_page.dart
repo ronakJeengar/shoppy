@@ -5,6 +5,7 @@ import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
 import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
+import 'package:shopp_app/core/constants/app_icon_sizes.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/domain/models/ui_state.dart';
 import 'package:shopp_app/features/addresses/domain/entities/address_entity.dart';
@@ -61,7 +62,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                     style: AppTypography.headingSmall,
                   ),
                   TextButton.icon(
-                    icon: const AppIcon(AppIcons.add, size: 18),
+                    icon: const AppIcon(AppIcons.add, size: AppIconSizes.action),
                     label: const Text('New'),
                     onPressed: () {
                       Navigator.pop(ctx);
@@ -181,7 +182,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                       color: AppColors.primary50,
                       borderRadius: AppRadius.borderSm,
                     ),
-                    child: const Center(child: AppIcon(AppIcons.address, color: AppColors.primary, size: 18)),
+                    child: const Center(child: AppIcon(AppIcons.address, color: AppColors.primary, size: AppIconSizes.action)),
                   ),
                   const SizedBox(width: 10),
                   const Text('Delivery Address', style: AppTypography.headingSmall),
@@ -255,7 +256,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                   color: AppColors.primary50,
                   borderRadius: AppRadius.borderSm,
                 ),
-                child: const Center(child: AppIcon(AppIcons.shipping, color: AppColors.primary, size: 18)),
+                child: const Center(child: AppIcon(AppIcons.shipping, color: AppColors.primary, size: AppIconSizes.action)),
               ),
               const SizedBox(width: 10),
               const Text('Shipping Method', style: AppTypography.headingSmall),
@@ -311,7 +312,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                   color: AppColors.primary50,
                   borderRadius: AppRadius.borderSm,
                 ),
-                child: const Center(child: AppIcon(AppIcons.payment, color: AppColors.primary, size: 18)),
+                child: const Center(child: AppIcon(AppIcons.payment, color: AppColors.primary, size: AppIconSizes.action)),
               ),
               const SizedBox(width: 10),
               const Text('Payment Method', style: AppTypography.headingSmall),
@@ -366,7 +367,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                   color: AppColors.primary50,
                   borderRadius: AppRadius.borderSm,
                 ),
-                child: const Center(child: AppIcon(AppIcons.orders, color: AppColors.primary, size: 18)),
+                child: const Center(child: AppIcon(AppIcons.orders, color: AppColors.primary, size: AppIconSizes.action)),
               ),
               const SizedBox(width: 10),
               const Text('Order Summary', style: AppTypography.headingSmall),
@@ -441,7 +442,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                   : null,
             ),
             if (icon != null) ...[
-              AppIcon(icon, size: 20, color: isSelected ? AppColors.primary : AppColors.slate600),
+              AppIcon(icon, size: AppIconSizes.medium, color: isSelected ? AppColors.primary : AppColors.slate600),
               const SizedBox(width: 10),
             ],
             Expanded(

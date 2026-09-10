@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopp_app/core/theme/app_icons.dart';
+import 'package:shopp_app/core/constants/app_icon_sizes.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/data/models/assistant_message_model.dart';
@@ -92,7 +93,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
         ),
         actions: [
           IconButton(
-            icon: const AppIcon(AppIcons.commentAdd, size: 20),
+            icon: const AppIcon(AppIcons.commentAdd, size: AppIconSizes.medium),
             tooltip: 'New Conversation',
             onPressed: () {
               notifier.startNewConversation();
@@ -111,7 +112,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [
-                    const AppIcon(AppIcons.errorOutline, color: Colors.red, size: 20),
+                    const AppIcon(AppIcons.errorOutline, color: Colors.red, size: AppIconSizes.medium),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -120,7 +121,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
                       ),
                     ),
                     IconButton(
-                      icon: const AppIcon(AppIcons.close, size: 18, color: Colors.red),
+                      icon: const AppIcon(AppIcons.close, size: AppIconSizes.action, color: Colors.red),
                       onPressed: () => notifier.clearError(),
                     ),
                   ],
@@ -226,7 +227,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
                 },
                 child: Row(
                   children: [
-                    const AppIcon(AppIcons.chatBubble, size: 16),
+                    const AppIcon(AppIcons.chatBubble, size: AppIconSizes.sm),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
@@ -234,7 +235,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
                         style: const TextStyle(fontSize: 14),
                       ),
                     ),
-                    const AppIcon(AppIcons.forward, size: 12),
+                    const AppIcon(AppIcons.forward, size: AppIconSizes.xs),
                   ],
                 ),
               ),
@@ -371,7 +372,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
         children: [
           Row(
             children: [
-              AppIcon(AppIcons.warning, color: Colors.amber.shade900, size: 20),
+              AppIcon(AppIcons.warning, color: Colors.amber.shade900, size: AppIconSizes.medium),
               const SizedBox(width: 8),
               Text(
                 'Confirmation Required',
@@ -424,7 +425,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
                           );
                         }
                       },
-                icon: const AppIcon(AppIcons.checkCircleOutline, size: 16),
+                icon: const AppIcon(AppIcons.checkCircleOutline, size: AppIconSizes.button),
                 label: const Text('Confirm', style: TextStyle(fontSize: 13)),
               ),
               const SizedBox(width: 10),
@@ -586,7 +587,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              AppIcon(AppIcons.verifiedOutline, size: 12, color: Colors.amber.shade900),
+              AppIcon(AppIcons.verifiedOutline, size: AppIconSizes.xs, color: Colors.amber.shade900),
               const SizedBox(width: 4),
               Text(
                 "Source: $title$sec",
@@ -614,7 +615,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          icon: AppIcon(_getActionIcon(act.type), size: 14),
+          icon: AppIcon(_getActionIcon(act.type), size: AppIconSizes.sm),
           label: Text(act.label, style: const TextStyle(fontSize: 12)),
           onPressed: () => notifier.executeAction(act, context),
         );
@@ -680,7 +681,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
           ),
           const SizedBox(width: 8),
           IconButton.filled(
-            icon: const AppIcon(AppIcons.send, size: 18, color: Colors.white),
+            icon: const AppIcon(AppIcons.send, size: AppIconSizes.action, color: Colors.white),
             onPressed: state.isLoading ? null : () => _sendMessage(notifier),
           ),
         ],
