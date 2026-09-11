@@ -110,10 +110,12 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
       appBar: AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const AppIcon(AppIcons.back, color: AppColors.slate800),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const AppIcon(AppIcons.back, color: AppColors.slate800),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
         title: Text(
           _currentProduct.productName,
           maxLines: 1,

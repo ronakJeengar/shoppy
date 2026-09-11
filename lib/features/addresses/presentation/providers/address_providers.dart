@@ -1,6 +1,6 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/network/api_client.dart';
-import 'package:shopp_app/core/utils/ui_state.dart';
+import 'package:shopp_app/features/auth/presentation/providers/auth_providers.dart';
 import '../../data/datasources/address_remote_datasource.dart';
 import '../../data/repositories/address_repository_impl.dart';
 import '../../domain/entities/address_entity.dart';
@@ -123,6 +123,7 @@ class AddressNotifier extends StateNotifier<UiState<List<AddressEntity>>> {
 
 final addressNotifierProvider =
     StateNotifierProvider<AddressNotifier, UiState<List<AddressEntity>>>((ref) {
+  ref.watch(currentUserProvider.select((u) => u?.id));
   return AddressNotifier(
     getAddressesUseCase: ref.watch(getAddressesUseCaseProvider),
     createAddressUseCase: ref.watch(createAddressUseCaseProvider),

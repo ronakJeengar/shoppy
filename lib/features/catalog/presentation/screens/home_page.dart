@@ -127,23 +127,29 @@ class _HomePageState extends ConsumerState<HomePage> {
               ),
             ),
             const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Shoppy Store',
-                  style: AppTypography.headingSmall,
-                ),
-                Text(
-                  currentUser?.name.isNotEmpty == true
-                      ? 'Hi, ${currentUser!.name}'
-                      : 'Find what you love',
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.slate500,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Shoppy Store',
+                    style: AppTypography.headingSmall,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ],
+                  Text(
+                    currentUser?.name.isNotEmpty == true
+                        ? 'Hi, ${currentUser!.name}'
+                        : 'Find what you love',
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.slate500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
           ],
         ),

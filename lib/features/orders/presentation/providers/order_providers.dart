@@ -1,6 +1,6 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/network/api_client.dart';
-import '../../../../core/utils/ui_state.dart';
+import 'package:shopp_app/features/auth/presentation/providers/auth_providers.dart';
 import '../../data/datasources/order_remote_datasource.dart';
 import '../../data/repositories/order_repository_impl.dart';
 import '../../domain/entities/order_entity.dart';
@@ -75,6 +75,7 @@ class OrdersNotifier extends StateNotifier<UiState<List<OrderEntity>>> {
 
 final ordersNotifierProvider =
     StateNotifierProvider<OrdersNotifier, UiState<List<OrderEntity>>>((ref) {
+  ref.watch(currentUserProvider.select((u) => u?.id));
   return OrdersNotifier(
     getOrdersUseCase: ref.watch(getOrdersUseCaseProvider),
     cancelOrderUseCase: ref.watch(cancelOrderUseCaseProvider),

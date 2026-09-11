@@ -60,32 +60,15 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final json = await _remoteDataSource.signUp(name.trim(), email.trim(), password);
       final data = (json['data'] ?? json) as Map<String, dynamic>;
-      final accessToken = (data['accessToken'] ?? data['token'] ?? '').toString();
-      final refreshToken = data['refreshToken']?.toString();
-
-      if (accessToken.isNotEmpty) {
-        await Preferences.saveTokens(
-          accessToken: accessToken,
-          refreshToken: refreshToken,
-        );
-      }
-
       UserModel userModel;
       if (data['user'] != null && data['user'] is Map<String, dynamic>) {
         userModel = UserModel.fromJson(data['user'] as Map<String, dynamic>);
-      } else if (accessToken.isNotEmpty) {
-        userModel = await _remoteDataSource.getCurrentUser();
       } else {
         userModel = UserModel(
           id: '',
           name: name,
           email: email,
         );
-      }
-
-      if (userModel.id.isNotEmpty) {
-        await Preferences.saveUserRole(userModel.role);
-        await Preferences.saveUserId(userModel.id);
       }
 
       return Success(userModel.toEntity());

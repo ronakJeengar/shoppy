@@ -1,6 +1,6 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/network/api_client.dart';
-import 'package:shopp_app/core/utils/ui_state.dart';
+import 'package:shopp_app/features/auth/presentation/providers/auth_providers.dart';
 import 'package:shopp_app/features/catalog/domain/entities/product_entity.dart';
 import '../../data/datasources/wishlist_remote_datasource.dart';
 import '../../data/repositories/wishlist_repository_impl.dart';
@@ -118,6 +118,7 @@ class WishlistNotifier extends StateNotifier<UiState<List<ProductEntity>>> {
 
 final wishlistNotifierProvider =
     StateNotifierProvider<WishlistNotifier, UiState<List<ProductEntity>>>((ref) {
+  ref.watch(currentUserProvider.select((u) => u?.id));
   return WishlistNotifier(
     getWishlistUseCase: ref.watch(getWishlistUseCaseProvider),
     toggleWishlistUseCase: ref.watch(toggleWishlistUseCaseProvider),

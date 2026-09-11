@@ -1,6 +1,6 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/network/api_client.dart';
-import 'package:shopp_app/core/utils/ui_state.dart';
+import 'package:shopp_app/features/auth/presentation/providers/auth_providers.dart';
 import '../../data/datasources/cart_remote_datasource.dart';
 import '../../data/repositories/cart_repository_impl.dart';
 import '../../domain/entities/cart_entity.dart';
@@ -131,6 +131,7 @@ class CartNotifier extends StateNotifier<UiState<CartEntity>> {
 /// Global Cart Notifier Provider
 final cartNotifierProvider =
     StateNotifierProvider<CartNotifier, UiState<CartEntity>>((ref) {
+  ref.watch(currentUserProvider.select((u) => u?.id));
   return CartNotifier(
     getCartUseCase: ref.watch(getCartUseCaseProvider),
     addToCartUseCase: ref.watch(addToCartUseCaseProvider),

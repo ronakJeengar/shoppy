@@ -62,10 +62,12 @@ class CartPage extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         elevation: 0,
-        leading: IconButton(
-          icon: const AppIcon(AppIcons.back, color: AppColors.slate800),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const AppIcon(AppIcons.back, color: AppColors.slate800),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
         title: Text(
           '${AppStrings.cart.title} (${cart.itemCount})',
           style: AppTypography.headingSmall,

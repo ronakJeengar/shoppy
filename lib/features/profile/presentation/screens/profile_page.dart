@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shopp_app/core/constants/route_names.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_shadows.dart';
@@ -12,7 +14,6 @@ import 'package:shopp_app/features/auth/presentation/providers/auth_providers.da
 import 'package:shopp_app/features/notifications/presentation/providers/notification_providers.dart';
 import 'package:shopp_app/features/addresses/presentation/screens/addresses_page.dart';
 import 'package:shopp_app/features/admin/presentation/screens/admin_dashboard_page.dart';
-import 'package:shopp_app/features/auth/presentation/screens/login_page.dart';
 import 'package:shopp_app/features/notifications/presentation/screens/notifications_page.dart';
 import 'package:shopp_app/features/orders/presentation/screens/orders_page.dart';
 import 'package:shopp_app/features/wishlist/presentation/screens/wishlist_page.dart';
@@ -207,11 +208,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               Navigator.pop(ctx);
               await ref.read(authStateProvider.notifier).logout();
               if (!mounted) return;
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginPage()),
-                (route) => false,
-              );
+              context.go(RouteNames.login);
             },
           ),
         ],
@@ -229,10 +226,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       appBar: AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const AppIcon(AppIcons.back, color: AppColors.slate800),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const AppIcon(AppIcons.back, color: AppColors.slate800),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
         title: const Text('My Account', style: AppTypography.headingSmall),
       ),
       body: user == null

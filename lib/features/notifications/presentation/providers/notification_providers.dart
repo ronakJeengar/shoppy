@@ -1,6 +1,6 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/network/api_client.dart';
-import '../../../../core/utils/ui_state.dart';
+import 'package:shopp_app/features/auth/presentation/providers/auth_providers.dart';
 import '../../data/datasources/notification_remote_datasource.dart';
 import '../../data/repositories/notification_repository_impl.dart';
 import '../../domain/entities/notification_entity.dart';
@@ -102,6 +102,7 @@ class NotificationNotifier
 
 final notificationNotifierProvider = StateNotifierProvider<NotificationNotifier,
     UiState<List<NotificationEntity>>>((ref) {
+  ref.watch(currentUserProvider.select((u) => u?.id));
   return NotificationNotifier(
     getNotificationsUseCase: ref.watch(getNotificationsUseCaseProvider),
     markReadUseCase: ref.watch(markNotificationReadUseCaseProvider),

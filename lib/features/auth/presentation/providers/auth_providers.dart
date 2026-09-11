@@ -195,17 +195,30 @@ class AuthNotifier extends StateNotifier<AuthState> {
         );
       },
       onFailure: (failure) {
-        state = state.copyWith(
-          userState: UiState.error(failure.message),
-          isLoading: false,
-          errorMessage: failure.message,
-        );
+        final isUnauthorized = failure.statusCode == 401 ||
+            failure.message.toLowerCase().contains('unauthorized') ||
+            failure.message.toLowerCase().contains('token') ||
+            failure.message.toLowerCase().contains('jwt');
+        if (isUnauthorized) {
+          Preferences.clearAuth();
+          state = const AuthState(
+            userState: UiState.initial(),
+            isAuthenticated: false,
+          );
+        } else {
+          state = state.copyWith(
+            userState: UiState.error(failure.message),
+            isLoading: false,
+            errorMessage: failure.message,
+          );
+        }
       },
     );
   }
 
   Future<void> logout() async {
     await _logoutUseCase();
+    await Preferences.clearAuth();
     state = const AuthState(
       userState: UiState.initial(),
       isAuthenticated: false,
