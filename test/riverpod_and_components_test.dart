@@ -5,8 +5,8 @@ import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/data/models/order_model.dart';
 import 'package:shopp_app/domain/models/ui_state.dart';
-import 'package:shopp_app/views/widgets/app_network_image.dart';
-import 'package:shopp_app/views/widgets/order_timeline.dart';
+import 'package:shopp_app/core/widgets/app_network_image.dart';
+import 'package:shopp_app/features/orders/presentation/widgets/order_timeline.dart';
 
 void main() {
   group('UiState Freezed Model Tests', () {

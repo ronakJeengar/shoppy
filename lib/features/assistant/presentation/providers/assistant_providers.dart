@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/data/models/assistant_message_model.dart';
 import 'package:shopp_app/data/repositories/ai_repository.dart';
-import 'package:shopp_app/views/cart_page.dart';
-import 'package:shopp_app/views/order_detail_page.dart';
-import 'package:shopp_app/views/orders_page.dart';
-import 'package:shopp_app/views/product_detail_page.dart';
-import 'package:shopp_app/views/profile_page.dart';
-import 'package:shopp_app/views/search_page.dart';
-import 'package:shopp_app/views/wishlist_page.dart';
+import 'package:shopp_app/features/cart/presentation/screens/cart_page.dart';
+import 'package:shopp_app/features/orders/presentation/screens/order_detail_page.dart';
+import 'package:shopp_app/features/orders/presentation/screens/orders_page.dart';
+import 'package:shopp_app/features/catalog/presentation/screens/product_detail_page.dart';
+import 'package:shopp_app/features/profile/presentation/screens/profile_page.dart';
+import 'package:shopp_app/features/search/presentation/screens/search_page.dart';
+import 'package:shopp_app/features/wishlist/presentation/screens/wishlist_page.dart';
 
 final aiRepositoryProvider = Provider<AiRepository>((ref) {
   return AiRepository();

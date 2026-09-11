@@ -1,4 +1,8 @@
+import 'package:dartz/dartz.dart';
 import '../errors/failures.dart';
+
+/// Type alias for Future containing Dartz Either
+typedef FutureEither<T> = Future<Either<Failure, T>>;
 
 /// Sealed Result class to handle Success and Failure functionally and safely.
 sealed class Result<T> {
@@ -33,6 +37,22 @@ sealed class Result<T> {
       FailureResult<T>(failure: final failure) => FailureResult(failure),
     };
   }
+
+  /// Converts this [Result] into a Dartz [Either].
+  Either<Failure, T> toEither() {
+    return switch (this) {
+      Success<T>(data: final data) => Right(data),
+      FailureResult<T>(failure: final failure) => Left(failure),
+    };
+  }
+
+  /// Creates a [Result] from a Dartz [Either].
+  static Result<T> fromEither<T>(Either<Failure, T> either) {
+    return either.fold(
+      (failure) => FailureResult<T>(failure),
+      (data) => Success<T>(data),
+    );
+  }
 }
 
 class Success<T> extends Result<T> {
@@ -65,3 +85,9 @@ class FailureResult<T> extends Result<T> {
   @override
   String toString() => 'FailureResult($failure)';
 }
+
+/// Extension on Dartz [Either] to easily convert to [Result].
+extension EitherToResultExtension<T> on Either<Failure, T> {
+  Result<T> toResult() => Result.fromEither(this);
+}
+

@@ -10,6 +10,8 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
+      fontFamily: AppTypography.fontFamily,
+      textTheme: AppTypography.textTheme,
       scaffoldBackgroundColor: AppColors.slate50,
       primaryColor: AppColors.primary,
       colorScheme: const ColorScheme(
@@ -87,6 +89,28 @@ class AppTheme {
         ),
       ),
 
+      // Text Button Theme
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.primary,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          textStyle: AppTypography.buttonText.copyWith(color: AppColors.primary),
+          shape: const RoundedRectangleBorder(
+            borderRadius: AppRadius.borderMd,
+          ),
+        ),
+      ),
+
+      // SnackBar Theme
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: AppColors.slate900,
+        contentTextStyle: AppTypography.bodyMedium.copyWith(color: AppColors.white),
+        shape: const RoundedRectangleBorder(
+          borderRadius: AppRadius.borderMd,
+        ),
+        behavior: SnackBarBehavior.floating,
+      ),
+
       // Input Decoration Theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -138,6 +162,8 @@ class AppTheme {
       dialogTheme: const DialogThemeData(
         backgroundColor: AppColors.white,
         elevation: 12,
+        titleTextStyle: AppTypography.headingLarge,
+        contentTextStyle: AppTypography.bodyMedium,
         shape: RoundedRectangleBorder(
           borderRadius: AppRadius.borderLg,
         ),

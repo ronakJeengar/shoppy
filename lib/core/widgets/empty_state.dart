@@ -31,10 +31,11 @@ class EmptyStateView extends StatelessWidget {
     final effectiveIconColor = iconColor ?? AppColors.primary;
 
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(
           horizontal: AppDimensions.xxxl,
-          vertical: AppDimensions.huge,
+          vertical: AppDimensions.xl,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

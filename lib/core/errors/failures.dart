@@ -15,19 +15,48 @@ class ServerFailure extends Failure {
 }
 
 class NetworkFailure extends Failure {
-  const NetworkFailure([super.message = 'Network connection failed. Please check your internet.', Object? cause])
-      : super(statusCode: null, cause: cause);
+  const NetworkFailure([
+    super.message = 'Network connection failed. Please check your internet.',
+    Object? cause,
+  ]) : super(statusCode: null, cause: cause);
 }
 
 class AuthFailure extends Failure {
-  const AuthFailure([super.message = 'Authentication failed. Please log in again.', int? statusCode = 401])
-      : super(statusCode: statusCode);
+  const AuthFailure([
+    super.message = 'Authentication failed. Please log in again.',
+    int? statusCode = 401,
+  ]) : super(statusCode: statusCode);
+}
+
+class UnauthorizedFailure extends AuthFailure {
+  const UnauthorizedFailure([
+    super.message = 'Unauthorized access.',
+    super.statusCode = 401,
+  ]);
+}
+
+class NotFoundFailure extends Failure {
+  const NotFoundFailure([
+    super.message = 'The requested resource was not found.',
+    int? statusCode = 404,
+  ]) : super(statusCode: statusCode);
+}
+
+class TimeoutFailure extends NetworkFailure {
+  const TimeoutFailure([
+    super.message = 'Connection timed out. Please try again later.',
+    super.cause,
+  ]);
 }
 
 class ValidationFailure extends Failure {
   final Map<String, String>? errors;
 
-  const ValidationFailure(super.message, {this.errors, super.statusCode = 400});
+  const ValidationFailure(
+    super.message, {
+    this.errors,
+    super.statusCode = 400,
+  });
 }
 
 class CacheFailure extends Failure {
@@ -35,8 +64,10 @@ class CacheFailure extends Failure {
 }
 
 class UnknownFailure extends Failure {
-  const UnknownFailure([super.message = 'An unexpected error occurred.', Object? cause])
-      : super(cause: cause);
+  const UnknownFailure([
+    super.message = 'An unexpected error occurred.',
+    Object? cause,
+  ]) : super(cause: cause);
 }
 
 /// Safely extracts error message from DioException response data, preventing

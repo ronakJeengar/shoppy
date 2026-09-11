@@ -28,8 +28,8 @@ import 'package:shopp_app/data/models/review_model.dart';
 import 'package:shopp_app/features/recommendations/presentation/providers/recommendation_providers.dart';
 import 'package:shopp_app/features/reviews/domain/entities/review_entity.dart';
 import 'package:shopp_app/features/reviews/presentation/providers/review_providers.dart';
-import 'package:shopp_app/views/home_page.dart';
-import 'package:shopp_app/views/product_detail_page.dart';
+import 'package:shopp_app/features/catalog/presentation/screens/home_page.dart';
+import 'package:shopp_app/features/catalog/presentation/screens/product_detail_page.dart';
 
 class MockAppConfigRemoteDataSource implements AppConfigRemoteDataSource {
   AppConfigRemoteResult? responseToReturn;

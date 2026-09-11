@@ -9,7 +9,7 @@ import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/data/models/product_media_model.dart';
 import 'package:shopp_app/data/models/product_model.dart';
-import 'package:shopp_app/views/widgets/product_media_gallery.dart';
+import 'package:shopp_app/features/catalog/presentation/widgets/product_media_gallery.dart';
 
 Widget buildRouterApp(ProviderContainer container) {
   return UncontrolledProviderScope(

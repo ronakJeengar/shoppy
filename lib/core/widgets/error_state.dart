@@ -25,10 +25,11 @@ class ErrorStateView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(
           horizontal: AppDimensions.xxxl,
-          vertical: AppDimensions.huge,
+          vertical: AppDimensions.xl,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

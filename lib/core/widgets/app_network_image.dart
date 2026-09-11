@@ -4,7 +4,7 @@ import 'package:shopp_app/core/theme/app_colors.dart';
 import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
-import 'package:shopp_app/views/widgets/skeleton_loader.dart';
+import 'package:shopp_app/core/widgets/skeleton_loader.dart';
 
 /// A 60 FPS zero-jank network image loader with automatic memory resizing,
 /// disk caching, smooth shimmer placeholder, and fallback error handling.
