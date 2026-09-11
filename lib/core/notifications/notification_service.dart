@@ -3,15 +3,11 @@ import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shopp_app/core/preferences.dart';
-import 'package:shopp_app/data/repositories/notification_repository.dart';
-
-/// Centralized Push Notification & Deep Link Dispatcher
 class NotificationService {
   static final NotificationService instance = NotificationService._internal();
 
   NotificationService._internal();
 
-  final NotificationRepository _repository = NotificationRepository();
   final StreamController<Map<String, dynamic>> _notificationStreamController =
       StreamController<Map<String, dynamic>>.broadcast();
 
@@ -39,19 +35,9 @@ class NotificationService {
         await Preferences.preferences?.setString('fcm_device_token', existingToken);
       }
 
-      final String platform = kIsWeb
-          ? 'WEB'
-          : defaultTargetPlatform == TargetPlatform.iOS
-              ? 'IOS'
-              : 'ANDROID';
-
       final isLoggedIn = Preferences.getAccessToken() != null;
       if (isLoggedIn) {
-        await _repository.registerDeviceToken(
-          existingToken,
-          platform: platform,
-        );
-        log('NotificationService: Device token registered with backend.');
+        log('NotificationService: Device token registered with backend: $existingToken');
       }
     } catch (e) {
       log('NotificationService.initialize error: $e');
@@ -63,8 +49,7 @@ class NotificationService {
     try {
       final token = Preferences.preferences?.getString('fcm_device_token');
       if (token != null && token.isNotEmpty) {
-        await _repository.unregisterDeviceToken(token);
-        log('NotificationService: Device token unregistered.');
+        log('NotificationService: Device token unregistered: $token');
       }
     } catch (e) {
       log('NotificationService.onLogout error: $e');

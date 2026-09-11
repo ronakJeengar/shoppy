@@ -7,10 +7,10 @@ import 'package:shopp_app/core/theme/app_spacing.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/core/constants/app_icon_sizes.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
-import 'package:shopp_app/data/models/order_model.dart';
+import '../../domain/entities/order_entity.dart';
 
 class OrderTimeline extends StatelessWidget {
-  final OrderModel order;
+  final OrderEntity order;
 
   const OrderTimeline({
     super.key,
@@ -105,7 +105,7 @@ class OrderTimeline extends StatelessWidget {
               final isCurrent = index == currentStep;
               final historyItem = order.statusHistory.firstWhere(
                 (h) => h.status.toUpperCase() == step.statusKey,
-                orElse: () => OrderStatusHistoryItem(
+                orElse: () => OrderStatusHistoryEntity(
                   status: '',
                   timestamp: DateTime.now(),
                   note: '',

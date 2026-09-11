@@ -1,6 +1,6 @@
 import '../../../../constants/urls.dart';
 import '../../../../core/network/api_client.dart';
-import '../../../../data/models/recommendation_model.dart';
+import '../models/recommendation_model.dart';
 
 abstract class RecommendationRemoteDataSource {
   Future<RecommendationResponseModel> getRecommendations({

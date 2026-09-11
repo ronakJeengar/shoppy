@@ -1,21 +1,37 @@
 import 'dart:developer';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import '../../../../data/models/admin_dashboard_model.dart';
-import '../../../../data/models/admin_user_model.dart';
-import '../../../../data/models/audit_log_model.dart';
-import '../../../../data/models/category_model.dart';
-import '../../../../data/models/order_model.dart';
-import '../../../../data/models/product_model.dart';
-import '../../../../data/models/review_model.dart';
-import '../../../../data/repositories/admin_repository.dart' as legacy_admin;
-import '../../../../data/repositories/review_repository.dart' as legacy_review;
+import 'package:shopp_app/core/network/api_client.dart';
+import 'package:shopp_app/core/utils/result.dart';
+import 'package:shopp_app/features/admin/data/datasources/admin_remote_datasource.dart';
+import 'package:shopp_app/features/admin/data/mappers/admin_mappers.dart';
+import 'package:shopp_app/features/admin/data/models/admin_dashboard_model.dart';
+import 'package:shopp_app/features/admin/data/models/admin_user_model.dart';
+import 'package:shopp_app/features/admin/data/models/audit_log_model.dart';
+import 'package:shopp_app/features/admin/data/repositories/admin_repository_impl.dart';
+import 'package:shopp_app/features/admin/domain/entities/admin_dashboard_entity.dart';
+import 'package:shopp_app/features/admin/domain/entities/admin_user_entity.dart';
+import 'package:shopp_app/features/admin/domain/entities/audit_log_entity.dart';
+import 'package:shopp_app/features/admin/domain/repositories/admin_repository.dart';
+import '../../../catalog/data/mappers/catalog_mappers.dart';
+import '../../../catalog/data/models/category_model.dart';
+import '../../../catalog/data/models/product_model.dart';
+import '../../../catalog/domain/entities/category_entity.dart';
+import '../../../catalog/domain/entities/product_entity.dart';
+import '../../../orders/data/mappers/order_mappers.dart';
+import '../../../orders/data/models/order_model.dart';
+import '../../../orders/domain/entities/order_entity.dart';
+import '../../../reviews/data/mappers/review_mappers.dart';
+import '../../../reviews/data/models/review_model.dart';
+import '../../../reviews/domain/entities/review_entity.dart';
 
-final legacyAdminRepoProvider = Provider<legacy_admin.AdminRepository>((ref) {
-  return legacy_admin.AdminRepository();
+final adminRemoteDataSourceProvider = Provider<AdminRemoteDataSource>((ref) {
+  final client = ref.watch(apiClientProvider);
+  return AdminRemoteDataSourceImpl(client);
 });
 
-final legacyReviewRepoProvider = Provider<legacy_review.ReviewRepository>((ref) {
-  return legacy_review.ReviewRepository();
+final adminRepositoryProvider = Provider<AdminRepository>((ref) {
+  final remote = ref.watch(adminRemoteDataSourceProvider);
+  return AdminRepositoryImpl(remote);
 });
 
 // ==========================================
@@ -47,7 +63,7 @@ class AdminDashboardState {
 }
 
 class AdminDashboardNotifier extends StateNotifier<AdminDashboardState> {
-  final legacy_admin.AdminRepository _repo;
+  final AdminRepository _repo;
 
   AdminDashboardNotifier(this._repo) : super(const AdminDashboardState()) {
     loadDashboard();
@@ -57,14 +73,14 @@ class AdminDashboardNotifier extends StateNotifier<AdminDashboardState> {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final response = await _repo.getDashboardMetrics();
-      if (response.status && response.data is AdminDashboardMetrics) {
+      if (response is Success<AdminDashboardMetricsEntity>) {
         state = state.copyWith(
-          metrics: response.data as AdminDashboardMetrics,
+          metrics: response.data.toModel(),
           isLoading: false,
         );
       } else {
         state = state.copyWith(
-          error: response.message,
+          error: response.failureOrNull?.message ?? 'Failed to load dashboard metrics',
           isLoading: false,
         );
       }
@@ -80,7 +96,7 @@ class AdminDashboardNotifier extends StateNotifier<AdminDashboardState> {
 
 final adminDashboardNotifierProvider =
     StateNotifierProvider<AdminDashboardNotifier, AdminDashboardState>((ref) {
-  return AdminDashboardNotifier(ref.watch(legacyAdminRepoProvider));
+  return AdminDashboardNotifier(ref.watch(adminRepositoryProvider));
 });
 
 // ==========================================
@@ -139,7 +155,7 @@ class AdminProductsState {
 }
 
 class AdminProductsNotifier extends StateNotifier<AdminProductsState> {
-  final legacy_admin.AdminRepository _repo;
+  final AdminRepository _repo;
 
   AdminProductsNotifier(this._repo) : super(const AdminProductsState());
 
@@ -147,9 +163,9 @@ class AdminProductsNotifier extends StateNotifier<AdminProductsState> {
     state = state.copyWith(isLoadingCategories: true);
     try {
       final response = await _repo.getAdminCategories();
-      if (response.status && response.data is List<CategoryModel>) {
+      if (response is Success<List<CategoryEntity>>) {
         state = state.copyWith(
-          categories: response.data as List<CategoryModel>,
+          categories: response.data.map((c) => c.toModel()).toList(),
           isLoadingCategories: false,
         );
       } else {
@@ -193,14 +209,14 @@ class AdminProductsNotifier extends StateNotifier<AdminProductsState> {
         lowStock: sLowStock,
       );
 
-      if (response.status && response.data is List<Product>) {
+      if (response is Success<List<ProductEntity>>) {
         state = state.copyWith(
-          products: response.data as List<Product>,
+          products: response.data.map((p) => p.toModel()).toList(),
           isLoading: false,
         );
       } else {
         state = state.copyWith(
-          error: response.message,
+          error: response.failureOrNull?.message ?? 'Failed to load products',
           isLoading: false,
         );
       }
@@ -216,9 +232,9 @@ class AdminProductsNotifier extends StateNotifier<AdminProductsState> {
   Future<bool> createProduct(Map<String, dynamic> data) async {
     try {
       final response = await _repo.createProduct(data);
-      if (response.status && response.data is Product) {
+      if (response is Success<ProductEntity>) {
         state = state.copyWith(
-          products: [response.data as Product, ...state.products],
+          products: [response.data.toModel(), ...state.products],
         );
         return true;
       }
@@ -232,8 +248,8 @@ class AdminProductsNotifier extends StateNotifier<AdminProductsState> {
   Future<bool> updateProduct(String id, Map<String, dynamic> data) async {
     try {
       final response = await _repo.updateProduct(id, data);
-      if (response.status && response.data is Product) {
-        final updated = response.data as Product;
+      if (response is Success<ProductEntity>) {
+        final updated = response.data.toModel();
         final list = [...state.products];
         final index = list.indexWhere((p) => p.id == id);
         if (index != -1) {
@@ -252,8 +268,8 @@ class AdminProductsNotifier extends StateNotifier<AdminProductsState> {
   Future<bool> updateStock(String id, int quantity, String operation) async {
     try {
       final response = await _repo.updateProductStock(id, quantity, operation);
-      if (response.status && response.data is Product) {
-        final updated = response.data as Product;
+      if (response is Success<ProductEntity>) {
+        final updated = response.data.toModel();
         final list = [...state.products];
         final index = list.indexWhere((p) => p.id == id);
         if (index != -1) {
@@ -272,7 +288,7 @@ class AdminProductsNotifier extends StateNotifier<AdminProductsState> {
   Future<bool> deleteProduct(String id) async {
     try {
       final response = await _repo.deleteProduct(id);
-      if (response.status) {
+      if (response is Success<void>) {
         final list = [...state.products];
         final index = list.indexWhere((p) => p.id == id);
         if (index != -1) {
@@ -303,7 +319,7 @@ class AdminProductsNotifier extends StateNotifier<AdminProductsState> {
 
 final adminProductsNotifierProvider =
     StateNotifierProvider<AdminProductsNotifier, AdminProductsState>((ref) {
-  return AdminProductsNotifier(ref.watch(legacyAdminRepoProvider));
+  return AdminProductsNotifier(ref.watch(adminRepositoryProvider));
 });
 
 // ==========================================
@@ -343,7 +359,7 @@ class AdminOrdersState {
 }
 
 class AdminOrdersNotifier extends StateNotifier<AdminOrdersState> {
-  final legacy_admin.AdminRepository _repo;
+  final AdminRepository _repo;
 
   AdminOrdersNotifier(this._repo) : super(const AdminOrdersState());
 
@@ -366,14 +382,14 @@ class AdminOrdersNotifier extends StateNotifier<AdminOrdersState> {
         search: sSearch,
       );
 
-      if (response.status && response.data is List<OrderModel>) {
+      if (response is Success<List<OrderEntity>>) {
         state = state.copyWith(
-          orders: response.data as List<OrderModel>,
+          orders: response.data.map((o) => o.toModel()).toList(),
           isLoading: false,
         );
       } else {
         state = state.copyWith(
-          error: response.message,
+          error: response.failureOrNull?.message ?? 'Failed to load orders',
           isLoading: false,
         );
       }
@@ -401,8 +417,8 @@ class AdminOrdersNotifier extends StateNotifier<AdminOrdersState> {
         trackingNumber: trackingNumber,
         note: note,
       );
-      if (response.status && response.data is OrderModel) {
-        final updated = response.data as OrderModel;
+      if (response is Success<OrderEntity>) {
+        final updated = response.data.toModel();
         final list = [...state.orders];
         final index = list.indexWhere((o) => o.id == id);
         if (index != -1) {
@@ -421,7 +437,7 @@ class AdminOrdersNotifier extends StateNotifier<AdminOrdersState> {
 
 final adminOrdersNotifierProvider =
     StateNotifierProvider<AdminOrdersNotifier, AdminOrdersState>((ref) {
-  return AdminOrdersNotifier(ref.watch(legacyAdminRepoProvider));
+  return AdminOrdersNotifier(ref.watch(adminRepositoryProvider));
 });
 
 // ==========================================
@@ -462,7 +478,7 @@ class AdminUsersState {
 }
 
 class AdminUsersNotifier extends StateNotifier<AdminUsersState> {
-  final legacy_admin.AdminRepository _repo;
+  final AdminRepository _repo;
 
   AdminUsersNotifier(this._repo) : super(const AdminUsersState());
 
@@ -486,14 +502,14 @@ class AdminUsersNotifier extends StateNotifier<AdminUsersState> {
         role: sRole,
       );
 
-      if (response.status && response.data is List<AdminUserModel>) {
+      if (response is Success<List<AdminUserEntity>>) {
         state = state.copyWith(
-          users: response.data as List<AdminUserModel>,
+          users: response.data.map((u) => u.toModel()).toList(),
           isLoading: false,
         );
       } else {
         state = state.copyWith(
-          error: response.message,
+          error: response.failureOrNull?.message ?? 'Failed to load users',
           isLoading: false,
         );
       }
@@ -508,8 +524,8 @@ class AdminUsersNotifier extends StateNotifier<AdminUsersState> {
 
   Future<bool> updateUserStatus(String id, bool isActive) async {
     try {
-      final response = await _repo.updateUserStatus(id, isActive);
-      if (response.status) {
+      final response = await _repo.toggleUserStatus(id, isActive);
+      if (response is Success<AdminUserEntity>) {
         final list = [...state.users];
         final index = list.indexWhere((u) => u.id == id);
         if (index != -1) {
@@ -528,7 +544,7 @@ class AdminUsersNotifier extends StateNotifier<AdminUsersState> {
   Future<bool> updateUserRole(String id, String role) async {
     try {
       final response = await _repo.updateUserRole(id, role);
-      if (response.status) {
+      if (response is Success<AdminUserEntity>) {
         final list = [...state.users];
         final index = list.indexWhere((u) => u.id == id);
         if (index != -1) {
@@ -547,7 +563,7 @@ class AdminUsersNotifier extends StateNotifier<AdminUsersState> {
 
 final adminUsersNotifierProvider =
     StateNotifierProvider<AdminUsersNotifier, AdminUsersState>((ref) {
-  return AdminUsersNotifier(ref.watch(legacyAdminRepoProvider));
+  return AdminUsersNotifier(ref.watch(adminRepositoryProvider));
 });
 
 // ==========================================
@@ -587,7 +603,7 @@ class AdminReviewsState {
 }
 
 class AdminReviewsNotifier extends StateNotifier<AdminReviewsState> {
-  final legacy_review.ReviewRepository _repo;
+  final AdminRepository _repo;
 
   AdminReviewsNotifier(this._repo) : super(const AdminReviewsState());
 
@@ -610,14 +626,14 @@ class AdminReviewsNotifier extends StateNotifier<AdminReviewsState> {
         search: sSearch.isEmpty ? null : sSearch,
       );
 
-      if (response.status && response.data is List<AdminReviewModel>) {
+      if (response is Success<List<AdminReviewEntity>>) {
         state = state.copyWith(
-          reviews: response.data as List<AdminReviewModel>,
+          reviews: response.data.map((r) => r.toModel()).toList(),
           isLoading: false,
         );
       } else {
         state = state.copyWith(
-          error: response.message,
+          error: response.failureOrNull?.message ?? 'Failed to load reviews',
           isLoading: false,
         );
       }
@@ -642,7 +658,7 @@ class AdminReviewsNotifier extends StateNotifier<AdminReviewsState> {
         reason: reason,
       );
 
-      if (response.status) {
+      if (response is Success<bool> && response.data) {
         final list = [...state.reviews];
         final idx = list.indexWhere((r) => r.id == reviewId);
         if (idx != -1) {
@@ -661,7 +677,7 @@ class AdminReviewsNotifier extends StateNotifier<AdminReviewsState> {
 
 final adminReviewsNotifierProvider =
     StateNotifierProvider<AdminReviewsNotifier, AdminReviewsState>((ref) {
-  return AdminReviewsNotifier(ref.watch(legacyReviewRepoProvider));
+  return AdminReviewsNotifier(ref.watch(adminRepositoryProvider));
 });
 
 // ==========================================
@@ -693,7 +709,7 @@ class AdminAuditLogsState {
 }
 
 class AdminAuditLogsNotifier extends StateNotifier<AdminAuditLogsState> {
-  final legacy_admin.AdminRepository _repo;
+  final AdminRepository _repo;
 
   AdminAuditLogsNotifier(this._repo) : super(const AdminAuditLogsState());
 
@@ -701,14 +717,14 @@ class AdminAuditLogsNotifier extends StateNotifier<AdminAuditLogsState> {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final response = await _repo.getAuditLogs(page: 1, limit: 50);
-      if (response.status && response.data is List<AuditLogModel>) {
+      if (response is Success<List<AuditLogEntity>>) {
         state = state.copyWith(
-          logs: response.data as List<AuditLogModel>,
+          logs: response.data.map((l) => l.toModel()).toList(),
           isLoading: false,
         );
       } else {
         state = state.copyWith(
-          error: response.message,
+          error: response.failureOrNull?.message ?? 'Failed to load audit logs',
           isLoading: false,
         );
       }
@@ -724,5 +740,5 @@ class AdminAuditLogsNotifier extends StateNotifier<AdminAuditLogsState> {
 
 final adminAuditLogsNotifierProvider =
     StateNotifierProvider<AdminAuditLogsNotifier, AdminAuditLogsState>((ref) {
-  return AdminAuditLogsNotifier(ref.watch(legacyAdminRepoProvider));
+  return AdminAuditLogsNotifier(ref.watch(adminRepositoryProvider));
 });

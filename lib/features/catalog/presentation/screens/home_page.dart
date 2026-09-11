@@ -10,7 +10,7 @@ import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/features/auth/presentation/providers/auth_providers.dart';
 import 'package:shopp_app/features/cart/presentation/providers/cart_providers.dart';
-import 'package:shopp_app/data/models/recommendation_model.dart';
+import 'package:shopp_app/features/recommendations/domain/entities/recommendation_entity.dart';
 import 'package:shopp_app/features/catalog/domain/entities/product_entity.dart';
 import 'package:shopp_app/features/catalog/presentation/providers/catalog_providers.dart';
 import 'package:shopp_app/features/config/domain/entities/app_config_entity.dart';
@@ -424,8 +424,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     required BuildContext context,
     required HomeSectionEntity section,
     required FeatureFlagsEntity featureFlags,
-    required List<RecommendedProduct> personalizedRecs,
-    required List<RecommendedProduct> trendingRecs,
+    required List<RecommendedProductEntity> personalizedRecs,
+    required List<RecommendedProductEntity> trendingRecs,
     required dynamic productsState,
     required List<ProductEntity> products,
     required bool isLoadingProducts,

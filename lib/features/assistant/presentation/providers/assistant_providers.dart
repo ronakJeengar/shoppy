@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:shopp_app/data/models/assistant_message_model.dart';
-import 'package:shopp_app/data/repositories/ai_repository.dart';
+import 'package:shopp_app/core/utils/result.dart';
+import 'package:shopp_app/features/assistant/domain/entities/assistant_message_entity.dart';
+import 'package:shopp_app/features/assistant/data/models/assistant_message_model.dart';
+import 'package:shopp_app/features/assistant/data/mappers/assistant_mappers.dart';
+import 'package:shopp_app/features/ai/domain/repositories/ai_repository.dart';
+import 'package:shopp_app/features/ai/presentation/providers/ai_providers.dart';
 import 'package:shopp_app/features/cart/presentation/screens/cart_page.dart';
 import 'package:shopp_app/features/orders/presentation/screens/order_detail_page.dart';
 import 'package:shopp_app/features/orders/presentation/screens/orders_page.dart';
@@ -9,10 +13,6 @@ import 'package:shopp_app/features/catalog/presentation/screens/product_detail_p
 import 'package:shopp_app/features/profile/presentation/screens/profile_page.dart';
 import 'package:shopp_app/features/search/presentation/screens/search_page.dart';
 import 'package:shopp_app/features/wishlist/presentation/screens/wishlist_page.dart';
-
-final aiRepositoryProvider = Provider<AiRepository>((ref) {
-  return AiRepository();
-});
 
 class AssistantState {
   final List<AssistantMessageModel> messages;
@@ -83,6 +83,7 @@ class AssistantNotifier extends StateNotifier<AssistantState> {
       id: 'usr_${DateTime.now().millisecondsSinceEpoch}',
       role: 'user',
       content: trimmed,
+      timestamp: DateTime.now(),
     );
 
     state = state.copyWith(
@@ -96,8 +97,8 @@ class AssistantNotifier extends StateNotifier<AssistantState> {
       conversationId: state.activeConversationId,
     );
 
-    if (response.status && response.data is AssistantChatResponseModel) {
-      final chatData = response.data as AssistantChatResponseModel;
+    if (response is Success<AssistantChatResponseEntity>) {
+      final chatData = response.data.toModel();
       final assistantMessage = AssistantMessageModel(
         id: 'ast_${DateTime.now().millisecondsSinceEpoch}',
         role: 'assistant',
@@ -106,6 +107,7 @@ class AssistantNotifier extends StateNotifier<AssistantState> {
         products: chatData.products,
         sources: chatData.sources,
         actions: chatData.actions,
+        timestamp: DateTime.now(),
       );
 
       state = state.copyWith(
@@ -118,11 +120,12 @@ class AssistantNotifier extends StateNotifier<AssistantState> {
         id: 'err_${DateTime.now().millisecondsSinceEpoch}',
         role: 'assistant',
         content:
-            "Sorry, I encountered an issue: ${response.message}. Please try again.",
+            "Sorry, I encountered an issue: ${response.failureOrNull?.message ?? 'An error occurred'}. Please try again.",
+        timestamp: DateTime.now(),
       );
 
       state = state.copyWith(
-        errorMessage: response.message,
+        errorMessage: response.failureOrNull?.message,
         messages: [...state.messages, fallbackErrorMsg],
         isLoading: false,
       );
@@ -139,13 +142,12 @@ class AssistantNotifier extends StateNotifier<AssistantState> {
       conversationId: state.activeConversationId,
     );
 
-    if (response.status) {
+    if (response is Success<bool> && response.data) {
       final successMsg = AssistantMessageModel(
         id: 'ast_cf_${DateTime.now().millisecondsSinceEpoch}',
         role: 'assistant',
-        content: response.message.isNotEmpty
-            ? response.message
-            : "Action confirmed and successfully executed.",
+        content: "Action confirmed and successfully executed.",
+        timestamp: DateTime.now(),
       );
 
       state = state.copyWith(
@@ -155,7 +157,7 @@ class AssistantNotifier extends StateNotifier<AssistantState> {
       return true;
     } else {
       state = state.copyWith(
-        errorMessage: response.message,
+        errorMessage: response.failureOrNull?.message,
         isLoading: false,
       );
       return false;
@@ -172,11 +174,12 @@ class AssistantNotifier extends StateNotifier<AssistantState> {
       conversationId: state.activeConversationId,
     );
 
-    if (response.status) {
+    if (response is Success<bool> && response.data) {
       final cancelMsg = AssistantMessageModel(
         id: 'ast_cn_${DateTime.now().millisecondsSinceEpoch}',
         role: 'assistant',
         content: "The action proposal has been cancelled.",
+        timestamp: DateTime.now(),
       );
 
       state = state.copyWith(
@@ -186,7 +189,7 @@ class AssistantNotifier extends StateNotifier<AssistantState> {
       return true;
     } else {
       state = state.copyWith(
-        errorMessage: response.message,
+        errorMessage: response.failureOrNull?.message,
         isLoading: false,
       );
       return false;
@@ -197,15 +200,16 @@ class AssistantNotifier extends StateNotifier<AssistantState> {
     state = state.copyWith(isLoading: true, clearErrorMessage: true);
 
     final response = await _aiRepository.getConversation(conversationId);
-    if (response.status && response.data is List<AssistantMessageModel>) {
+    if (response is Success<List<AssistantMessageEntity>>) {
+      final models = response.data.map((e) => e.toModel()).toList();
       state = state.copyWith(
-        messages: response.data as List<AssistantMessageModel>,
+        messages: models,
         activeConversationId: conversationId,
         isLoading: false,
       );
     } else {
       state = state.copyWith(
-        errorMessage: response.message,
+        errorMessage: response.failureOrNull?.message,
         isLoading: false,
       );
     }

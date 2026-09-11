@@ -1,4 +1,5 @@
 import '../../../../core/utils/result.dart';
+import '../entities/notification_entity.dart';
 import '../repositories/notification_repository.dart';
 
 class GetNotificationsUseCase {

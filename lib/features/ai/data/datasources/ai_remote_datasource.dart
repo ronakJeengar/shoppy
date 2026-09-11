@@ -1,7 +1,7 @@
 import '../../../../constants/urls.dart';
 import '../../../../core/network/api_client.dart';
-import '../../../../data/models/ai_config_model.dart';
-import '../../../../data/models/assistant_message_model.dart';
+import '../models/ai_config_model.dart';
+import '../../../assistant/data/models/assistant_message_model.dart';
 
 abstract class AiRemoteDataSource {
   Future<AiHealthModel> getAiHealth();
@@ -18,6 +18,7 @@ abstract class AiRemoteDataSource {
     required String confirmationId,
     String? conversationId,
   });
+  Future<List<AssistantMessageModel>> getConversation(String conversationId);
 }
 
 class AiRemoteDataSourceImpl implements AiRemoteDataSource {
@@ -88,5 +89,20 @@ class AiRemoteDataSourceImpl implements AiRemoteDataSource {
       return data['success'] == true || data['status'] == true;
     }
     return true;
+  }
+
+  @override
+  Future<List<AssistantMessageModel>> getConversation(String conversationId) async {
+    final response = await _client.get(Urls.aiConversation(conversationId));
+    final data = response.data;
+    final map = (data is Map<String, dynamic> ? (data['data'] ?? data) : data) as Map<String, dynamic>;
+    final rawMessages = map['messages'];
+    if (rawMessages is List) {
+      return rawMessages
+          .whereType<Map<String, dynamic>>()
+          .map((m) => AssistantMessageModel.fromJson(m))
+          .toList();
+    }
+    return [];
   }
 }

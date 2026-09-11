@@ -7,7 +7,6 @@ import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
-import 'package:shopp_app/data/models/review_model.dart';
 import 'package:shopp_app/features/cart/presentation/providers/cart_providers.dart';
 import 'package:shopp_app/features/catalog/data/mappers/catalog_mappers.dart';
 import 'package:shopp_app/features/catalog/domain/entities/product_entity.dart';
@@ -400,7 +399,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
     );
   }
 
-  Widget _buildReviewCard(BuildContext context, ReviewModel rev) {
+  Widget _buildReviewCard(BuildContext context, ReviewEntity rev) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

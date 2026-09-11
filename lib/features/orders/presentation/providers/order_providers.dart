@@ -1,9 +1,9 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/network/api_client.dart';
-import '../../../../data/models/order_model.dart';
-import '../../../../domain/models/ui_state.dart';
+import '../../../../core/utils/ui_state.dart';
 import '../../data/datasources/order_remote_datasource.dart';
 import '../../data/repositories/order_repository_impl.dart';
+import '../../domain/entities/order_entity.dart';
 import '../../domain/repositories/order_repository.dart';
 import '../../domain/usecases/order_usecases.dart';
 
@@ -29,7 +29,7 @@ final cancelOrderUseCaseProvider = Provider<CancelOrderUseCase>((ref) {
   return CancelOrderUseCase(ref.watch(orderRepositoryProvider));
 });
 
-class OrdersNotifier extends StateNotifier<UiState<List<OrderModel>>> {
+class OrdersNotifier extends StateNotifier<UiState<List<OrderEntity>>> {
   final GetOrdersUseCase _getOrdersUseCase;
   final CancelOrderUseCase _cancelOrderUseCase;
   String? _currentFilter;
@@ -74,7 +74,7 @@ class OrdersNotifier extends StateNotifier<UiState<List<OrderModel>>> {
 }
 
 final ordersNotifierProvider =
-    StateNotifierProvider<OrdersNotifier, UiState<List<OrderModel>>>((ref) {
+    StateNotifierProvider<OrdersNotifier, UiState<List<OrderEntity>>>((ref) {
   return OrdersNotifier(
     getOrdersUseCase: ref.watch(getOrdersUseCaseProvider),
     cancelOrderUseCase: ref.watch(cancelOrderUseCaseProvider),
@@ -82,7 +82,7 @@ final ordersNotifierProvider =
 });
 
 final orderDetailProvider =
-    FutureProvider.family<OrderModel, String>((ref, orderId) async {
+    FutureProvider.family<OrderEntity, String>((ref, orderId) async {
   final useCase = ref.watch(getOrderDetailUseCaseProvider);
   final result = await useCase(orderId);
   return result.fold(

@@ -1,7 +1,7 @@
 import '../../../../core/utils/result.dart';
-import '../../../../data/models/order_model.dart';
-import '../../../../data/models/payment_model.dart';
+import '../../../orders/domain/entities/order_entity.dart';
 import '../entities/checkout_entity.dart';
+import '../entities/payment_entity.dart';
 
 abstract class CheckoutRepository {
   Future<Result<CheckoutValidationEntity>> validateCheckout(
@@ -16,14 +16,14 @@ abstract class CheckoutRepository {
     String? idempotencyKey,
   });
 
-  Future<Result<PaymentModel>> processPayment({
+  Future<Result<PaymentEntity>> processPayment({
     required String orderId,
     required String paymentMethod,
     String? idempotencyKey,
     bool simulateSuccess = true,
   });
 
-  Future<Result<OrderModel>> confirmOrder({
+  Future<Result<OrderEntity>> confirmOrder({
     required String orderId,
     required String paymentId,
   });

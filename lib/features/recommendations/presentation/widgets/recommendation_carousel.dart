@@ -4,14 +4,13 @@ import 'package:shopp_app/core/theme/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/core/widgets/widgets.dart';
-import 'package:shopp_app/data/models/recommendation_model.dart';
-import 'package:shopp_app/features/catalog/data/mappers/catalog_mappers.dart';
+import '../../domain/entities/recommendation_entity.dart';
 import 'package:shopp_app/features/catalog/presentation/widgets/product_card.dart';
 
 class RecommendationCarousel extends StatelessWidget {
   final String title;
   final String? subtitle;
-  final List<RecommendedProduct> items;
+  final List<RecommendedProductEntity> items;
   final bool isLoading;
   final VoidCallback? onRefresh;
 
@@ -125,7 +124,7 @@ class RecommendationCarousel extends StatelessWidget {
                 final recItem = items[index];
                 return SizedBox(
                   width: 164,
-                  child: ProductCard(product: recItem.product.toEntity()),
+                  child: ProductCard(product: recItem.product),
                 );
               },
             ),

@@ -1,9 +1,10 @@
 import 'package:dio/dio.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/utils/result.dart';
-import '../../../../data/models/recommendation_model.dart';
+import '../../domain/entities/recommendation_entity.dart';
 import '../../domain/repositories/recommendation_repository.dart';
 import '../datasources/recommendation_remote_datasource.dart';
+import '../mappers/recommendation_mappers.dart';
 
 class RecommendationRepositoryImpl implements RecommendationRepository {
   final RecommendationRemoteDataSource _remoteDataSource;
@@ -11,7 +12,7 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
   RecommendationRepositoryImpl(this._remoteDataSource);
 
   @override
-  Future<Result<RecommendationResponseModel>> getRecommendations({
+  Future<Result<RecommendationResponseEntity>> getRecommendations({
     String type = 'PERSONALIZED',
     String? productId,
     String? categoryId,
@@ -24,7 +25,7 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
         categoryId: categoryId,
         limit: limit,
       );
-      return Success(res);
+      return Success(res.toEntity());
     } on DioException catch (e) {
       final msg = extractDioErrorMessage(e, 'Failed to load recommendations');
       return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));

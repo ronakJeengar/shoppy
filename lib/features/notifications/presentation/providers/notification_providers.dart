@@ -1,9 +1,9 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/network/api_client.dart';
-import '../../../../data/models/notification_model.dart';
-import '../../../../domain/models/ui_state.dart';
+import '../../../../core/utils/ui_state.dart';
 import '../../data/datasources/notification_remote_datasource.dart';
 import '../../data/repositories/notification_repository_impl.dart';
+import '../../domain/entities/notification_entity.dart';
 import '../../domain/repositories/notification_repository.dart';
 import '../../domain/usecases/notification_usecases.dart';
 
@@ -40,7 +40,7 @@ final getUnreadCountUseCaseProvider = Provider<GetUnreadCountUseCase>((ref) {
 });
 
 class NotificationNotifier
-    extends StateNotifier<UiState<List<NotificationModel>>> {
+    extends StateNotifier<UiState<List<NotificationEntity>>> {
   final GetNotificationsUseCase _getNotificationsUseCase;
   final MarkNotificationReadUseCase _markReadUseCase;
   final MarkAllNotificationsReadUseCase _markAllReadUseCase;
@@ -101,7 +101,7 @@ class NotificationNotifier
 }
 
 final notificationNotifierProvider = StateNotifierProvider<NotificationNotifier,
-    UiState<List<NotificationModel>>>((ref) {
+    UiState<List<NotificationEntity>>>((ref) {
   return NotificationNotifier(
     getNotificationsUseCase: ref.watch(getNotificationsUseCaseProvider),
     markReadUseCase: ref.watch(markNotificationReadUseCaseProvider),

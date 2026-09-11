@@ -8,8 +8,8 @@ import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
-import 'package:shopp_app/data/models/notification_model.dart';
-import 'package:shopp_app/domain/models/ui_state.dart';
+import '../../../../core/utils/ui_state.dart';
+import '../../domain/entities/notification_entity.dart';
 import 'package:shopp_app/features/notifications/presentation/providers/notification_providers.dart';
 import 'package:shopp_app/features/orders/presentation/screens/order_detail_page.dart';
 import 'package:shopp_app/core/widgets/empty_state.dart';
@@ -136,7 +136,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
 
   Widget _buildNotificationTile(
     BuildContext context,
-    NotificationModel notif,
+    NotificationEntity notif,
   ) {
     final typeColor = _getTypeColor(notif.type);
     final typeIcon = _getTypeIcon(notif.type);

@@ -7,8 +7,8 @@ import 'package:shopp_app/core/preferences.dart';
 import 'package:shopp_app/core/router/app_router.dart';
 import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
-import 'package:shopp_app/data/models/product_media_model.dart';
-import 'package:shopp_app/data/models/product_model.dart';
+import 'package:shopp_app/features/catalog/data/models/product_media_model.dart';
+import 'package:shopp_app/features/catalog/data/models/product_model.dart';
 import 'package:shopp_app/features/catalog/presentation/widgets/product_media_gallery.dart';
 
 Widget buildRouterApp(ProviderContainer container) {
@@ -115,7 +115,7 @@ void main() {
     });
 
     test('Product helper methods derive allMedia and media capabilities', () {
-      final product = Product(
+      const product = Product(
         id: 'p1',
         productName: 'Headphones',
         description: 'Studio headphones',
@@ -139,7 +139,7 @@ void main() {
 
     testWidgets('ProductMediaGallery renders image carousel and page indicators',
         (WidgetTester tester) async {
-      final product = Product(
+      const product = Product(
         id: 'p_test',
         productName: 'Test Product',
         price: 99.99,
@@ -152,7 +152,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: ProductMediaGallery(
               product: product,
@@ -168,14 +168,14 @@ void main() {
 
     testWidgets('ProductMediaGallery renders interactive 3D viewer when model provided',
         (WidgetTester tester) async {
-      final product = Product(
+      const product = Product(
         id: 'p_3d',
         productName: '3D Astronaut',
         price: 149.99,
         productImage: '',
         model3dUrl: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
         media: [
-          const ProductMedia(
+          ProductMedia(
             id: 'm_3d',
             type: ProductMediaType.model3d,
             url: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
@@ -184,7 +184,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: ProductMediaGallery(
               product: product,

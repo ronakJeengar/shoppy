@@ -1,12 +1,19 @@
 import 'package:dio/dio.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/utils/result.dart';
-import '../../../../data/models/admin_dashboard_model.dart';
-import '../../../../data/models/admin_user_model.dart';
-import '../../../../data/models/order_model.dart';
-import '../../../../data/models/product_model.dart';
-import '../../domain/repositories/admin_repository.dart';
 import '../datasources/admin_remote_datasource.dart';
+import '../mappers/admin_mappers.dart';
+import '../../domain/entities/admin_dashboard_entity.dart';
+import '../../domain/entities/admin_user_entity.dart';
+import '../../domain/entities/audit_log_entity.dart';
+import '../../domain/repositories/admin_repository.dart';
+import '../../../catalog/data/mappers/catalog_mappers.dart';
+import '../../../catalog/domain/entities/product_entity.dart';
+import '../../../catalog/domain/entities/category_entity.dart';
+import '../../../orders/data/mappers/order_mappers.dart';
+import '../../../orders/domain/entities/order_entity.dart';
+import '../../../reviews/data/mappers/review_mappers.dart';
+import '../../../reviews/domain/entities/review_entity.dart';
 
 class AdminRepositoryImpl implements AdminRepository {
   final AdminRemoteDataSource _remoteDataSource;
@@ -14,10 +21,10 @@ class AdminRepositoryImpl implements AdminRepository {
   AdminRepositoryImpl(this._remoteDataSource);
 
   @override
-  Future<Result<AdminDashboardMetrics>> getDashboardMetrics() async {
+  Future<Result<AdminDashboardMetricsEntity>> getDashboardMetrics() async {
     try {
       final metrics = await _remoteDataSource.getDashboardMetrics();
-      return Success(metrics);
+      return Success(metrics.toEntity());
     } on DioException catch (e) {
       final msg = extractDioErrorMessage(e, 'Failed to load dashboard metrics');
       return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));
@@ -27,7 +34,7 @@ class AdminRepositoryImpl implements AdminRepository {
   }
 
   @override
-  Future<Result<Map<String, dynamic>>> getAdminProducts({
+  Future<Result<List<ProductEntity>>> getAdminProducts({
     int page = 1,
     int limit = 20,
     String? search,
@@ -36,7 +43,7 @@ class AdminRepositoryImpl implements AdminRepository {
     bool? lowStock,
   }) async {
     try {
-      final res = await _remoteDataSource.getAdminProducts(
+      final models = await _remoteDataSource.getAdminProducts(
         page: page,
         limit: limit,
         search: search,
@@ -44,7 +51,8 @@ class AdminRepositoryImpl implements AdminRepository {
         status: status,
         lowStock: lowStock,
       );
-      return Success(res);
+      final entities = models.map((m) => m.toEntity()).toList();
+      return Success(entities);
     } on DioException catch (e) {
       final msg = extractDioErrorMessage(e, 'Failed to load products');
       return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));
@@ -54,10 +62,24 @@ class AdminRepositoryImpl implements AdminRepository {
   }
 
   @override
-  Future<Result<Product>> createProduct(Map<String, dynamic> data) async {
+  Future<Result<List<CategoryEntity>>> getAdminCategories() async {
     try {
-      final product = await _remoteDataSource.createProduct(data);
-      return Success(product);
+      final models = await _remoteDataSource.getAdminCategories();
+      final entities = models.map((m) => m.toEntity()).toList();
+      return Success(entities);
+    } on DioException catch (e) {
+      final msg = extractDioErrorMessage(e, 'Failed to load categories');
+      return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));
+    } catch (e) {
+      return FailureResult(UnknownFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Result<ProductEntity>> createProduct(Map<String, dynamic> data) async {
+    try {
+      final model = await _remoteDataSource.createProduct(data);
+      return Success(model.toEntity());
     } on DioException catch (e) {
       final msg = extractDioErrorMessage(e, 'Failed to create product');
       return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));
@@ -67,13 +89,32 @@ class AdminRepositoryImpl implements AdminRepository {
   }
 
   @override
-  Future<Result<Product>> updateProduct(
-      String id, Map<String, dynamic> data) async {
+  Future<Result<ProductEntity>> updateProduct(
+    String id,
+    Map<String, dynamic> data,
+  ) async {
     try {
-      final product = await _remoteDataSource.updateProduct(id, data);
-      return Success(product);
+      final model = await _remoteDataSource.updateProduct(id, data);
+      return Success(model.toEntity());
     } on DioException catch (e) {
       final msg = extractDioErrorMessage(e, 'Failed to update product');
+      return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));
+    } catch (e) {
+      return FailureResult(UnknownFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Result<ProductEntity>> updateProductStock(
+    String id,
+    int quantity,
+    String operation,
+  ) async {
+    try {
+      final model = await _remoteDataSource.updateProductStock(id, quantity, operation);
+      return Success(model.toEntity());
+    } on DioException catch (e) {
+      final msg = extractDioErrorMessage(e, 'Failed to update product stock');
       return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));
     } catch (e) {
       return FailureResult(UnknownFailure(e.toString()));
@@ -94,20 +135,21 @@ class AdminRepositoryImpl implements AdminRepository {
   }
 
   @override
-  Future<Result<Map<String, dynamic>>> getAdminOrders({
+  Future<Result<List<OrderEntity>>> getAdminOrders({
     int page = 1,
     int limit = 20,
     String? status,
     String? search,
   }) async {
     try {
-      final res = await _remoteDataSource.getAdminOrders(
+      final models = await _remoteDataSource.getAdminOrders(
         page: page,
         limit: limit,
         status: status,
         search: search,
       );
-      return Success(res);
+      final entities = models.map((m) => m.toEntity()).toList();
+      return Success(entities);
     } on DioException catch (e) {
       final msg = extractDioErrorMessage(e, 'Failed to load orders');
       return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));
@@ -117,20 +159,22 @@ class AdminRepositoryImpl implements AdminRepository {
   }
 
   @override
-  Future<Result<OrderModel>> updateOrderStatus(
-    String id,
-    String status, {
+  Future<Result<OrderEntity>> updateOrderStatus(
+    String id, {
+    required String status,
     String? trackingNumber,
     String? carrier,
+    String? note,
   }) async {
     try {
-      final order = await _remoteDataSource.updateOrderStatus(
+      final model = await _remoteDataSource.updateOrderStatus(
         id,
-        status,
+        status: status,
         trackingNumber: trackingNumber,
         carrier: carrier,
+        note: note,
       );
-      return Success(order);
+      return Success(model.toEntity());
     } on DioException catch (e) {
       final msg = extractDioErrorMessage(e, 'Failed to update order status');
       return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));
@@ -140,20 +184,21 @@ class AdminRepositoryImpl implements AdminRepository {
   }
 
   @override
-  Future<Result<Map<String, dynamic>>> getAdminUsers({
+  Future<Result<List<AdminUserEntity>>> getAdminUsers({
     int page = 1,
     int limit = 20,
     String? role,
     String? search,
   }) async {
     try {
-      final res = await _remoteDataSource.getAdminUsers(
+      final models = await _remoteDataSource.getAdminUsers(
         page: page,
         limit: limit,
         role: role,
         search: search,
       );
-      return Success(res);
+      final entities = models.map((m) => m.toEntity()).toList();
+      return Success(entities);
     } on DioException catch (e) {
       final msg = extractDioErrorMessage(e, 'Failed to load users');
       return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));
@@ -163,11 +208,13 @@ class AdminRepositoryImpl implements AdminRepository {
   }
 
   @override
-  Future<Result<AdminUserModel>> updateUserRole(
-      String id, String role) async {
+  Future<Result<AdminUserEntity>> updateUserRole(
+    String id,
+    String role,
+  ) async {
     try {
-      final user = await _remoteDataSource.updateUserRole(id, role);
-      return Success(user);
+      final model = await _remoteDataSource.updateUserRole(id, role);
+      return Success(model.toEntity());
     } on DioException catch (e) {
       final msg = extractDioErrorMessage(e, 'Failed to update user role');
       return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));
@@ -177,11 +224,13 @@ class AdminRepositoryImpl implements AdminRepository {
   }
 
   @override
-  Future<Result<AdminUserModel>> toggleUserStatus(
-      String id, bool isActive) async {
+  Future<Result<AdminUserEntity>> toggleUserStatus(
+    String id,
+    bool isActive,
+  ) async {
     try {
-      final user = await _remoteDataSource.toggleUserStatus(id, isActive);
-      return Success(user);
+      final model = await _remoteDataSource.toggleUserStatus(id, isActive);
+      return Success(model.toEntity());
     } on DioException catch (e) {
       final msg = extractDioErrorMessage(e, 'Failed to update user status');
       return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));
@@ -191,22 +240,46 @@ class AdminRepositoryImpl implements AdminRepository {
   }
 
   @override
-  Future<Result<Map<String, dynamic>>> getAdminReviews({
+  Future<Result<List<AdminReviewEntity>>> getAdminReviews({
     int page = 1,
     int limit = 20,
     int? rating,
+    String? status,
     String? search,
   }) async {
     try {
-      final res = await _remoteDataSource.getAdminReviews(
+      final models = await _remoteDataSource.getAdminReviews(
         page: page,
         limit: limit,
         rating: rating,
+        status: status,
         search: search,
       );
-      return Success(res);
+      final entities = models.map((m) => m.toEntity()).toList();
+      return Success(entities);
     } on DioException catch (e) {
       final msg = extractDioErrorMessage(e, 'Failed to load reviews');
+      return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));
+    } catch (e) {
+      return FailureResult(UnknownFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Result<bool>> updateAdminReviewStatus(
+    String reviewId, {
+    required String status,
+    String? reason,
+  }) async {
+    try {
+      final success = await _remoteDataSource.updateAdminReviewStatus(
+        reviewId,
+        status: status,
+        reason: reason,
+      );
+      return Success(success);
+    } on DioException catch (e) {
+      final msg = extractDioErrorMessage(e, 'Failed to update review status');
       return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));
     } catch (e) {
       return FailureResult(UnknownFailure(e.toString()));
@@ -227,20 +300,21 @@ class AdminRepositoryImpl implements AdminRepository {
   }
 
   @override
-  Future<Result<Map<String, dynamic>>> getAuditLogs({
+  Future<Result<List<AuditLogEntity>>> getAuditLogs({
     int page = 1,
     int limit = 30,
     String? action,
     String? targetType,
   }) async {
     try {
-      final res = await _remoteDataSource.getAuditLogs(
+      final models = await _remoteDataSource.getAuditLogs(
         page: page,
         limit: limit,
         action: action,
         targetType: targetType,
       );
-      return Success(res);
+      final entities = models.map((m) => m.toEntity()).toList();
+      return Success(entities);
     } on DioException catch (e) {
       final msg = extractDioErrorMessage(e, 'Failed to load audit logs');
       return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));

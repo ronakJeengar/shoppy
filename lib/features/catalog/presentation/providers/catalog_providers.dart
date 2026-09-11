@@ -1,7 +1,7 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/network/api_client.dart';
-import '../../../../domain/models/ui_state.dart';
-export '../../../../domain/models/ui_state.dart';
+import 'package:shopp_app/core/utils/ui_state.dart';
+export 'package:shopp_app/core/utils/ui_state.dart';
 import '../../data/datasources/catalog_remote_datasource.dart';
 import '../../data/repositories/catalog_repository_impl.dart';
 import '../../domain/entities/category_entity.dart';

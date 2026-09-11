@@ -1,5 +1,5 @@
 import '../../../../core/utils/result.dart';
-import '../../../../data/models/recommendation_model.dart';
+import '../entities/recommendation_entity.dart';
 import '../repositories/recommendation_repository.dart';
 
 class GetRecommendationsUseCase {
@@ -7,7 +7,7 @@ class GetRecommendationsUseCase {
 
   GetRecommendationsUseCase(this._repository);
 
-  Future<Result<RecommendationResponseModel>> call({
+  Future<Result<RecommendationResponseEntity>> call({
     String type = 'PERSONALIZED',
     String? productId,
     String? categoryId,

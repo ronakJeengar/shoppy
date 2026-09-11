@@ -1,8 +1,8 @@
 import '../../../../constants/urls.dart';
 import '../../../../core/network/api_client.dart';
-import '../../../../data/models/checkout_validation_model.dart';
-import '../../../../data/models/order_model.dart';
-import '../../../../data/models/payment_model.dart';
+import '../models/checkout_validation_model.dart';
+import '../models/payment_model.dart';
+import '../../../orders/data/models/order_model.dart';
 
 abstract class CheckoutRemoteDataSource {
   Future<CheckoutValidationModel> validateCheckout(String addressId, String shippingMethod);

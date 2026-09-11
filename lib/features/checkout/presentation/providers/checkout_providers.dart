@@ -1,6 +1,6 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/network/api_client.dart';
-import '../../../../data/models/order_model.dart';
+import '../../../orders/domain/entities/order_entity.dart';
 import '../../data/datasources/checkout_remote_datasource.dart';
 import '../../data/repositories/checkout_repository_impl.dart';
 import '../../domain/entities/checkout_entity.dart';
@@ -32,7 +32,7 @@ class CheckoutState {
   final bool isPlacingOrder;
   final CheckoutValidationEntity? validation;
   final String? error;
-  final OrderModel? placedOrder;
+  final OrderEntity? placedOrder;
   final String selectedPaymentMethod;
   final String selectedShippingMethod;
 
@@ -52,7 +52,7 @@ class CheckoutState {
     CheckoutValidationEntity? validation,
     String? error,
     bool clearError = false,
-    OrderModel? placedOrder,
+    OrderEntity? placedOrder,
     String? selectedPaymentMethod,
     String? selectedShippingMethod,
   }) {
@@ -106,7 +106,7 @@ class CheckoutNotifier extends StateNotifier<CheckoutState> {
     );
   }
 
-  Future<OrderModel?> placeOrder({
+  Future<OrderEntity?> placeOrder({
     required String addressId,
     String? idempotencyKey,
   }) async {

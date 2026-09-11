@@ -3,7 +3,7 @@ import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/constants/app_icon_sizes.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:shopp_app/data/models/review_model.dart';
+import 'package:shopp_app/features/reviews/data/models/review_model.dart';
 import 'package:shopp_app/features/admin/presentation/providers/admin_providers.dart';
 
 class AdminReviewsPage extends ConsumerStatefulWidget {

@@ -1,6 +1,6 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/network/api_client.dart';
-import '../../../../domain/models/ui_state.dart';
+import 'package:shopp_app/core/utils/ui_state.dart';
 import '../../data/datasources/cart_remote_datasource.dart';
 import '../../data/repositories/cart_repository_impl.dart';
 import '../../domain/entities/cart_entity.dart';

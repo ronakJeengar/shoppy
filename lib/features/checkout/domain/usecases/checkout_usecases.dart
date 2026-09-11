@@ -1,5 +1,5 @@
 import '../../../../core/utils/result.dart';
-import '../../../../data/models/order_model.dart';
+import '../../../orders/domain/entities/order_entity.dart';
 import '../entities/checkout_entity.dart';
 import '../repositories/checkout_repository.dart';
 
@@ -21,7 +21,7 @@ class PlaceOrderUseCase {
 
   PlaceOrderUseCase(this._repository);
 
-  Future<Result<OrderModel>> call({
+  Future<Result<OrderEntity>> call({
     required String addressId,
     String shippingMethod = 'STANDARD',
     String paymentMethod = 'CARD',
@@ -36,7 +36,7 @@ class PlaceOrderUseCase {
 
     return createResult.fold(
       onSuccess: (data) async {
-        final order = data['order'] as OrderModel;
+        final order = data['order'] as OrderEntity;
         if (paymentMethod == 'COD') {
           return Success(order);
         }

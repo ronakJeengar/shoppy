@@ -3,8 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
-import 'package:shopp_app/data/models/order_model.dart';
-import 'package:shopp_app/domain/models/ui_state.dart';
+import 'package:shopp_app/features/orders/data/models/order_model.dart';
+import 'package:shopp_app/features/orders/data/mappers/order_mappers.dart';
+import 'package:shopp_app/core/utils/ui_state.dart';
 import 'package:shopp_app/core/widgets/app_network_image.dart';
 import 'package:shopp_app/features/orders/presentation/widgets/order_timeline.dart';
 
@@ -78,7 +79,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: SingleChildScrollView(
-              child: OrderTimeline(order: order),
+              child: OrderTimeline(order: order.toEntity()),
             ),
           ),
         ),
@@ -113,7 +114,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: SingleChildScrollView(
-              child: OrderTimeline(order: order),
+              child: OrderTimeline(order: order.toEntity()),
             ),
           ),
         ),

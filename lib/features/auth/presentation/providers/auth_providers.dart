@@ -1,8 +1,8 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/preferences.dart';
-import '../../../../domain/models/ui_state.dart';
-export '../../../../domain/models/ui_state.dart';
+import '../../../../core/utils/ui_state.dart';
+export '../../../../core/utils/ui_state.dart';
 import '../../data/datasources/auth_remote_datasource.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/entities/user_entity.dart';

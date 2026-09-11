@@ -1,36 +1,10 @@
-import 'package:shopp_app/data/models/category_model.dart';
-import 'package:shopp_app/data/models/product_media_model.dart' as model;
-import 'package:shopp_app/data/models/product_model.dart';
-import 'package:shopp_app/features/catalog/domain/entities/category_entity.dart';
-import 'package:shopp_app/features/catalog/domain/entities/product_entity.dart';
-import 'package:shopp_app/features/catalog/domain/entities/product_media_entity.dart' as entity;
+import '../models/category_model.dart';
+import '../models/product_media_model.dart';
+import '../models/product_model.dart';
+import '../../domain/entities/category_entity.dart';
+import '../../domain/entities/product_entity.dart';
 
-extension ProductMediaMapper on model.ProductMedia {
-  entity.ProductMediaEntity toEntity() {
-    entity.ProductMediaType entityType;
-    switch (type) {
-      case model.ProductMediaType.video:
-        entityType = entity.ProductMediaType.video;
-        break;
-      case model.ProductMediaType.model3d:
-        entityType = entity.ProductMediaType.model3d;
-        break;
-      case model.ProductMediaType.image:
-        entityType = entity.ProductMediaType.image;
-        break;
-    }
-
-    return entity.ProductMediaEntity(
-      id: id,
-      type: entityType,
-      url: url,
-      thumbnailUrl: thumbnailUrl ?? url,
-      sortOrder: sortOrder,
-    );
-  }
-}
-
-extension CategoryMapper on CategoryModel {
+extension CategoryModelMapper on CategoryModel {
   CategoryEntity toEntity() {
     return CategoryEntity(
       id: id,
@@ -39,7 +13,28 @@ extension CategoryMapper on CategoryModel {
   }
 }
 
-extension ProductMapper on Product {
+extension CategoryEntityMapper on CategoryEntity {
+  CategoryModel toModel() {
+    return CategoryModel(
+      id: id,
+      name: name,
+    );
+  }
+}
+
+extension ProductMediaModelMapper on ProductMediaModel {
+  ProductMediaEntity toEntity() {
+    return ProductMediaEntity(
+      id: id,
+      type: type,
+      url: url,
+      thumbnailUrl: thumbnailUrl ?? url,
+      sortOrder: sortOrder,
+    );
+  }
+}
+
+extension ProductModelMapper on ProductModel {
   ProductEntity toEntity() {
     return ProductEntity(
       id: id,
@@ -57,14 +52,14 @@ extension ProductMapper on Product {
       images: images,
       videoUrl: videoUrl,
       model3dUrl: model3dUrl,
-      media: allMedia.map((m) => m.toEntity()).toList(),
+      media: media.map((m) => m.toEntity()).toList(),
     );
   }
 }
 
 extension ProductEntityMapper on ProductEntity {
-  Product toModel() {
-    return Product(
+  ProductModel toModel() {
+    return ProductModel(
       id: id,
       productName: productName,
       sellerName: sellerName,
@@ -80,6 +75,15 @@ extension ProductEntityMapper on ProductEntity {
       images: images,
       videoUrl: videoUrl,
       model3dUrl: model3dUrl,
+      media: media
+          .map((m) => ProductMediaModel(
+                id: m.id,
+                type: m.type,
+                url: m.url,
+                thumbnailUrl: m.thumbnailUrl,
+                sortOrder: m.sortOrder,
+              ))
+          .toList(),
     );
   }
 }

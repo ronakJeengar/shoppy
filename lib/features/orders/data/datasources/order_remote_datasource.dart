@@ -1,6 +1,6 @@
 import '../../../../constants/urls.dart';
 import '../../../../core/network/api_client.dart';
-import '../../../../data/models/order_model.dart';
+import '../models/order_model.dart';
 
 abstract class OrderRemoteDataSource {
   Future<List<OrderModel>> getOrders({int page = 1, int limit = 10, String? status});

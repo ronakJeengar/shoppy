@@ -1,6 +1,6 @@
 import '../../../../constants/urls.dart';
 import '../../../../core/network/api_client.dart';
-import '../../../../data/models/product_model.dart';
+import 'package:shopp_app/features/catalog/data/models/product_model.dart';
 
 abstract class WishlistRemoteDataSource {
   Future<List<Product>> getWishlist();

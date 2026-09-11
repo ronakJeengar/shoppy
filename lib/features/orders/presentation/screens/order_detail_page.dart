@@ -8,7 +8,7 @@ import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/core/widgets/app_network_image.dart';
-import 'package:shopp_app/data/models/order_model.dart';
+import '../../domain/entities/order_entity.dart';
 import 'package:shopp_app/features/orders/presentation/providers/order_providers.dart';
 import '../widgets/order_timeline.dart';
 import 'package:shopp_app/features/reviews/presentation/widgets/write_review_dialog.dart';
@@ -42,7 +42,7 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
     }
   }
 
-  void _showCancelDialog(OrderModel order) {
+  void _showCancelDialog(OrderEntity order) {
     final reasons = [
       'Found a better price elsewhere',
       'Ordered by mistake',
@@ -237,7 +237,7 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
     );
   }
 
-  Widget _buildHeaderCard(BuildContext context, OrderModel order) {
+  Widget _buildHeaderCard(BuildContext context, OrderEntity order) {
     final statusColor = _getStatusColor(order.status);
 
     return Card(
@@ -332,7 +332,7 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
     );
   }
 
-  Widget _buildAddressCard(OrderModel order) {
+  Widget _buildAddressCard(OrderEntity order) {
     final addr = order.shippingAddress!;
 
     return Card(
@@ -378,7 +378,7 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
     );
   }
 
-  Widget _buildItemsCard(OrderModel order) {
+  Widget _buildItemsCard(OrderEntity order) {
     return Card(
       elevation: 0.5,
       shape: const RoundedRectangleBorder(
@@ -476,7 +476,7 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
     );
   }
 
-  Widget _buildPaymentCard(OrderModel order) {
+  Widget _buildPaymentCard(OrderEntity order) {
     final payment = order.payment;
 
     return Card(
@@ -557,7 +557,7 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
     );
   }
 
-  Widget _buildPriceBreakdownCard(OrderModel order, ThemeData theme) {
+  Widget _buildPriceBreakdownCard(OrderEntity order, ThemeData theme) {
     return Card(
       elevation: 0.5,
       shape: const RoundedRectangleBorder(

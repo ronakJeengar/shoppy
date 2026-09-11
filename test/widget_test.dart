@@ -3,14 +3,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shopp_app/core/preferences.dart';
-import 'package:shopp_app/data/models/address_model.dart';
-import 'package:shopp_app/data/models/currrent_user_model.dart';
-import 'package:shopp_app/data/models/order_model.dart';
-import 'package:shopp_app/data/models/product_model.dart';
-import 'package:shopp_app/data/models/review_model.dart';
-import 'package:shopp_app/data/models/ai_config_model.dart';
-import 'package:shopp_app/data/repositories/ai_repository.dart';
+import 'package:shopp_app/features/addresses/data/models/address_model.dart';
+import 'package:shopp_app/features/auth/data/models/user_model.dart';
+import 'package:shopp_app/features/orders/data/models/order_model.dart';
+import 'package:shopp_app/features/catalog/data/models/product_model.dart';
+import 'package:shopp_app/features/reviews/data/models/review_model.dart';
+import 'package:shopp_app/features/ai/data/models/ai_config_model.dart';
+import 'package:shopp_app/features/ai/data/datasources/ai_remote_datasource.dart';
+import 'package:shopp_app/features/ai/data/repositories/ai_repository_impl.dart';
 import 'package:shopp_app/features/catalog/data/mappers/catalog_mappers.dart';
+import 'package:shopp_app/features/orders/data/mappers/order_mappers.dart';
+import 'package:shopp_app/features/reviews/data/mappers/review_mappers.dart';
+import 'package:shopp_app/features/recommendations/data/mappers/recommendation_mappers.dart';
 import 'package:shopp_app/features/reviews/domain/entities/review_entity.dart';
 import 'package:shopp_app/features/reviews/presentation/providers/review_providers.dart';
 import 'package:shopp_app/features/assistant/presentation/providers/assistant_providers.dart';
@@ -43,9 +47,9 @@ import 'package:shopp_app/features/catalog/presentation/screens/product_detail_p
 import 'package:shopp_app/features/profile/presentation/screens/profile_page.dart';
 import 'package:shopp_app/features/search/presentation/screens/search_page.dart';
 import 'package:shopp_app/features/wishlist/presentation/screens/wishlist_page.dart';
-import 'package:shopp_app/data/models/assistant_message_model.dart';
+import 'package:shopp_app/features/assistant/data/models/assistant_message_model.dart';
 import 'package:shopp_app/features/assistant/presentation/screens/assistant_page.dart';
-import 'package:shopp_app/data/models/recommendation_model.dart';
+import 'package:shopp_app/features/recommendations/data/models/recommendation_model.dart';
 import 'package:shopp_app/features/recommendations/presentation/widgets/recommendation_carousel.dart';
 import 'package:shopp_app/features/addresses/presentation/widgets/address_form_dialog.dart';
 import 'package:shopp_app/features/search/presentation/widgets/filter_bottom_sheet.dart';
@@ -259,7 +263,7 @@ void main() {
     });
     await Preferences.init();
 
-    final testUser = CurrentUserModel(
+    const testUser = CurrentUserModel(
       id: 'usr_101',
       name: 'Jane Doe',
       email: 'jane@example.com',
@@ -281,7 +285,7 @@ void main() {
   testWidgets(
       'ProductCard displays information, wishlist toggle, and navigates to ProductDetailPage',
       (WidgetTester tester) async {
-    final testProduct = Product(
+    const testProduct = Product(
       id: 'prod_123',
       productName: 'Mechanical Gaming Keyboard',
       sellerName: 'KeyCrafters',
@@ -408,7 +412,7 @@ void main() {
       id: 'ord_123',
       orderNumber: 'ORD-2026-X99',
       orderItems: [
-        OrderItemModel(
+        const OrderItemModel(
           productId: 'prod_1',
           productName: 'Wireless Headphones',
           productImage: '',
@@ -418,7 +422,7 @@ void main() {
           lineTotal: 149.99,
         ),
       ],
-      shippingAddress: AddressModel(
+      shippingAddress: const AddressModel(
         id: 'addr_1',
         fullName: 'Jane Doe',
         phone: '555-1234',
@@ -437,7 +441,7 @@ void main() {
 
     await tester.pumpWidget(
       buildTestApp(
-        home: OrderConfirmationPage(order: testOrder),
+        home: OrderConfirmationPage(order: testOrder.toEntity()),
       ),
     );
     await tester.pumpAndSettle();
@@ -524,7 +528,7 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
 
-    final testUser = CurrentUserModel(
+    const testUser = CurrentUserModel(
       id: 'usr_101',
       name: 'Jane Doe',
       email: 'jane@example.com',
@@ -559,7 +563,7 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
 
-    final adminUser = CurrentUserModel(
+    const adminUser = CurrentUserModel(
       id: 'usr_admin',
       name: 'Super Administrator',
       email: 'admin@shoppy.com',
@@ -665,7 +669,7 @@ void main() {
   testWidgets(
       'ProductDetailPage renders customer reviews section and rating summary',
       (WidgetTester tester) async {
-    final testProduct = Product(
+    const testProduct = Product(
       id: 'prod_999',
       productName: 'Noise Cancelling Headphones',
       sellerName: 'AudioMaster',
@@ -677,11 +681,11 @@ void main() {
     );
 
     final mockReviewsResult = ProductReviewsResult(
-      summary: ReviewSummaryModel(
+      summary: const ReviewSummaryModel(
         averageRating: 4.5,
         totalReviews: 2,
         ratingDistribution: {1: 0, 2: 0, 3: 0, 4: 1, 5: 1},
-      ),
+      ).toEntity(),
       reviews: [
         ReviewModel(
           id: 'rev_1',
@@ -691,7 +695,7 @@ void main() {
           verifiedPurchase: true,
           authorName: 'David K.',
           createdAt: DateTime.now(),
-        ),
+        ).toEntity(),
       ],
     );
 
@@ -826,7 +830,7 @@ void main() {
   });
 
   test('AiRepository instantiates cleanly with default dependencies', () {
-    final repo = AiRepository();
+    final repo = AiRepositoryImpl(AiRemoteDataSourceImpl(ApiClient()));
     expect(repo, isNotNull);
   });
 
@@ -922,7 +926,7 @@ void main() {
   });
 
   test('AssistantNotifier maintains conversation state and provides suggested prompts', () {
-    final notifier = AssistantNotifier(AiRepository());
+    final notifier = AssistantNotifier(AiRepositoryImpl(AiRemoteDataSourceImpl(ApiClient())));
     expect(notifier.state.messages.isEmpty, isTrue);
     expect(notifier.state.isLoading, isFalse);
     expect(notifier.state.suggestedPrompts.isNotEmpty, isTrue);
@@ -1011,7 +1015,7 @@ void main() {
 
   testWidgets('AssistantPage renders ConfirmationCard when pendingConfirmation is present',
       (WidgetTester tester) async {
-    final assistantNotifier = AssistantNotifier(AiRepository());
+    final assistantNotifier = AssistantNotifier(AiRepositoryImpl(AiRemoteDataSourceImpl(ApiClient())));
     const confModel = AssistantConfirmationModel(
       confirmationId: 'conf_test_77',
       action: 'cancel_order',
@@ -1020,7 +1024,7 @@ void main() {
       totalAmount: 89.99,
     );
 
-    final msg = AssistantMessageModel(
+    const msg = AssistantMessageModel(
       id: 'm_test_1',
       role: 'assistant',
       content: 'I have prepared your order cancellation request. Please confirm below:',
@@ -1112,7 +1116,7 @@ void main() {
   testWidgets('RecommendationCarousel renders header, subtitle, and items correctly',
       (WidgetTester tester) async {
     final testProducts = [
-      RecommendedProduct(
+      const RecommendedProduct(
         product: Product(
           id: 'rec_widget_1',
           productName: 'Mechanical Keyboard RGB',
@@ -1124,7 +1128,7 @@ void main() {
         recommendationReason: 'Trending in Electronics',
         score: 0.91,
       ),
-      RecommendedProduct(
+      const RecommendedProduct(
         product: Product(
           id: 'rec_widget_2',
           productName: 'Wireless Gaming Mouse',
@@ -1144,7 +1148,7 @@ void main() {
           body: RecommendationCarousel(
             title: 'Recommended For You',
             subtitle: 'Based on your recent interest in Gaming',
-            items: testProducts,
+            items: testProducts.map((p) => p.toEntity()).toList(),
           ),
         ),
       ),

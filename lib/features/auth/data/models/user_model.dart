@@ -1,27 +1,22 @@
-import '../../domain/entities/user_entity.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class UserModel {
-  final String id;
-  final String name;
-  final String email;
-  final String role;
-  final String avatar;
-  final String phone;
-  final bool orderUpdates;
-  final bool promotions;
-  final bool wishlistAlerts;
+part 'user_model.freezed.dart';
 
-  const UserModel({
-    required this.id,
-    required this.name,
-    required this.email,
-    this.role = 'CUSTOMER',
-    this.avatar = '',
-    this.phone = '',
-    this.orderUpdates = true,
-    this.promotions = true,
-    this.wishlistAlerts = true,
-  });
+@freezed
+abstract class UserModel with _$UserModel {
+  const UserModel._();
+
+  const factory UserModel({
+    required String id,
+    required String name,
+    required String email,
+    @Default('CUSTOMER') String role,
+    @Default('') String avatar,
+    @Default('') String phone,
+    @Default(true) bool orderUpdates,
+    @Default(true) bool promotions,
+    @Default(true) bool wishlistAlerts,
+  }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     final prefs = json['notificationPreferences'] as Map<String, dynamic>?;
@@ -37,7 +32,9 @@ class UserModel {
       wishlistAlerts: prefs?['wishlistAlerts'] ?? true,
     );
   }
+}
 
+extension UserModelX on UserModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -54,32 +51,6 @@ class UserModel {
       },
     };
   }
-
-  UserEntity toEntity() {
-    return UserEntity(
-      id: id,
-      name: name,
-      email: email,
-      role: role,
-      avatar: avatar,
-      phone: phone,
-      orderUpdates: orderUpdates,
-      promotions: promotions,
-      wishlistAlerts: wishlistAlerts,
-    );
-  }
-
-  factory UserModel.fromEntity(UserEntity entity) {
-    return UserModel(
-      id: entity.id,
-      name: entity.name,
-      email: entity.email,
-      role: entity.role,
-      avatar: entity.avatar,
-      phone: entity.phone,
-      orderUpdates: entity.orderUpdates,
-      promotions: entity.promotions,
-      wishlistAlerts: entity.wishlistAlerts,
-    );
-  }
 }
+
+typedef CurrentUserModel = UserModel;

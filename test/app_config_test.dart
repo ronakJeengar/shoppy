@@ -23,8 +23,7 @@ import 'package:shopp_app/features/wishlist/domain/repositories/wishlist_reposit
 import 'package:shopp_app/features/wishlist/presentation/providers/wishlist_providers.dart';
 import 'package:shopp_app/features/catalog/presentation/providers/catalog_providers.dart';
 import 'package:shopp_app/features/notifications/presentation/providers/notification_providers.dart';
-import 'package:shopp_app/data/models/recommendation_model.dart';
-import 'package:shopp_app/data/models/review_model.dart';
+import 'package:shopp_app/features/recommendations/domain/entities/recommendation_entity.dart';
 import 'package:shopp_app/features/recommendations/presentation/providers/recommendation_providers.dart';
 import 'package:shopp_app/features/reviews/domain/entities/review_entity.dart';
 import 'package:shopp_app/features/reviews/presentation/providers/review_providers.dart';
@@ -477,13 +476,13 @@ void main() {
             wishlistRepositoryProvider.overrideWithValue(FakeWishlistRepository()),
             productDetailProvider.overrideWith((ref, id) => testProduct),
             productReviewsProvider('prod-test-1').overrideWith(
-              (ref) => ProductReviewsResult(
+              (ref) => const ProductReviewsResult(
                 reviews: [],
-                summary: ReviewSummaryModel(averageRating: 0, totalReviews: 0, ratingDistribution: {}),
+                summary: ReviewSummaryEntity(averageRating: 0, totalReviews: 0, ratingDistribution: {}),
               ),
             ),
             frequentlyBoughtTogetherProvider('prod-test-1').overrideWith(
-              (ref) => RecommendationResponseModel(
+              (ref) => const RecommendationResponseEntity(
                 recommendationType: 'FBT',
                 reason: 'None',
                 count: 0,

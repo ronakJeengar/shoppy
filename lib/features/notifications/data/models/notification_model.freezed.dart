@@ -1,0 +1,954 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
+// ignore_for_file: type=lint
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
+
+part of 'notification_model.dart';
+
+// **************************************************************************
+// FreezedGenerator
+// **************************************************************************
+
+// dart format off
+T _$identity<T>(T value) => value;
+
+/// @nodoc
+mixin _$NotificationModel {
+  String get id;
+  String get type;
+  String get title;
+  String get body;
+  String? get orderId;
+  String? get orderNumber;
+  bool get isRead;
+  DateTime get createdAt;
+
+  /// Create a copy of NotificationModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $NotificationModelCopyWith<NotificationModel> get copyWith =>
+      _$NotificationModelCopyWithImpl<NotificationModel>(
+          this as NotificationModel, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is NotificationModel &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.type, type) || other.type == type) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.body, body) || other.body == body) &&
+            (identical(other.orderId, orderId) || other.orderId == orderId) &&
+            (identical(other.orderNumber, orderNumber) ||
+                other.orderNumber == orderNumber) &&
+            (identical(other.isRead, isRead) || other.isRead == isRead) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, id, type, title, body, orderId,
+      orderNumber, isRead, createdAt);
+
+  @override
+  String toString() {
+    return 'NotificationModel(id: $id, type: $type, title: $title, body: $body, orderId: $orderId, orderNumber: $orderNumber, isRead: $isRead, createdAt: $createdAt)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $NotificationModelCopyWith<$Res> {
+  factory $NotificationModelCopyWith(
+          NotificationModel value, $Res Function(NotificationModel) _then) =
+      _$NotificationModelCopyWithImpl;
+  @useResult
+  $Res call(
+      {String id,
+      String type,
+      String title,
+      String body,
+      String? orderId,
+      String? orderNumber,
+      bool isRead,
+      DateTime createdAt});
+}
+
+/// @nodoc
+class _$NotificationModelCopyWithImpl<$Res>
+    implements $NotificationModelCopyWith<$Res> {
+  _$NotificationModelCopyWithImpl(this._self, this._then);
+
+  final NotificationModel _self;
+  final $Res Function(NotificationModel) _then;
+
+  /// Create a copy of NotificationModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? type = null,
+    Object? title = null,
+    Object? body = null,
+    Object? orderId = freezed,
+    Object? orderNumber = freezed,
+    Object? isRead = null,
+    Object? createdAt = null,
+  }) {
+    return _then(_self.copyWith(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      type: null == type
+          ? _self.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _self.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      body: null == body
+          ? _self.body
+          : body // ignore: cast_nullable_to_non_nullable
+              as String,
+      orderId: freezed == orderId
+          ? _self.orderId
+          : orderId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      orderNumber: freezed == orderNumber
+          ? _self.orderNumber
+          : orderNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isRead: null == isRead
+          ? _self.isRead
+          : isRead // ignore: cast_nullable_to_non_nullable
+              as bool,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [NotificationModel].
+extension NotificationModelPatterns on NotificationModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_NotificationModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_NotificationModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_NotificationModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String type,
+            String title,
+            String body,
+            String? orderId,
+            String? orderNumber,
+            bool isRead,
+            DateTime createdAt)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationModel() when $default != null:
+        return $default(_that.id, _that.type, _that.title, _that.body,
+            _that.orderId, _that.orderNumber, _that.isRead, _that.createdAt);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String type,
+            String title,
+            String body,
+            String? orderId,
+            String? orderNumber,
+            bool isRead,
+            DateTime createdAt)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationModel():
+        return $default(_that.id, _that.type, _that.title, _that.body,
+            _that.orderId, _that.orderNumber, _that.isRead, _that.createdAt);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            String type,
+            String title,
+            String body,
+            String? orderId,
+            String? orderNumber,
+            bool isRead,
+            DateTime createdAt)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationModel() when $default != null:
+        return $default(_that.id, _that.type, _that.title, _that.body,
+            _that.orderId, _that.orderNumber, _that.isRead, _that.createdAt);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+
+class _NotificationModel implements NotificationModel {
+  const _NotificationModel(
+      {required this.id,
+      required this.type,
+      required this.title,
+      required this.body,
+      this.orderId,
+      this.orderNumber,
+      this.isRead = false,
+      required this.createdAt});
+
+  @override
+  final String id;
+  @override
+  final String type;
+  @override
+  final String title;
+  @override
+  final String body;
+  @override
+  final String? orderId;
+  @override
+  final String? orderNumber;
+  @override
+  @JsonKey()
+  final bool isRead;
+  @override
+  final DateTime createdAt;
+
+  /// Create a copy of NotificationModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$NotificationModelCopyWith<_NotificationModel> get copyWith =>
+      __$NotificationModelCopyWithImpl<_NotificationModel>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _NotificationModel &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.type, type) || other.type == type) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.body, body) || other.body == body) &&
+            (identical(other.orderId, orderId) || other.orderId == orderId) &&
+            (identical(other.orderNumber, orderNumber) ||
+                other.orderNumber == orderNumber) &&
+            (identical(other.isRead, isRead) || other.isRead == isRead) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, id, type, title, body, orderId,
+      orderNumber, isRead, createdAt);
+
+  @override
+  String toString() {
+    return 'NotificationModel(id: $id, type: $type, title: $title, body: $body, orderId: $orderId, orderNumber: $orderNumber, isRead: $isRead, createdAt: $createdAt)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$NotificationModelCopyWith<$Res>
+    implements $NotificationModelCopyWith<$Res> {
+  factory _$NotificationModelCopyWith(
+          _NotificationModel value, $Res Function(_NotificationModel) _then) =
+      __$NotificationModelCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String type,
+      String title,
+      String body,
+      String? orderId,
+      String? orderNumber,
+      bool isRead,
+      DateTime createdAt});
+}
+
+/// @nodoc
+class __$NotificationModelCopyWithImpl<$Res>
+    implements _$NotificationModelCopyWith<$Res> {
+  __$NotificationModelCopyWithImpl(this._self, this._then);
+
+  final _NotificationModel _self;
+  final $Res Function(_NotificationModel) _then;
+
+  /// Create a copy of NotificationModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? type = null,
+    Object? title = null,
+    Object? body = null,
+    Object? orderId = freezed,
+    Object? orderNumber = freezed,
+    Object? isRead = null,
+    Object? createdAt = null,
+  }) {
+    return _then(_NotificationModel(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      type: null == type
+          ? _self.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _self.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      body: null == body
+          ? _self.body
+          : body // ignore: cast_nullable_to_non_nullable
+              as String,
+      orderId: freezed == orderId
+          ? _self.orderId
+          : orderId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      orderNumber: freezed == orderNumber
+          ? _self.orderNumber
+          : orderNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isRead: null == isRead
+          ? _self.isRead
+          : isRead // ignore: cast_nullable_to_non_nullable
+              as bool,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$NotificationPaginatedModel {
+  List<NotificationModel> get notifications;
+  int get unreadCount;
+  int get page;
+  int get limit;
+  int get totalNotifications;
+  int get totalPages;
+  bool get hasNextPage;
+
+  /// Create a copy of NotificationPaginatedModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $NotificationPaginatedModelCopyWith<NotificationPaginatedModel>
+      get copyWith =>
+          _$NotificationPaginatedModelCopyWithImpl<NotificationPaginatedModel>(
+              this as NotificationPaginatedModel, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is NotificationPaginatedModel &&
+            const DeepCollectionEquality()
+                .equals(other.notifications, notifications) &&
+            (identical(other.unreadCount, unreadCount) ||
+                other.unreadCount == unreadCount) &&
+            (identical(other.page, page) || other.page == page) &&
+            (identical(other.limit, limit) || other.limit == limit) &&
+            (identical(other.totalNotifications, totalNotifications) ||
+                other.totalNotifications == totalNotifications) &&
+            (identical(other.totalPages, totalPages) ||
+                other.totalPages == totalPages) &&
+            (identical(other.hasNextPage, hasNextPage) ||
+                other.hasNextPage == hasNextPage));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(notifications),
+      unreadCount,
+      page,
+      limit,
+      totalNotifications,
+      totalPages,
+      hasNextPage);
+
+  @override
+  String toString() {
+    return 'NotificationPaginatedModel(notifications: $notifications, unreadCount: $unreadCount, page: $page, limit: $limit, totalNotifications: $totalNotifications, totalPages: $totalPages, hasNextPage: $hasNextPage)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $NotificationPaginatedModelCopyWith<$Res> {
+  factory $NotificationPaginatedModelCopyWith(NotificationPaginatedModel value,
+          $Res Function(NotificationPaginatedModel) _then) =
+      _$NotificationPaginatedModelCopyWithImpl;
+  @useResult
+  $Res call(
+      {List<NotificationModel> notifications,
+      int unreadCount,
+      int page,
+      int limit,
+      int totalNotifications,
+      int totalPages,
+      bool hasNextPage});
+}
+
+/// @nodoc
+class _$NotificationPaginatedModelCopyWithImpl<$Res>
+    implements $NotificationPaginatedModelCopyWith<$Res> {
+  _$NotificationPaginatedModelCopyWithImpl(this._self, this._then);
+
+  final NotificationPaginatedModel _self;
+  final $Res Function(NotificationPaginatedModel) _then;
+
+  /// Create a copy of NotificationPaginatedModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? notifications = null,
+    Object? unreadCount = null,
+    Object? page = null,
+    Object? limit = null,
+    Object? totalNotifications = null,
+    Object? totalPages = null,
+    Object? hasNextPage = null,
+  }) {
+    return _then(_self.copyWith(
+      notifications: null == notifications
+          ? _self.notifications
+          : notifications // ignore: cast_nullable_to_non_nullable
+              as List<NotificationModel>,
+      unreadCount: null == unreadCount
+          ? _self.unreadCount
+          : unreadCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      page: null == page
+          ? _self.page
+          : page // ignore: cast_nullable_to_non_nullable
+              as int,
+      limit: null == limit
+          ? _self.limit
+          : limit // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalNotifications: null == totalNotifications
+          ? _self.totalNotifications
+          : totalNotifications // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalPages: null == totalPages
+          ? _self.totalPages
+          : totalPages // ignore: cast_nullable_to_non_nullable
+              as int,
+      hasNextPage: null == hasNextPage
+          ? _self.hasNextPage
+          : hasNextPage // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [NotificationPaginatedModel].
+extension NotificationPaginatedModelPatterns on NotificationPaginatedModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_NotificationPaginatedModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationPaginatedModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_NotificationPaginatedModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationPaginatedModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_NotificationPaginatedModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationPaginatedModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            List<NotificationModel> notifications,
+            int unreadCount,
+            int page,
+            int limit,
+            int totalNotifications,
+            int totalPages,
+            bool hasNextPage)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationPaginatedModel() when $default != null:
+        return $default(
+            _that.notifications,
+            _that.unreadCount,
+            _that.page,
+            _that.limit,
+            _that.totalNotifications,
+            _that.totalPages,
+            _that.hasNextPage);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            List<NotificationModel> notifications,
+            int unreadCount,
+            int page,
+            int limit,
+            int totalNotifications,
+            int totalPages,
+            bool hasNextPage)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationPaginatedModel():
+        return $default(
+            _that.notifications,
+            _that.unreadCount,
+            _that.page,
+            _that.limit,
+            _that.totalNotifications,
+            _that.totalPages,
+            _that.hasNextPage);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            List<NotificationModel> notifications,
+            int unreadCount,
+            int page,
+            int limit,
+            int totalNotifications,
+            int totalPages,
+            bool hasNextPage)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationPaginatedModel() when $default != null:
+        return $default(
+            _that.notifications,
+            _that.unreadCount,
+            _that.page,
+            _that.limit,
+            _that.totalNotifications,
+            _that.totalPages,
+            _that.hasNextPage);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+
+class _NotificationPaginatedModel implements NotificationPaginatedModel {
+  const _NotificationPaginatedModel(
+      {final List<NotificationModel> notifications = const [],
+      this.unreadCount = 0,
+      this.page = 1,
+      this.limit = 20,
+      this.totalNotifications = 0,
+      this.totalPages = 1,
+      this.hasNextPage = false})
+      : _notifications = notifications;
+
+  final List<NotificationModel> _notifications;
+  @override
+  @JsonKey()
+  List<NotificationModel> get notifications {
+    if (_notifications is EqualUnmodifiableListView) return _notifications;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_notifications);
+  }
+
+  @override
+  @JsonKey()
+  final int unreadCount;
+  @override
+  @JsonKey()
+  final int page;
+  @override
+  @JsonKey()
+  final int limit;
+  @override
+  @JsonKey()
+  final int totalNotifications;
+  @override
+  @JsonKey()
+  final int totalPages;
+  @override
+  @JsonKey()
+  final bool hasNextPage;
+
+  /// Create a copy of NotificationPaginatedModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$NotificationPaginatedModelCopyWith<_NotificationPaginatedModel>
+      get copyWith => __$NotificationPaginatedModelCopyWithImpl<
+          _NotificationPaginatedModel>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _NotificationPaginatedModel &&
+            const DeepCollectionEquality()
+                .equals(other._notifications, _notifications) &&
+            (identical(other.unreadCount, unreadCount) ||
+                other.unreadCount == unreadCount) &&
+            (identical(other.page, page) || other.page == page) &&
+            (identical(other.limit, limit) || other.limit == limit) &&
+            (identical(other.totalNotifications, totalNotifications) ||
+                other.totalNotifications == totalNotifications) &&
+            (identical(other.totalPages, totalPages) ||
+                other.totalPages == totalPages) &&
+            (identical(other.hasNextPage, hasNextPage) ||
+                other.hasNextPage == hasNextPage));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(_notifications),
+      unreadCount,
+      page,
+      limit,
+      totalNotifications,
+      totalPages,
+      hasNextPage);
+
+  @override
+  String toString() {
+    return 'NotificationPaginatedModel(notifications: $notifications, unreadCount: $unreadCount, page: $page, limit: $limit, totalNotifications: $totalNotifications, totalPages: $totalPages, hasNextPage: $hasNextPage)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$NotificationPaginatedModelCopyWith<$Res>
+    implements $NotificationPaginatedModelCopyWith<$Res> {
+  factory _$NotificationPaginatedModelCopyWith(
+          _NotificationPaginatedModel value,
+          $Res Function(_NotificationPaginatedModel) _then) =
+      __$NotificationPaginatedModelCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {List<NotificationModel> notifications,
+      int unreadCount,
+      int page,
+      int limit,
+      int totalNotifications,
+      int totalPages,
+      bool hasNextPage});
+}
+
+/// @nodoc
+class __$NotificationPaginatedModelCopyWithImpl<$Res>
+    implements _$NotificationPaginatedModelCopyWith<$Res> {
+  __$NotificationPaginatedModelCopyWithImpl(this._self, this._then);
+
+  final _NotificationPaginatedModel _self;
+  final $Res Function(_NotificationPaginatedModel) _then;
+
+  /// Create a copy of NotificationPaginatedModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? notifications = null,
+    Object? unreadCount = null,
+    Object? page = null,
+    Object? limit = null,
+    Object? totalNotifications = null,
+    Object? totalPages = null,
+    Object? hasNextPage = null,
+  }) {
+    return _then(_NotificationPaginatedModel(
+      notifications: null == notifications
+          ? _self._notifications
+          : notifications // ignore: cast_nullable_to_non_nullable
+              as List<NotificationModel>,
+      unreadCount: null == unreadCount
+          ? _self.unreadCount
+          : unreadCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      page: null == page
+          ? _self.page
+          : page // ignore: cast_nullable_to_non_nullable
+              as int,
+      limit: null == limit
+          ? _self.limit
+          : limit // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalNotifications: null == totalNotifications
+          ? _self.totalNotifications
+          : totalNotifications // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalPages: null == totalPages
+          ? _self.totalPages
+          : totalPages // ignore: cast_nullable_to_non_nullable
+              as int,
+      hasNextPage: null == hasNextPage
+          ? _self.hasNextPage
+          : hasNextPage // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
+}
+
+// dart format on

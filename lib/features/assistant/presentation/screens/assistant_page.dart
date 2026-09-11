@@ -8,7 +8,7 @@ import 'package:shopp_app/core/theme/app_shadows.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/core/widgets/app_network_image.dart';
-import 'package:shopp_app/data/models/assistant_message_model.dart';
+import 'package:shopp_app/features/assistant/data/models/assistant_message_model.dart';
 import 'package:shopp_app/features/assistant/presentation/providers/assistant_providers.dart';
 import 'package:shopp_app/features/catalog/data/mappers/catalog_mappers.dart';
 import 'package:shopp_app/features/catalog/presentation/screens/product_detail_page.dart';

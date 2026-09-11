@@ -7,14 +7,14 @@ import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/core/constants/app_icon_sizes.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
-import 'package:shopp_app/data/models/order_model.dart';
+import '../../../orders/domain/entities/order_entity.dart';
 import 'package:shopp_app/features/catalog/presentation/screens/home_page.dart';
 import 'package:shopp_app/features/orders/presentation/screens/orders_page.dart';
 import 'package:shopp_app/core/widgets/app_button.dart';
 import 'package:shopp_app/core/widgets/app_network_image.dart';
 
 class OrderConfirmationPage extends StatelessWidget {
-  final OrderModel? order;
+  final OrderEntity? order;
   final String? orderId;
 
   const OrderConfirmationPage({

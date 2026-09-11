@@ -1,10 +1,9 @@
 import 'package:shopp_app/constants/urls.dart';
 import 'package:shopp_app/core/network/api_client.dart';
-import 'package:shopp_app/data/models/notification_model.dart';
-import '../../domain/repositories/notification_repository.dart';
+import '../models/notification_model.dart';
 
 abstract class NotificationRemoteDataSource {
-  Future<NotificationPaginatedEntity> getNotifications(int page, int limit);
+  Future<NotificationPaginatedModel> getNotifications(int page, int limit);
   Future<void> markAsRead(String id);
   Future<void> markAllAsRead();
   Future<int> getUnreadCount();
@@ -16,7 +15,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   NotificationRemoteDataSourceImpl(this._client);
 
   @override
-  Future<NotificationPaginatedEntity> getNotifications(
+  Future<NotificationPaginatedModel> getNotifications(
       int page, int limit) async {
     final response = await _client.get(
       Urls.notifications,
@@ -25,29 +24,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
     final data = response.data;
     final map = (data is Map<String, dynamic> ? (data['data'] ?? data) : data)
         as Map<String, dynamic>;
-    final rawList = map['notifications'] as List? ?? [];
-    final List<NotificationModel> list = [];
-    for (final item in rawList) {
-      if (item is Map<String, dynamic>) {
-        list.add(NotificationModel.fromJson(item));
-      }
-    }
-
-    return NotificationPaginatedEntity(
-      notifications: list,
-      unreadCount: (map['unreadCount'] is num)
-          ? (map['unreadCount'] as num).toInt()
-          : 0,
-      page: (map['page'] is num) ? (map['page'] as num).toInt() : page,
-      limit: (map['limit'] is num) ? (map['limit'] as num).toInt() : limit,
-      totalNotifications: (map['totalNotifications'] is num)
-          ? (map['totalNotifications'] as num).toInt()
-          : list.length,
-      totalPages: (map['totalPages'] is num)
-          ? (map['totalPages'] as num).toInt()
-          : 1,
-      hasNextPage: map['hasNextPage'] == true,
-    );
+    return NotificationPaginatedModel.fromJson(map);
   }
 
   @override

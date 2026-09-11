@@ -1,7 +1,7 @@
 import '../../../../constants/urls.dart';
 import '../../../../core/network/api_client.dart';
-import '../../../../data/models/category_model.dart';
-import '../../../../data/models/product_model.dart';
+import '../models/category_model.dart';
+import '../models/product_model.dart';
 
 abstract class CatalogRemoteDataSource {
   Future<List<CategoryModel>> getCategories();

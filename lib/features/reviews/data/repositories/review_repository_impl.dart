@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/utils/result.dart';
-import '../../../../data/models/review_model.dart';
 import '../../domain/entities/review_entity.dart';
 import '../../domain/repositories/review_repository.dart';
 import '../datasources/review_remote_datasource.dart';
+import '../mappers/review_mappers.dart';
 
 class ReviewRepositoryImpl implements ReviewRepository {
   final ReviewRemoteDataSource _remoteDataSource;
@@ -35,7 +35,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
   }
 
   @override
-  Future<Result<ReviewModel>> submitReview({
+  Future<Result<ReviewEntity>> submitReview({
     required String productId,
     required int rating,
     required String title,
@@ -48,7 +48,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
         title: title,
         comment: comment,
       );
-      return Success(review);
+      return Success(review.toEntity());
     } on DioException catch (e) {
       final msg = extractDioErrorMessage(e, 'Failed to submit review');
       return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));
@@ -58,7 +58,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
   }
 
   @override
-  Future<Result<ReviewModel>> updateReview(
+  Future<Result<ReviewEntity>> updateReview(
     String reviewId, {
     int? rating,
     String? title,
@@ -71,7 +71,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
         title: title,
         comment: comment,
       );
-      return Success(review);
+      return Success(review.toEntity());
     } on DioException catch (e) {
       final msg = extractDioErrorMessage(e, 'Failed to update review');
       return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));

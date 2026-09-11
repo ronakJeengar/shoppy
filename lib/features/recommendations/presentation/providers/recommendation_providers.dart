@@ -1,8 +1,8 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/network/api_client.dart';
-import '../../../../data/models/recommendation_model.dart';
 import '../../data/datasources/recommendation_remote_datasource.dart';
 import '../../data/repositories/recommendation_repository_impl.dart';
+import '../../domain/entities/recommendation_entity.dart';
 import '../../domain/repositories/recommendation_repository.dart';
 import '../../domain/usecases/recommendation_usecases.dart';
 
@@ -28,7 +28,7 @@ final trackEventUseCaseProvider = Provider<TrackEventUseCase>((ref) {
 });
 
 final personalizedRecommendationsProvider =
-    FutureProvider<RecommendationResponseModel>((ref) async {
+    FutureProvider<RecommendationResponseEntity>((ref) async {
   final useCase = ref.watch(getRecommendationsUseCaseProvider);
   final result = await useCase(type: 'PERSONALIZED', limit: 10);
   return result.fold(
@@ -38,7 +38,7 @@ final personalizedRecommendationsProvider =
 });
 
 final trendingRecommendationsProvider =
-    FutureProvider<RecommendationResponseModel>((ref) async {
+    FutureProvider<RecommendationResponseEntity>((ref) async {
   final useCase = ref.watch(getRecommendationsUseCaseProvider);
   final result = await useCase(type: 'TRENDING', limit: 10);
   return result.fold(
@@ -47,14 +47,27 @@ final trendingRecommendationsProvider =
   );
 });
 
-final frequentlyBoughtTogetherProvider =
-    FutureProvider.family<RecommendationResponseModel, String>(
-        (ref, productId) async {
+final relatedRecommendationsProvider = FutureProvider.family<
+    RecommendationResponseEntity, String>((ref, productId) async {
+  final useCase = ref.watch(getRecommendationsUseCaseProvider);
+  final result = await useCase(
+    type: 'SIMILAR',
+    productId: productId,
+    limit: 6,
+  );
+  return result.fold(
+    onSuccess: (data) => data,
+    onFailure: (failure) => throw Exception(failure.message),
+  );
+});
+
+final frequentlyBoughtTogetherProvider = FutureProvider.family<
+    RecommendationResponseEntity, String>((ref, productId) async {
   final useCase = ref.watch(getRecommendationsUseCaseProvider);
   final result = await useCase(
     type: 'FREQUENTLY_BOUGHT_TOGETHER',
     productId: productId,
-    limit: 6,
+    limit: 4,
   );
   return result.fold(
     onSuccess: (data) => data,

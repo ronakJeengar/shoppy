@@ -1,79 +1,47 @@
-class CartItemEntity {
-  final String id;
-  final String productId;
-  final String productName;
-  final String sellerName;
-  final String productImage;
-  final double price;
-  final int quantity;
-  final int stock;
-  final bool isAvailable;
-  final double lineTotal;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  const CartItemEntity({
-    required this.id,
-    required this.productId,
-    required this.productName,
-    required this.sellerName,
-    required this.productImage,
-    required this.price,
-    required this.quantity,
-    required this.stock,
-    required this.isAvailable,
-    required this.lineTotal,
-  });
+part 'cart_entity.freezed.dart';
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is CartItemEntity &&
-          other.productId == productId &&
-          other.quantity == quantity &&
-          other.lineTotal == lineTotal);
-
-  @override
-  int get hashCode => Object.hash(productId, quantity, lineTotal);
+@freezed
+abstract class CartItemEntity with _$CartItemEntity {
+  const factory CartItemEntity({
+    required String id,
+    required String productId,
+    required String productName,
+    required String sellerName,
+    required String productImage,
+    required double price,
+    required int quantity,
+    required int stock,
+    required bool isAvailable,
+    required double lineTotal,
+  }) = _CartItemEntity;
 }
 
-class CartEntity {
-  final String id;
-  final List<CartItemEntity> items;
-  final int itemCount;
-  final double subtotal;
-  final double shipping;
-  final double tax;
-  final double total;
+@freezed
+abstract class CartEntity with _$CartEntity {
+  const CartEntity._();
 
-  const CartEntity({
-    required this.id,
-    required this.items,
-    required this.itemCount,
-    required this.subtotal,
-    required this.shipping,
-    required this.tax,
-    required this.total,
-  });
+  const factory CartEntity({
+    @Default('') String id,
+    @Default([]) List<CartItemEntity> items,
+    @Default(0) int itemCount,
+    @Default(0.0) double subtotal,
+    @Default(0.0) double shipping,
+    @Default(0.0) double tax,
+    @Default(0.0) double total,
+  }) = _CartEntity;
 
-  const CartEntity.empty()
-      : id = '',
-        items = const [],
-        itemCount = 0,
-        subtotal = 0.0,
-        shipping = 0.0,
-        tax = 0.0,
-        total = 0.0;
+  const factory CartEntity.empty({
+    @Default('') String id,
+    @Default([]) List<CartItemEntity> items,
+    @Default(0) int itemCount,
+    @Default(0.0) double subtotal,
+    @Default(0.0) double shipping,
+    @Default(0.0) double tax,
+    @Default(0.0) double total,
+  }) = _CartEntityEmpty;
 
   bool get isEmpty => items.isEmpty;
   bool get isNotEmpty => items.isNotEmpty;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is CartEntity &&
-          other.id == id &&
-          other.itemCount == itemCount &&
-          other.total == total);
-
-  @override
-  int get hashCode => Object.hash(id, itemCount, total);
 }

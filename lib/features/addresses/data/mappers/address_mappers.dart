@@ -1,4 +1,4 @@
-import '../../../../data/models/address_model.dart';
+import '../models/address_model.dart';
 import '../../domain/entities/address_entity.dart';
 
 extension AddressModelMapper on AddressModel {
@@ -18,6 +18,20 @@ extension AddressModelMapper on AddressModel {
 }
 
 extension AddressEntityMapper on AddressEntity {
+  AddressModel toModel() {
+    return AddressModel(
+      id: id,
+      fullName: fullName,
+      phone: phone,
+      streetAddress: streetAddress,
+      city: city,
+      state: state,
+      postalCode: postalCode,
+      country: country,
+      isDefault: isDefault,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'fullName': fullName,

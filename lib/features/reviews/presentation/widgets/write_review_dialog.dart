@@ -5,13 +5,13 @@ import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_radius.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
-import 'package:shopp_app/data/models/review_model.dart';
+import '../../domain/entities/review_entity.dart';
 import 'package:shopp_app/features/reviews/presentation/providers/review_providers.dart';
 
 class WriteReviewDialog extends ConsumerStatefulWidget {
   final String productId;
   final String productName;
-  final ReviewModel? existingReview;
+  final ReviewEntity? existingReview;
 
   const WriteReviewDialog({
     super.key,

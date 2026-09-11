@@ -1,38 +1,26 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'product_media_entity.freezed.dart';
+
 enum ProductMediaType {
   image,
   video,
   model3d,
 }
 
-class ProductMediaEntity {
-  final String id;
-  final ProductMediaType type;
-  final String url;
-  final String thumbnailUrl;
-  final int sortOrder;
+@freezed
+abstract class ProductMediaEntity with _$ProductMediaEntity {
+  const ProductMediaEntity._();
 
-  const ProductMediaEntity({
-    required this.id,
-    required this.type,
-    required this.url,
-    required this.thumbnailUrl,
-    this.sortOrder = 0,
-  });
+  const factory ProductMediaEntity({
+    required String id,
+    required ProductMediaType type,
+    required String url,
+    required String thumbnailUrl,
+    @Default(0) int sortOrder,
+  }) = _ProductMediaEntity;
 
   bool get isImage => type == ProductMediaType.image;
   bool get isVideo => type == ProductMediaType.video;
   bool get is3dModel => type == ProductMediaType.model3d;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is ProductMediaEntity &&
-          other.id == id &&
-          other.type == type &&
-          other.url == url &&
-          other.thumbnailUrl == thumbnailUrl &&
-          other.sortOrder == sortOrder);
-
-  @override
-  int get hashCode => Object.hash(id, type, url, thumbnailUrl, sortOrder);
 }

@@ -1,5 +1,4 @@
 import '../../../../core/utils/result.dart';
-import '../../../../data/models/review_model.dart';
 import '../entities/review_entity.dart';
 import '../repositories/review_repository.dart';
 
@@ -28,7 +27,7 @@ class SubmitReviewUseCase {
 
   SubmitReviewUseCase(this._repository);
 
-  Future<Result<ReviewModel>> call({
+  Future<Result<ReviewEntity>> call({
     required String productId,
     required int rating,
     required String title,
@@ -48,7 +47,7 @@ class UpdateReviewUseCase {
 
   UpdateReviewUseCase(this._repository);
 
-  Future<Result<ReviewModel>> call({
+  Future<Result<ReviewEntity>> call({
     required String reviewId,
     int? rating,
     String? title,

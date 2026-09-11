@@ -9,8 +9,8 @@ import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/core/constants/app_icon_sizes.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
-import 'package:shopp_app/data/models/product_media_model.dart';
-import 'package:shopp_app/data/models/product_model.dart';
+import '../../data/models/product_media_model.dart';
+import '../../data/models/product_model.dart';
 import 'package:video_player/video_player.dart';
 
 /// Premium Multi-Media Gallery supporting Images, Real Videos, and Interactive 3D Product Viewer.

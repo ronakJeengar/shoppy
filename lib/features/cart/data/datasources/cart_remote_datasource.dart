@@ -1,6 +1,6 @@
 import '../../../../constants/urls.dart';
 import '../../../../core/network/api_client.dart';
-import '../../../../data/models/cart_model.dart';
+import '../models/cart_model.dart';
 
 abstract class CartRemoteDataSource {
   Future<CartModel> getCart();

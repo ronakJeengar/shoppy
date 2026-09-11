@@ -1,32 +1,17 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:shopp_app/features/addresses/domain/entities/address_entity.dart';
 
-class CheckoutValidationEntity {
-  final bool valid;
-  final AddressEntity? shippingAddress;
-  final String shippingMethod;
-  final double subtotal;
-  final double shippingFee;
-  final double tax;
-  final double grandTotal;
+part 'checkout_entity.freezed.dart';
 
-  const CheckoutValidationEntity({
-    required this.valid,
-    this.shippingAddress,
-    this.shippingMethod = 'STANDARD',
-    required this.subtotal,
-    required this.shippingFee,
-    required this.tax,
-    required this.grandTotal,
-  });
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is CheckoutValidationEntity &&
-          other.valid == valid &&
-          other.grandTotal == grandTotal &&
-          other.shippingMethod == shippingMethod);
-
-  @override
-  int get hashCode => Object.hash(valid, grandTotal, shippingMethod);
+@freezed
+abstract class CheckoutValidationEntity with _$CheckoutValidationEntity {
+  const factory CheckoutValidationEntity({
+    required bool valid,
+    AddressEntity? shippingAddress,
+    @Default('STANDARD') String shippingMethod,
+    required double subtotal,
+    required double shippingFee,
+    required double tax,
+    required double grandTotal,
+  }) = _CheckoutValidationEntity;
 }

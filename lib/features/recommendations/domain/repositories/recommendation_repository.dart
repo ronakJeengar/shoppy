@@ -1,8 +1,8 @@
 import '../../../../core/utils/result.dart';
-import '../../../../data/models/recommendation_model.dart';
+import '../entities/recommendation_entity.dart';
 
 abstract class RecommendationRepository {
-  Future<Result<RecommendationResponseModel>> getRecommendations({
+  Future<Result<RecommendationResponseEntity>> getRecommendations({
     String type = 'PERSONALIZED',
     String? productId,
     String? categoryId,

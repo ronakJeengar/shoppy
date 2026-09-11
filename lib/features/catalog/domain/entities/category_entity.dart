@@ -1,30 +1,17 @@
-class CategoryEntity {
-  final String id;
-  final String name;
-  final String? image;
-  final String? description;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  const CategoryEntity({
-    required this.id,
-    required this.name,
-    this.image,
-    this.description,
-  });
+part 'category_entity.freezed.dart';
+
+@freezed
+abstract class CategoryEntity with _$CategoryEntity {
+  const CategoryEntity._();
+
+  const factory CategoryEntity({
+    required String id,
+    required String name,
+    String? image,
+    String? description,
+  }) = _CategoryEntity;
 
   String get displayName => name;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is CategoryEntity &&
-          other.id == id &&
-          other.name == name &&
-          other.image == image &&
-          other.description == description);
-
-  @override
-  int get hashCode => Object.hash(id, name, image, description);
-
-  @override
-  String toString() => 'CategoryEntity(id: $id, name: $name)';
 }

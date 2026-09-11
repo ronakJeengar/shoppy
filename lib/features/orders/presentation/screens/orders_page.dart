@@ -6,8 +6,8 @@ import 'package:shopp_app/core/theme/app_shadows.dart';
 import 'package:shopp_app/core/theme/app_icons.dart';
 import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
-import 'package:shopp_app/data/models/order_model.dart';
-import 'package:shopp_app/domain/models/ui_state.dart';
+import '../../../../core/utils/ui_state.dart';
+import '../../domain/entities/order_entity.dart';
 import 'package:shopp_app/features/orders/presentation/providers/order_providers.dart';
 import 'package:shopp_app/features/catalog/presentation/screens/home_page.dart';
 import 'order_detail_page.dart';
@@ -125,7 +125,7 @@ class _OrdersPageState extends ConsumerState<OrdersPage> {
     );
   }
 
-  Widget _buildOrderCard(BuildContext context, OrderModel order) {
+  Widget _buildOrderCard(BuildContext context, OrderEntity order) {
     final statusColor = _getStatusColor(order.status);
     final statusBg = _getStatusBg(order.status);
 

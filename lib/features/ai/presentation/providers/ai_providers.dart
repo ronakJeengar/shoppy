@@ -1,9 +1,9 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/network/api_client.dart';
-import '../../../../data/models/ai_config_model.dart';
-import '../../../../data/models/assistant_message_model.dart';
+import '../../../assistant/domain/entities/assistant_message_entity.dart';
 import '../../data/datasources/ai_remote_datasource.dart';
 import '../../data/repositories/ai_repository_impl.dart';
+import '../../domain/entities/ai_config_entity.dart';
 import '../../domain/repositories/ai_repository.dart';
 import '../../domain/usecases/ai_usecases.dart';
 
@@ -34,7 +34,7 @@ final cancelAiActionUseCaseProvider = Provider<CancelAiActionUseCase>((ref) {
   return CancelAiActionUseCase(ref.watch(aiRepositoryProvider));
 });
 
-final aiHealthProvider = FutureProvider<AiHealthModel>((ref) async {
+final aiHealthProvider = FutureProvider<AiHealthEntity>((ref) async {
   final useCase = ref.watch(getAiHealthUseCaseProvider);
   final result = await useCase();
   return result.fold(
@@ -44,10 +44,10 @@ final aiHealthProvider = FutureProvider<AiHealthModel>((ref) async {
 });
 
 class AssistantState {
-  final List<AssistantMessageModel> messages;
+  final List<AssistantMessageEntity> messages;
   final String? activeConversationId;
   final bool isLoading;
-  final AssistantConfirmationModel? pendingConfirmation;
+  final AssistantConfirmationEntity? pendingConfirmation;
   final String? errorMessage;
   final List<String> suggestedPrompts;
 
@@ -66,10 +66,10 @@ class AssistantState {
   });
 
   AssistantState copyWith({
-    List<AssistantMessageModel>? messages,
+    List<AssistantMessageEntity>? messages,
     String? activeConversationId,
     bool? isLoading,
-    AssistantConfirmationModel? pendingConfirmation,
+    AssistantConfirmationEntity? pendingConfirmation,
     bool clearConfirmation = false,
     String? errorMessage,
     bool clearError = false,
@@ -113,10 +113,11 @@ class AssistantNotifier extends StateNotifier<AssistantState> {
     final trimmed = text.trim();
     if (trimmed.isEmpty || state.isLoading) return;
 
-    final userMessage = AssistantMessageModel(
+    final userMessage = AssistantMessageEntity(
       id: 'usr_${DateTime.now().millisecondsSinceEpoch}',
       role: 'user',
       content: trimmed,
+      timestamp: DateTime.now(),
     );
 
     state = state.copyWith(
@@ -132,7 +133,7 @@ class AssistantNotifier extends StateNotifier<AssistantState> {
 
     result.fold(
       onSuccess: (chatData) {
-        final assistantMessage = AssistantMessageModel(
+        final assistantMessage = AssistantMessageEntity(
           id: 'ast_${DateTime.now().millisecondsSinceEpoch}',
           role: 'assistant',
           content: chatData.message,
@@ -140,6 +141,7 @@ class AssistantNotifier extends StateNotifier<AssistantState> {
           products: chatData.products,
           sources: chatData.sources,
           actions: chatData.actions,
+          timestamp: DateTime.now(),
         );
 
         state = state.copyWith(
@@ -150,11 +152,12 @@ class AssistantNotifier extends StateNotifier<AssistantState> {
         );
       },
       onFailure: (failure) {
-        final fallbackErrorMsg = AssistantMessageModel(
+        final fallbackErrorMsg = AssistantMessageEntity(
           id: 'err_${DateTime.now().millisecondsSinceEpoch}',
           role: 'assistant',
           content:
               "Sorry, I encountered an issue: ${failure.message}. Please try again.",
+          timestamp: DateTime.now(),
         );
         state = state.copyWith(
           messages: [...state.messages, fallbackErrorMsg],
@@ -177,10 +180,11 @@ class AssistantNotifier extends StateNotifier<AssistantState> {
 
     return result.fold(
       onSuccess: (_) {
-        final successMsg = AssistantMessageModel(
+        final successMsg = AssistantMessageEntity(
           id: 'ast_${DateTime.now().millisecondsSinceEpoch}',
           role: 'assistant',
           content: 'Action completed successfully: ${conf.summary}',
+          timestamp: DateTime.now(),
         );
         state = state.copyWith(
           messages: [...state.messages, successMsg],

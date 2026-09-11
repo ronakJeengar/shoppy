@@ -46,6 +46,8 @@ class Urls {
 
   // Reviews & Ratings module
   static const String reviews = ApiEndpoints.reviews;
+  static String review(String id) => '${ApiEndpoints.reviews}/$id';
+  static String voteReviewHelpful(String id) => '${ApiEndpoints.reviews}/$id/helpful';
   static String productReviews(String productId) => ApiEndpoints.productReviews(productId);
   static String reviewEligibility(String productId) =>
       ApiEndpoints.reviewEligibility(productId);

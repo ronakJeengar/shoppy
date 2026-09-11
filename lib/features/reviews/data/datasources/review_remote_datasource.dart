@@ -1,6 +1,7 @@
 import '../../../../constants/urls.dart';
 import '../../../../core/network/api_client.dart';
-import '../../../../data/models/review_model.dart';
+import '../mappers/review_mappers.dart';
+import '../models/review_model.dart';
 import '../../domain/entities/review_entity.dart';
 
 abstract class ReviewRemoteDataSource {
@@ -26,6 +27,7 @@ abstract class ReviewRemoteDataSource {
   });
 
   Future<void> deleteReview(String reviewId);
+
   Future<void> voteHelpful(String reviewId);
 }
 
@@ -62,13 +64,16 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
 
     final summary = map['summary'] is Map<String, dynamic>
         ? ReviewSummaryModel.fromJson(map['summary'] as Map<String, dynamic>)
-        : ReviewSummaryModel(
+        : const ReviewSummaryModel(
             averageRating: 0.0,
             totalReviews: 0,
             ratingDistribution: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
           );
 
-    return ProductReviewsResult(reviews: reviews, summary: summary);
+    return ProductReviewsResult(
+      reviews: reviews.map((r) => r.toEntity()).toList(),
+      summary: summary.toEntity(),
+    );
   }
 
   @override
@@ -79,9 +84,8 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
     required String comment,
   }) async {
     final response = await _client.post(
-      Urls.reviews,
+      Urls.productReviews(productId),
       data: {
-        'productId': productId,
         'rating': rating,
         'title': title,
         'comment': comment,
@@ -100,8 +104,8 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
     String? title,
     String? comment,
   }) async {
-    final response = await _client.patch(
-      '${Urls.reviews}/$reviewId',
+    final response = await _client.put(
+      Urls.review(reviewId),
       data: {
         if (rating != null) 'rating': rating,
         if (title != null) 'title': title,
@@ -116,11 +120,11 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
 
   @override
   Future<void> deleteReview(String reviewId) async {
-    await _client.delete('${Urls.reviews}/$reviewId');
+    await _client.delete(Urls.review(reviewId));
   }
 
   @override
   Future<void> voteHelpful(String reviewId) async {
-    await _client.post('${Urls.reviews}/$reviewId/vote', data: {'vote': 'up'});
+    await _client.post(Urls.voteReviewHelpful(reviewId));
   }
 }

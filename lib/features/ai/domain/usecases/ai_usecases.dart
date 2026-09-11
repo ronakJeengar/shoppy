@@ -1,6 +1,6 @@
 import '../../../../core/utils/result.dart';
-import '../../../../data/models/ai_config_model.dart';
-import '../../../../data/models/assistant_message_model.dart';
+import '../../../assistant/domain/entities/assistant_message_entity.dart';
+import '../entities/ai_config_entity.dart';
 import '../repositories/ai_repository.dart';
 
 class GetAiHealthUseCase {
@@ -8,7 +8,7 @@ class GetAiHealthUseCase {
 
   GetAiHealthUseCase(this._repository);
 
-  Future<Result<AiHealthModel>> call() => _repository.getAiHealth();
+  Future<Result<AiHealthEntity>> call() => _repository.getAiHealth();
 }
 
 class ChatWithAssistantUseCase {
@@ -16,7 +16,7 @@ class ChatWithAssistantUseCase {
 
   ChatWithAssistantUseCase(this._repository);
 
-  Future<Result<AssistantChatResponseModel>> call({
+  Future<Result<AssistantChatResponseEntity>> call({
     required String message,
     String? conversationId,
     Map<String, dynamic>? options,

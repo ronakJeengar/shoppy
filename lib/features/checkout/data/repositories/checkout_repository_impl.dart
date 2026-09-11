@@ -1,12 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:shopp_app/core/errors/failures.dart';
 import 'package:shopp_app/core/utils/result.dart';
-import 'package:shopp_app/data/models/order_model.dart';
-import 'package:shopp_app/data/models/payment_model.dart';
-import 'package:shopp_app/features/addresses/data/mappers/address_mappers.dart';
-import '../../domain/entities/checkout_entity.dart';
-import '../../domain/repositories/checkout_repository.dart';
+import 'package:shopp_app/features/checkout/data/mappers/checkout_mappers.dart';
+import 'package:shopp_app/features/checkout/domain/entities/checkout_entity.dart';
+import 'package:shopp_app/features/checkout/domain/entities/payment_entity.dart';
+import 'package:shopp_app/features/checkout/domain/repositories/checkout_repository.dart';
+import 'package:shopp_app/features/orders/data/mappers/order_mappers.dart';
+import 'package:shopp_app/features/orders/data/models/order_model.dart';
+import 'package:shopp_app/features/orders/domain/entities/order_entity.dart';
 import '../datasources/checkout_remote_datasource.dart';
+import '../models/payment_model.dart';
 
 class CheckoutRepositoryImpl implements CheckoutRepository {
   final CheckoutRemoteDataSource _remoteDataSource;
@@ -21,15 +24,7 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
     try {
       final model =
           await _remoteDataSource.validateCheckout(addressId, shippingMethod);
-      return Success(CheckoutValidationEntity(
-        valid: model.valid,
-        shippingAddress: model.shippingAddress?.toEntity(),
-        shippingMethod: model.shippingMethod,
-        subtotal: model.subtotal,
-        shippingFee: model.shippingFee,
-        tax: model.tax,
-        grandTotal: model.grandTotal,
-      ));
+      return Success(model.toEntity());
     } on DioException catch (e) {
       final msg = extractDioErrorMessage(e, 'Failed to validate checkout');
       return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));
@@ -57,7 +52,7 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
       if (data['payment'] is Map<String, dynamic>) {
         payment = PaymentModel.fromJson(data['payment'] as Map<String, dynamic>);
       }
-      return Success({'order': order, 'payment': payment});
+      return Success({'order': order.toEntity(), 'payment': payment?.toEntity()});
     } on DioException catch (e) {
       final msg = extractDioErrorMessage(e, 'Failed to create order');
       return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));
@@ -67,7 +62,7 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
   }
 
   @override
-  Future<Result<PaymentModel>> processPayment({
+  Future<Result<PaymentEntity>> processPayment({
     required String orderId,
     required String paymentMethod,
     String? idempotencyKey,
@@ -80,7 +75,7 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
         idempotencyKey: idempotencyKey,
         simulateSuccess: simulateSuccess,
       );
-      return Success(payment);
+      return Success(payment.toEntity());
     } on DioException catch (e) {
       final msg = extractDioErrorMessage(e, 'Payment processing failed');
       return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));
@@ -90,7 +85,7 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
   }
 
   @override
-  Future<Result<OrderModel>> confirmOrder({
+  Future<Result<OrderEntity>> confirmOrder({
     required String orderId,
     required String paymentId,
   }) async {
@@ -99,7 +94,7 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
         orderId: orderId,
         paymentId: paymentId,
       );
-      return Success(order);
+      return Success(order.toEntity());
     } on DioException catch (e) {
       final msg = extractDioErrorMessage(e, 'Order confirmation failed');
       return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));
