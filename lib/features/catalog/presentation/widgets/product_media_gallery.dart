@@ -12,6 +12,8 @@ import 'package:shopp_app/core/widgets/app_icon.dart';
 import '../../data/models/product_media_model.dart';
 import '../../data/models/product_model.dart';
 import 'package:video_player/video_player.dart';
+import '../screens/product_fullscreen_gallery_page.dart';
+export '../screens/product_fullscreen_gallery_page.dart';
 
 /// Premium Multi-Media Gallery supporting Images, Real Videos, and Interactive 3D Product Viewer.
 class ProductMediaGallery extends StatefulWidget {
@@ -224,7 +226,8 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
                     icon: const AppIcon(AppIcons.fullscreen,
                         color: Colors.white, size: 22),
                     tooltip: AppStrings.product.fullscreen,
-                    onPressed: () => _openFullscreenMedia(context),
+                    onPressed: () => _openFullscreenMedia(context,
+                        initialIndex: _currentIndex),
                   ),
                 ),
               ),
@@ -337,9 +340,8 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
   }
 
   Widget _buildImageViewer(ProductMedia media) {
-    return InteractiveViewer(
-      minScale: 1.0,
-      maxScale: 3.5,
+    return GestureDetector(
+      onTap: () => _openFullscreenMedia(context, initialIndex: _currentIndex),
       child: Center(
         child: CachedNetworkImage(
           imageUrl: media.url,
@@ -641,29 +643,16 @@ class _ProductMediaGalleryState extends State<ProductMediaGallery> {
     );
   }
 
-  void _openFullscreenMedia(BuildContext context) {
+  void _openFullscreenMedia(BuildContext context, {int? initialIndex}) {
     Navigator.of(context).push(
       MaterialPageRoute(
         fullscreenDialog: true,
-        builder: (_) => Scaffold(
-          backgroundColor: Colors.black,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            iconTheme: const IconThemeData(color: Colors.white),
-            title: Text(
-              widget.product.productName,
-              style: AppTypography.titleMedium.copyWith(color: Colors.white),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          body: Center(
-            child: ProductMediaGallery(
-              product: widget.product,
-              height: MediaQuery.of(context).size.height * 0.8,
-            ),
-          ),
+        builder: (_) => ProductFullscreenGalleryPage(
+          product: widget.product,
+          mediaList: _mediaList,
+          initialIndex: initialIndex ?? _currentIndex,
+          enableVideo: widget.enableVideo,
+          enable3d: widget.enable3d,
         ),
       ),
     );
