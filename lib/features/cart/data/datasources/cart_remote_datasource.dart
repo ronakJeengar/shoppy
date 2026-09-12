@@ -8,6 +8,8 @@ abstract class CartRemoteDataSource {
   Future<CartModel> updateQuantity(String productId, int quantity);
   Future<CartModel> removeItem(String productId);
   Future<void> clearCart();
+  Future<CartModel> applyCoupon(String code);
+  Future<CartModel> removeCoupon();
 }
 
 class CartRemoteDataSourceImpl implements CartRemoteDataSource {
@@ -60,5 +62,26 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
   @override
   Future<void> clearCart() async {
     await _client.delete(Urls.cart);
+  }
+
+  @override
+  Future<CartModel> applyCoupon(String code) async {
+    final response = await _client.post(
+      Urls.cartCoupon,
+      data: {'code': code},
+    );
+    final data = response.data;
+    final map = (data is Map<String, dynamic> ? (data['data'] ?? data) : data)
+        as Map<String, dynamic>;
+    return CartModel.fromJson(map);
+  }
+
+  @override
+  Future<CartModel> removeCoupon() async {
+    final response = await _client.delete(Urls.cartCoupon);
+    final data = response.data;
+    final map = (data is Map<String, dynamic> ? (data['data'] ?? data) : data)
+        as Map<String, dynamic>;
+    return CartModel.fromJson(map);
   }
 }

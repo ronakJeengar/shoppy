@@ -28,8 +28,13 @@ class Urls {
   // Cart & Wishlist modules
   static const String cart = ApiEndpoints.cart;
   static const String cartItems = ApiEndpoints.cartItems;
+  static const String cartCoupon = ApiEndpoints.cartCoupon;
   static const String wishlist = ApiEndpoints.wishlist;
   static const String wishlistToggle = ApiEndpoints.wishlistToggle;
+
+  // Coupons & Promotions modules
+  static const String couponsAvailable = ApiEndpoints.couponsAvailable;
+  static const String couponValidate = ApiEndpoints.couponValidate;
 
   // Address, Checkout & Payment modules
   static const String addresses = ApiEndpoints.addresses;

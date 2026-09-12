@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:shopp_app/features/coupons/data/models/coupon_model.dart';
 
 part 'cart_model.freezed.dart';
 
@@ -49,6 +50,10 @@ abstract class CartModel with _$CartModel {
     @Default(0.0) double shipping,
     @Default(0.0) double tax,
     @Default(0.0) double total,
+    @Default(0.0) double discount,
+    @Default(0.0) double taxableAmount,
+    String? couponCode,
+    AppliedCouponModel? appliedCoupon,
   }) = _CartModel;
 
   const factory CartModel.empty({
@@ -59,6 +64,10 @@ abstract class CartModel with _$CartModel {
     @Default(0.0) double shipping,
     @Default(0.0) double tax,
     @Default(0.0) double total,
+    @Default(0.0) double discount,
+    @Default(0.0) double taxableAmount,
+    String? couponCode,
+    AppliedCouponModel? appliedCoupon,
   }) = _CartModelEmpty;
 
   factory CartModel.fromJson(Map<String, dynamic> json) {
@@ -73,8 +82,14 @@ abstract class CartModel with _$CartModel {
       }
     }
 
+    AppliedCouponModel? appliedCoupon;
+    final rawCoupon = json['appliedCoupon'] ?? json['coupon'];
+    if (rawCoupon is Map<String, dynamic>) {
+      appliedCoupon = AppliedCouponModel.fromJson(rawCoupon);
+    }
+
     return CartModel(
-      id: json['id']?.toString() ?? '',
+      id: json['id']?.toString() ?? json['_id']?.toString() ?? '',
       items: parsedItems,
       itemCount: (json['itemCount'] is num)
           ? (json['itemCount'] as num).toInt()
@@ -87,6 +102,14 @@ abstract class CartModel with _$CartModel {
           : 0.0,
       tax: (json['tax'] is num) ? (json['tax'] as num).toDouble() : 0.0,
       total: (json['total'] is num) ? (json['total'] as num).toDouble() : 0.0,
+      discount: (json['discount'] is num)
+          ? (json['discount'] as num).toDouble()
+          : 0.0,
+      taxableAmount: (json['taxableAmount'] is num)
+          ? (json['taxableAmount'] as num).toDouble()
+          : 0.0,
+      couponCode: json['couponCode']?.toString() ?? appliedCoupon?.code,
+      appliedCoupon: appliedCoupon,
     );
   }
 }
@@ -118,6 +141,9 @@ extension CartModelX on CartModel {
       'shipping': shipping,
       'tax': tax,
       'total': total,
+      'discount': discount,
+      'taxableAmount': taxableAmount,
+      'couponCode': couponCode,
     };
   }
 }

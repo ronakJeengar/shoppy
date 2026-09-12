@@ -40,6 +40,14 @@ final clearCartUseCaseProvider = Provider<ClearCartUseCase>((ref) {
   return ClearCartUseCase(ref.watch(cartRepositoryProvider));
 });
 
+final applyCouponUseCaseProvider = Provider<ApplyCouponUseCase>((ref) {
+  return ApplyCouponUseCase(ref.watch(cartRepositoryProvider));
+});
+
+final removeCouponUseCaseProvider = Provider<RemoveCouponUseCase>((ref) {
+  return RemoveCouponUseCase(ref.watch(cartRepositoryProvider));
+});
+
 /// Cart State Notifier
 class CartNotifier extends StateNotifier<UiState<CartEntity>> {
   final GetCartUseCase _getCartUseCase;
@@ -47,6 +55,8 @@ class CartNotifier extends StateNotifier<UiState<CartEntity>> {
   final UpdateCartQuantityUseCase _updateCartQuantityUseCase;
   final RemoveFromCartUseCase _removeFromCartUseCase;
   final ClearCartUseCase _clearCartUseCase;
+  final ApplyCouponUseCase _applyCouponUseCase;
+  final RemoveCouponUseCase _removeCouponUseCase;
 
   CartNotifier({
     required GetCartUseCase getCartUseCase,
@@ -54,11 +64,15 @@ class CartNotifier extends StateNotifier<UiState<CartEntity>> {
     required UpdateCartQuantityUseCase updateCartQuantityUseCase,
     required RemoveFromCartUseCase removeFromCartUseCase,
     required ClearCartUseCase clearCartUseCase,
+    required ApplyCouponUseCase applyCouponUseCase,
+    required RemoveCouponUseCase removeCouponUseCase,
   })  : _getCartUseCase = getCartUseCase,
         _addToCartUseCase = addToCartUseCase,
         _updateCartQuantityUseCase = updateCartQuantityUseCase,
         _removeFromCartUseCase = removeFromCartUseCase,
         _clearCartUseCase = clearCartUseCase,
+        _applyCouponUseCase = applyCouponUseCase,
+        _removeCouponUseCase = removeCouponUseCase,
         super(const UiState.initial()) {
     loadCart();
   }
@@ -126,6 +140,30 @@ class CartNotifier extends StateNotifier<UiState<CartEntity>> {
     await _clearCartUseCase();
     state = const UiState.empty('Your cart is empty');
   }
+
+  Future<String?> applyCoupon(String code) async {
+    final result = await _applyCouponUseCase(code);
+    return result.fold(
+      onSuccess: (cart) {
+        state = UiState.success(cart);
+        return null; // Null indicates success
+      },
+      onFailure: (failure) {
+        return failure.message;
+      },
+    );
+  }
+
+  Future<bool> removeCoupon() async {
+    final result = await _removeCouponUseCase();
+    return result.fold(
+      onSuccess: (cart) {
+        state = UiState.success(cart);
+        return true;
+      },
+      onFailure: (failure) => false,
+    );
+  }
 }
 
 /// Global Cart Notifier Provider
@@ -138,6 +176,8 @@ final cartNotifierProvider =
     updateCartQuantityUseCase: ref.watch(updateCartQuantityUseCaseProvider),
     removeFromCartUseCase: ref.watch(removeFromCartUseCaseProvider),
     clearCartUseCase: ref.watch(clearCartUseCaseProvider),
+    applyCouponUseCase: ref.watch(applyCouponUseCaseProvider),
+    removeCouponUseCase: ref.watch(removeCouponUseCaseProvider),
   );
 });
 

@@ -552,6 +552,10 @@ mixin _$CartModel {
   double get shipping;
   double get tax;
   double get total;
+  double get discount;
+  double get taxableAmount;
+  String? get couponCode;
+  AppliedCouponModel? get appliedCoupon;
 
   /// Create a copy of CartModel
   /// with the given fields replaced by the non-null parameter values.
@@ -574,7 +578,15 @@ mixin _$CartModel {
             (identical(other.shipping, shipping) ||
                 other.shipping == shipping) &&
             (identical(other.tax, tax) || other.tax == tax) &&
-            (identical(other.total, total) || other.total == total));
+            (identical(other.total, total) || other.total == total) &&
+            (identical(other.discount, discount) ||
+                other.discount == discount) &&
+            (identical(other.taxableAmount, taxableAmount) ||
+                other.taxableAmount == taxableAmount) &&
+            (identical(other.couponCode, couponCode) ||
+                other.couponCode == couponCode) &&
+            (identical(other.appliedCoupon, appliedCoupon) ||
+                other.appliedCoupon == appliedCoupon));
   }
 
   @override
@@ -586,11 +598,15 @@ mixin _$CartModel {
       subtotal,
       shipping,
       tax,
-      total);
+      total,
+      discount,
+      taxableAmount,
+      couponCode,
+      appliedCoupon);
 
   @override
   String toString() {
-    return 'CartModel(id: $id, items: $items, itemCount: $itemCount, subtotal: $subtotal, shipping: $shipping, tax: $tax, total: $total)';
+    return 'CartModel(id: $id, items: $items, itemCount: $itemCount, subtotal: $subtotal, shipping: $shipping, tax: $tax, total: $total, discount: $discount, taxableAmount: $taxableAmount, couponCode: $couponCode, appliedCoupon: $appliedCoupon)';
   }
 }
 
@@ -606,7 +622,13 @@ abstract mixin class $CartModelCopyWith<$Res> {
       double subtotal,
       double shipping,
       double tax,
-      double total});
+      double total,
+      double discount,
+      double taxableAmount,
+      String? couponCode,
+      AppliedCouponModel? appliedCoupon});
+
+  $AppliedCouponModelCopyWith<$Res>? get appliedCoupon;
 }
 
 /// @nodoc
@@ -628,6 +650,10 @@ class _$CartModelCopyWithImpl<$Res> implements $CartModelCopyWith<$Res> {
     Object? shipping = null,
     Object? tax = null,
     Object? total = null,
+    Object? discount = null,
+    Object? taxableAmount = null,
+    Object? couponCode = freezed,
+    Object? appliedCoupon = freezed,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -658,7 +684,37 @@ class _$CartModelCopyWithImpl<$Res> implements $CartModelCopyWith<$Res> {
           ? _self.total
           : total // ignore: cast_nullable_to_non_nullable
               as double,
+      discount: null == discount
+          ? _self.discount
+          : discount // ignore: cast_nullable_to_non_nullable
+              as double,
+      taxableAmount: null == taxableAmount
+          ? _self.taxableAmount
+          : taxableAmount // ignore: cast_nullable_to_non_nullable
+              as double,
+      couponCode: freezed == couponCode
+          ? _self.couponCode
+          : couponCode // ignore: cast_nullable_to_non_nullable
+              as String?,
+      appliedCoupon: freezed == appliedCoupon
+          ? _self.appliedCoupon
+          : appliedCoupon // ignore: cast_nullable_to_non_nullable
+              as AppliedCouponModel?,
     ));
+  }
+
+  /// Create a copy of CartModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $AppliedCouponModelCopyWith<$Res>? get appliedCoupon {
+    if (_self.appliedCoupon == null) {
+      return null;
+    }
+
+    return $AppliedCouponModelCopyWith<$Res>(_self.appliedCoupon!, (value) {
+      return _then(_self.copyWith(appliedCoupon: value));
+    });
   }
 }
 
@@ -764,22 +820,62 @@ extension CartModelPatterns on CartModel {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String id, List<CartItemModel> items, int itemCount,
-            double subtotal, double shipping, double tax, double total)?
+    TResult Function(
+            String id,
+            List<CartItemModel> items,
+            int itemCount,
+            double subtotal,
+            double shipping,
+            double tax,
+            double total,
+            double discount,
+            double taxableAmount,
+            String? couponCode,
+            AppliedCouponModel? appliedCoupon)?
         $default, {
-    TResult Function(String id, List<CartItemModel> items, int itemCount,
-            double subtotal, double shipping, double tax, double total)?
+    TResult Function(
+            String id,
+            List<CartItemModel> items,
+            int itemCount,
+            double subtotal,
+            double shipping,
+            double tax,
+            double total,
+            double discount,
+            double taxableAmount,
+            String? couponCode,
+            AppliedCouponModel? appliedCoupon)?
         empty,
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _CartModel() when $default != null:
-        return $default(_that.id, _that.items, _that.itemCount, _that.subtotal,
-            _that.shipping, _that.tax, _that.total);
+        return $default(
+            _that.id,
+            _that.items,
+            _that.itemCount,
+            _that.subtotal,
+            _that.shipping,
+            _that.tax,
+            _that.total,
+            _that.discount,
+            _that.taxableAmount,
+            _that.couponCode,
+            _that.appliedCoupon);
       case _CartModelEmpty() when empty != null:
-        return empty(_that.id, _that.items, _that.itemCount, _that.subtotal,
-            _that.shipping, _that.tax, _that.total);
+        return empty(
+            _that.id,
+            _that.items,
+            _that.itemCount,
+            _that.subtotal,
+            _that.shipping,
+            _that.tax,
+            _that.total,
+            _that.discount,
+            _that.taxableAmount,
+            _that.couponCode,
+            _that.appliedCoupon);
       case _:
         return orElse();
     }
@@ -800,8 +896,18 @@ extension CartModelPatterns on CartModel {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String id, List<CartItemModel> items, int itemCount,
-            double subtotal, double shipping, double tax, double total)
+    TResult Function(
+            String id,
+            List<CartItemModel> items,
+            int itemCount,
+            double subtotal,
+            double shipping,
+            double tax,
+            double total,
+            double discount,
+            double taxableAmount,
+            String? couponCode,
+            AppliedCouponModel? appliedCoupon)
         $default, {
     required TResult Function(
             String id,
@@ -810,17 +916,41 @@ extension CartModelPatterns on CartModel {
             double subtotal,
             double shipping,
             double tax,
-            double total)
+            double total,
+            double discount,
+            double taxableAmount,
+            String? couponCode,
+            AppliedCouponModel? appliedCoupon)
         empty,
   }) {
     final _that = this;
     switch (_that) {
       case _CartModel():
-        return $default(_that.id, _that.items, _that.itemCount, _that.subtotal,
-            _that.shipping, _that.tax, _that.total);
+        return $default(
+            _that.id,
+            _that.items,
+            _that.itemCount,
+            _that.subtotal,
+            _that.shipping,
+            _that.tax,
+            _that.total,
+            _that.discount,
+            _that.taxableAmount,
+            _that.couponCode,
+            _that.appliedCoupon);
       case _CartModelEmpty():
-        return empty(_that.id, _that.items, _that.itemCount, _that.subtotal,
-            _that.shipping, _that.tax, _that.total);
+        return empty(
+            _that.id,
+            _that.items,
+            _that.itemCount,
+            _that.subtotal,
+            _that.shipping,
+            _that.tax,
+            _that.total,
+            _that.discount,
+            _that.taxableAmount,
+            _that.couponCode,
+            _that.appliedCoupon);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -840,21 +970,61 @@ extension CartModelPatterns on CartModel {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String id, List<CartItemModel> items, int itemCount,
-            double subtotal, double shipping, double tax, double total)?
+    TResult? Function(
+            String id,
+            List<CartItemModel> items,
+            int itemCount,
+            double subtotal,
+            double shipping,
+            double tax,
+            double total,
+            double discount,
+            double taxableAmount,
+            String? couponCode,
+            AppliedCouponModel? appliedCoupon)?
         $default, {
-    TResult? Function(String id, List<CartItemModel> items, int itemCount,
-            double subtotal, double shipping, double tax, double total)?
+    TResult? Function(
+            String id,
+            List<CartItemModel> items,
+            int itemCount,
+            double subtotal,
+            double shipping,
+            double tax,
+            double total,
+            double discount,
+            double taxableAmount,
+            String? couponCode,
+            AppliedCouponModel? appliedCoupon)?
         empty,
   }) {
     final _that = this;
     switch (_that) {
       case _CartModel() when $default != null:
-        return $default(_that.id, _that.items, _that.itemCount, _that.subtotal,
-            _that.shipping, _that.tax, _that.total);
+        return $default(
+            _that.id,
+            _that.items,
+            _that.itemCount,
+            _that.subtotal,
+            _that.shipping,
+            _that.tax,
+            _that.total,
+            _that.discount,
+            _that.taxableAmount,
+            _that.couponCode,
+            _that.appliedCoupon);
       case _CartModelEmpty() when empty != null:
-        return empty(_that.id, _that.items, _that.itemCount, _that.subtotal,
-            _that.shipping, _that.tax, _that.total);
+        return empty(
+            _that.id,
+            _that.items,
+            _that.itemCount,
+            _that.subtotal,
+            _that.shipping,
+            _that.tax,
+            _that.total,
+            _that.discount,
+            _that.taxableAmount,
+            _that.couponCode,
+            _that.appliedCoupon);
       case _:
         return null;
     }
@@ -871,7 +1041,11 @@ class _CartModel extends CartModel {
       this.subtotal = 0.0,
       this.shipping = 0.0,
       this.tax = 0.0,
-      this.total = 0.0})
+      this.total = 0.0,
+      this.discount = 0.0,
+      this.taxableAmount = 0.0,
+      this.couponCode,
+      this.appliedCoupon})
       : _items = items,
         super._();
 
@@ -902,6 +1076,16 @@ class _CartModel extends CartModel {
   @override
   @JsonKey()
   final double total;
+  @override
+  @JsonKey()
+  final double discount;
+  @override
+  @JsonKey()
+  final double taxableAmount;
+  @override
+  final String? couponCode;
+  @override
+  final AppliedCouponModel? appliedCoupon;
 
   /// Create a copy of CartModel
   /// with the given fields replaced by the non-null parameter values.
@@ -925,7 +1109,15 @@ class _CartModel extends CartModel {
             (identical(other.shipping, shipping) ||
                 other.shipping == shipping) &&
             (identical(other.tax, tax) || other.tax == tax) &&
-            (identical(other.total, total) || other.total == total));
+            (identical(other.total, total) || other.total == total) &&
+            (identical(other.discount, discount) ||
+                other.discount == discount) &&
+            (identical(other.taxableAmount, taxableAmount) ||
+                other.taxableAmount == taxableAmount) &&
+            (identical(other.couponCode, couponCode) ||
+                other.couponCode == couponCode) &&
+            (identical(other.appliedCoupon, appliedCoupon) ||
+                other.appliedCoupon == appliedCoupon));
   }
 
   @override
@@ -937,11 +1129,15 @@ class _CartModel extends CartModel {
       subtotal,
       shipping,
       tax,
-      total);
+      total,
+      discount,
+      taxableAmount,
+      couponCode,
+      appliedCoupon);
 
   @override
   String toString() {
-    return 'CartModel(id: $id, items: $items, itemCount: $itemCount, subtotal: $subtotal, shipping: $shipping, tax: $tax, total: $total)';
+    return 'CartModel(id: $id, items: $items, itemCount: $itemCount, subtotal: $subtotal, shipping: $shipping, tax: $tax, total: $total, discount: $discount, taxableAmount: $taxableAmount, couponCode: $couponCode, appliedCoupon: $appliedCoupon)';
   }
 }
 
@@ -960,7 +1156,14 @@ abstract mixin class _$CartModelCopyWith<$Res>
       double subtotal,
       double shipping,
       double tax,
-      double total});
+      double total,
+      double discount,
+      double taxableAmount,
+      String? couponCode,
+      AppliedCouponModel? appliedCoupon});
+
+  @override
+  $AppliedCouponModelCopyWith<$Res>? get appliedCoupon;
 }
 
 /// @nodoc
@@ -982,6 +1185,10 @@ class __$CartModelCopyWithImpl<$Res> implements _$CartModelCopyWith<$Res> {
     Object? shipping = null,
     Object? tax = null,
     Object? total = null,
+    Object? discount = null,
+    Object? taxableAmount = null,
+    Object? couponCode = freezed,
+    Object? appliedCoupon = freezed,
   }) {
     return _then(_CartModel(
       id: null == id
@@ -1012,7 +1219,37 @@ class __$CartModelCopyWithImpl<$Res> implements _$CartModelCopyWith<$Res> {
           ? _self.total
           : total // ignore: cast_nullable_to_non_nullable
               as double,
+      discount: null == discount
+          ? _self.discount
+          : discount // ignore: cast_nullable_to_non_nullable
+              as double,
+      taxableAmount: null == taxableAmount
+          ? _self.taxableAmount
+          : taxableAmount // ignore: cast_nullable_to_non_nullable
+              as double,
+      couponCode: freezed == couponCode
+          ? _self.couponCode
+          : couponCode // ignore: cast_nullable_to_non_nullable
+              as String?,
+      appliedCoupon: freezed == appliedCoupon
+          ? _self.appliedCoupon
+          : appliedCoupon // ignore: cast_nullable_to_non_nullable
+              as AppliedCouponModel?,
     ));
+  }
+
+  /// Create a copy of CartModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $AppliedCouponModelCopyWith<$Res>? get appliedCoupon {
+    if (_self.appliedCoupon == null) {
+      return null;
+    }
+
+    return $AppliedCouponModelCopyWith<$Res>(_self.appliedCoupon!, (value) {
+      return _then(_self.copyWith(appliedCoupon: value));
+    });
   }
 }
 
@@ -1026,7 +1263,11 @@ class _CartModelEmpty extends CartModel {
       this.subtotal = 0.0,
       this.shipping = 0.0,
       this.tax = 0.0,
-      this.total = 0.0})
+      this.total = 0.0,
+      this.discount = 0.0,
+      this.taxableAmount = 0.0,
+      this.couponCode,
+      this.appliedCoupon})
       : _items = items,
         super._();
 
@@ -1057,6 +1298,16 @@ class _CartModelEmpty extends CartModel {
   @override
   @JsonKey()
   final double total;
+  @override
+  @JsonKey()
+  final double discount;
+  @override
+  @JsonKey()
+  final double taxableAmount;
+  @override
+  final String? couponCode;
+  @override
+  final AppliedCouponModel? appliedCoupon;
 
   /// Create a copy of CartModel
   /// with the given fields replaced by the non-null parameter values.
@@ -1080,7 +1331,15 @@ class _CartModelEmpty extends CartModel {
             (identical(other.shipping, shipping) ||
                 other.shipping == shipping) &&
             (identical(other.tax, tax) || other.tax == tax) &&
-            (identical(other.total, total) || other.total == total));
+            (identical(other.total, total) || other.total == total) &&
+            (identical(other.discount, discount) ||
+                other.discount == discount) &&
+            (identical(other.taxableAmount, taxableAmount) ||
+                other.taxableAmount == taxableAmount) &&
+            (identical(other.couponCode, couponCode) ||
+                other.couponCode == couponCode) &&
+            (identical(other.appliedCoupon, appliedCoupon) ||
+                other.appliedCoupon == appliedCoupon));
   }
 
   @override
@@ -1092,11 +1351,15 @@ class _CartModelEmpty extends CartModel {
       subtotal,
       shipping,
       tax,
-      total);
+      total,
+      discount,
+      taxableAmount,
+      couponCode,
+      appliedCoupon);
 
   @override
   String toString() {
-    return 'CartModel.empty(id: $id, items: $items, itemCount: $itemCount, subtotal: $subtotal, shipping: $shipping, tax: $tax, total: $total)';
+    return 'CartModel.empty(id: $id, items: $items, itemCount: $itemCount, subtotal: $subtotal, shipping: $shipping, tax: $tax, total: $total, discount: $discount, taxableAmount: $taxableAmount, couponCode: $couponCode, appliedCoupon: $appliedCoupon)';
   }
 }
 
@@ -1115,7 +1378,14 @@ abstract mixin class _$CartModelEmptyCopyWith<$Res>
       double subtotal,
       double shipping,
       double tax,
-      double total});
+      double total,
+      double discount,
+      double taxableAmount,
+      String? couponCode,
+      AppliedCouponModel? appliedCoupon});
+
+  @override
+  $AppliedCouponModelCopyWith<$Res>? get appliedCoupon;
 }
 
 /// @nodoc
@@ -1138,6 +1408,10 @@ class __$CartModelEmptyCopyWithImpl<$Res>
     Object? shipping = null,
     Object? tax = null,
     Object? total = null,
+    Object? discount = null,
+    Object? taxableAmount = null,
+    Object? couponCode = freezed,
+    Object? appliedCoupon = freezed,
   }) {
     return _then(_CartModelEmpty(
       id: null == id
@@ -1168,7 +1442,37 @@ class __$CartModelEmptyCopyWithImpl<$Res>
           ? _self.total
           : total // ignore: cast_nullable_to_non_nullable
               as double,
+      discount: null == discount
+          ? _self.discount
+          : discount // ignore: cast_nullable_to_non_nullable
+              as double,
+      taxableAmount: null == taxableAmount
+          ? _self.taxableAmount
+          : taxableAmount // ignore: cast_nullable_to_non_nullable
+              as double,
+      couponCode: freezed == couponCode
+          ? _self.couponCode
+          : couponCode // ignore: cast_nullable_to_non_nullable
+              as String?,
+      appliedCoupon: freezed == appliedCoupon
+          ? _self.appliedCoupon
+          : appliedCoupon // ignore: cast_nullable_to_non_nullable
+              as AppliedCouponModel?,
     ));
+  }
+
+  /// Create a copy of CartModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $AppliedCouponModelCopyWith<$Res>? get appliedCoupon {
+    if (_self.appliedCoupon == null) {
+      return null;
+    }
+
+    return $AppliedCouponModelCopyWith<$Res>(_self.appliedCoupon!, (value) {
+      return _then(_self.copyWith(appliedCoupon: value));
+    });
   }
 }
 

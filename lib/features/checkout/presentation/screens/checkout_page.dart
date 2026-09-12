@@ -347,9 +347,10 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
   ) {
     final validation = checkoutState.validation;
     final subtotal = validation?.subtotal ?? cart.subtotal;
+    final discount = validation?.discount ?? cart.discount;
     final shipping = validation?.shippingFee ?? (checkoutState.selectedShippingMethod == 'EXPRESS' ? 99.0 : (subtotal >= 499 ? 0.0 : 49.0));
     final tax = validation?.tax ?? cart.tax;
-    final total = validation?.grandTotal ?? (subtotal + shipping);
+    final total = validation?.grandTotal ?? (subtotal - discount + shipping);
     final taxBreakdown = validation?.taxBreakdown;
 
     return Container(
@@ -379,6 +380,14 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
           ),
           const SizedBox(height: 14),
           _summaryRow('Items Subtotal', CurrencyFormatter.format(subtotal)),
+          if (discount > 0) ...[
+            const SizedBox(height: 8),
+            _summaryRow(
+              'Coupon Discount',
+              '-${CurrencyFormatter.format(discount)}',
+              valueColor: AppColors.success,
+            ),
+          ],
           const SizedBox(height: 8),
           _summaryRow(
             'Shipping Fee',

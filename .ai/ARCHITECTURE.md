@@ -512,3 +512,31 @@ Shoppy implements an authoritative Indian Goods and Services Tax (GST) calculati
 * **Standard Currency**: Centralized to Indian Rupee (`INR`, `₹`).
 * **Client-Side Currency Formatter (`CurrencyFormatter`)**: Formats numbers strictly using the Indian numbering system (Lakhs and Crores, `₹12,999.00`, `₹1,29,999.00`, compact `₹1.5 L`, `₹2.5 Cr`).
 * **Zero Currency Ambiguity**: All fallback currencies, AI prompts, mock seeds, filter sheets, admin dashboards, and checkout flows migrated from `$` to `₹`. Zero hardcoded dollar signs or generic 8% sales tax remaining.
+ 
+---
+ 
+## 11. Feature 2: Indian Coupon & Promotion System
+ 
+Shoppy implements a secure, backend-authoritative Indian coupon and promotion system across the Clean Architecture Flutter presentation, domain, and data layers.
+ 
+### 11.1 Clean Architecture Flutter Layering
+* **Domain Layer (`lib/features/coupons/domain/`)**:
+  - `CouponEntity`: Immutable entity representing coupon properties (`code`, `title`, `description`, `discountType`, `discountValue`, `minimumOrderValue`, `maximumDiscountAmount`, `firstOrderOnly`, `expiresAt`, etc.).
+  - `AppliedCouponEntity`: Snapshot of applied coupon on the cart or checkout (`code`, `discount`, `discountType`, `discountValue`).
+  - `CouponRepository`: Interface contract defining `getAvailableCoupons()` and `validateCoupon()`.
+  - Use cases: `GetAvailableCouponsUseCase`, `ValidateCouponUseCase`.
+* **Data Layer (`lib/features/coupons/data/`)**:
+  - `CouponModel`: Freezed model with JSON serialization mapping backend API responses.
+  - `CouponMappers`: Bidirectional mapping between `CouponModel` and `CouponEntity`.
+  - `CouponRemoteDataSource`: Dio HTTP client implementation targeting `/api/v1/coupons/available` and `/api/v1/coupons/validate`.
+  - `CouponRepositoryImpl`: Concrete implementation returning `Either<Failure, T>`.
+* **Cart Integration (`lib/features/cart/`)**:
+  - `CartModel` & `CartEntity`: Extended to include authoritative `discount`, `couponCode`, `taxableAmount`, and `appliedCoupon`.
+  - `ApplyCouponUseCase` and `RemoveCouponUseCase`: Dispatching server-authoritative coupon application and removal.
+  - `CartNotifier`: Methods `applyCoupon(String code)` and `removeCoupon()`.
+* **UI & Presentation (`lib/features/coupons/presentation/`)**:
+  - `CouponCard`: Ticket/voucher visual card with dashed cutouts, discount badge, validity terms, and one-tap Apply action.
+  - `CouponBottomSheet`: Draggable modal sheet for discovering and selecting available coupons.
+  - `CouponSection`: Embedded cart widget with text field, Apply button, applied coupon pill with savings celebration, and remove action.
+  - Design compliance: 100% SVG icons (`AppIcons.coupon`, `AppIcons.checkCircle`, `AppIcons.close`), zero Material icon fallback, full dark/light theme support.
+

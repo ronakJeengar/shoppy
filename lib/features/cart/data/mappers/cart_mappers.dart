@@ -1,5 +1,6 @@
 import '../models/cart_model.dart';
 import '../../domain/entities/cart_entity.dart';
+import 'package:shopp_app/features/coupons/data/mappers/coupon_mappers.dart';
 
 extension CartItemMapper on CartItemModel {
   CartItemEntity toEntity() {
@@ -45,6 +46,10 @@ extension CartMapper on CartModel {
       shipping: shipping,
       tax: tax,
       total: total,
+      discount: discount,
+      taxableAmount: taxableAmount,
+      couponCode: couponCode,
+      appliedCoupon: appliedCoupon?.toEntity(),
     );
   }
 }
@@ -59,6 +64,10 @@ extension CartEntityMapper on CartEntity {
       shipping: shipping,
       tax: tax,
       total: total,
+      discount: discount,
+      taxableAmount: taxableAmount,
+      couponCode: couponCode,
+      appliedCoupon: appliedCoupon?.toModel(),
     );
   }
 }

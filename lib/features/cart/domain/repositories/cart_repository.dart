@@ -7,4 +7,6 @@ abstract class CartRepository {
   Future<Result<CartEntity>> updateQuantity(String productId, int quantity);
   Future<Result<CartEntity>> removeFromCart(String productId);
   Future<Result<CartEntity>> clearCart();
+  Future<Result<CartEntity>> applyCoupon(String code);
+  Future<Result<CartEntity>> removeCoupon();
 }

@@ -75,4 +75,30 @@ class CartRepositoryImpl implements CartRepository {
       return FailureResult(UnknownFailure(e.toString()));
     }
   }
+
+  @override
+  Future<Result<CartEntity>> applyCoupon(String code) async {
+    try {
+      final model = await _remoteDataSource.applyCoupon(code);
+      return Success(model.toEntity());
+    } on DioException catch (e) {
+      final msg = extractDioErrorMessage(e, 'Failed to apply coupon');
+      return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));
+    } catch (e) {
+      return FailureResult(UnknownFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Result<CartEntity>> removeCoupon() async {
+    try {
+      final model = await _remoteDataSource.removeCoupon();
+      return Success(model.toEntity());
+    } on DioException catch (e) {
+      final msg = extractDioErrorMessage(e, 'Failed to remove coupon');
+      return FailureResult(ServerFailure(msg, statusCode: e.response?.statusCode));
+    } catch (e) {
+      return FailureResult(UnknownFailure(e.toString()));
+    }
+  }
 }

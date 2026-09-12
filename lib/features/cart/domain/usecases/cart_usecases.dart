@@ -47,3 +47,21 @@ class ClearCartUseCase {
 
   Future<Result<CartEntity>> call() => _repository.clearCart();
 }
+
+class ApplyCouponUseCase {
+  final CartRepository _repository;
+
+  ApplyCouponUseCase(this._repository);
+
+  Future<Result<CartEntity>> call(String code) {
+    return _repository.applyCoupon(code);
+  }
+}
+
+class RemoveCouponUseCase {
+  final CartRepository _repository;
+
+  RemoveCouponUseCase(this._repository);
+
+  Future<Result<CartEntity>> call() => _repository.removeCoupon();
+}

@@ -16,6 +16,7 @@ import 'package:shopp_app/core/widgets/app_button.dart';
 import 'package:shopp_app/core/utils/currency_formatter.dart';
 import 'package:shopp_app/features/checkout/presentation/screens/checkout_page.dart';
 import '../widgets/cart_item_tile.dart';
+import '../widgets/coupon_section.dart';
 import 'package:shopp_app/core/widgets/empty_state.dart';
 import 'package:shopp_app/core/widgets/error_state.dart';
 
@@ -199,6 +200,9 @@ class CartPage extends ConsumerWidget {
 
           const SizedBox(height: AppDimensions.md),
 
+          // Coupon & Promotion Section
+          CouponSection(cart: cart),
+
           // Order Summary Card
           Container(
             margin: const EdgeInsets.symmetric(horizontal: AppDimensions.lg, vertical: AppDimensions.sm),
@@ -215,6 +219,14 @@ class CartPage extends ConsumerWidget {
                 Text(AppStrings.cart.orderSummary, style: AppTypography.headingSmall),
                 const SizedBox(height: 14),
                 _summaryRow(AppStrings.cart.subtotal, CurrencyFormatter.format(cart.subtotal)),
+                if (cart.discount > 0) ...[
+                  const SizedBox(height: AppDimensions.sm),
+                  _summaryRow(
+                    'Coupon Discount (${cart.couponCode ?? "APPLIED"})',
+                    '-${CurrencyFormatter.format(cart.discount)}',
+                    valueColor: AppColors.success,
+                  ),
+                ],
                 const SizedBox(height: AppDimensions.sm),
                 _summaryRow(
                   AppStrings.cart.shipping,

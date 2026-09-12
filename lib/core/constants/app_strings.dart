@@ -7,6 +7,7 @@ class AppStrings {
   static const home = _HomeStrings();
   static const product = _ProductStrings();
   static const cart = _CartStrings();
+  static const coupons = _CouponStrings();
   static const checkout = _CheckoutStrings();
   static const orders = _OrderStrings();
   static const profile = _ProfileStrings();
@@ -159,6 +160,25 @@ class _CartStrings {
   final String freeShippingUnlocked = 'You unlocked FREE Standard Shipping!';
   String freeShippingAddMore(double amount) =>
       'Add ₹${amount.toStringAsFixed(0)} more for FREE Delivery';
+}
+
+class _CouponStrings {
+  const _CouponStrings();
+  final String title = 'Coupons & Offers';
+  final String applyCoupon = 'Apply Coupon';
+  final String enterCouponCode = 'Enter coupon code';
+  final String apply = 'APPLY';
+  final String remove = 'Remove';
+  final String applied = 'Applied';
+  final String viewAvailable = 'View Available Offers';
+  final String availableOffers = 'Available Coupons & Offers';
+  final String noOffersAvailable = 'No coupons currently available';
+  final String minOrderValue = 'Minimum order value:';
+  final String maxDiscount = 'Maximum discount:';
+  final String expiresOn = 'Expires:';
+  final String firstOrderOnly = 'First Order Only';
+  String saveAmount(double amount) =>
+      'You save ₹${amount.toStringAsFixed(2)} with this coupon';
 }
 
 class _CheckoutStrings {

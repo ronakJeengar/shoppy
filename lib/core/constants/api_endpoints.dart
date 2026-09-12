@@ -22,8 +22,13 @@ class ApiEndpoints {
   // Cart & Wishlist
   static const String cart = 'cart';
   static const String cartItems = 'cart/items';
+  static const String cartCoupon = 'cart/coupon';
   static const String wishlist = 'wishlist';
   static const String wishlistToggle = 'wishlist/toggle';
+
+  // Coupons & Promotions
+  static const String couponsAvailable = 'coupons/available';
+  static const String couponValidate = 'coupons/validate';
 
   // Addresses & Checkout
   static const String addresses = 'addresses';

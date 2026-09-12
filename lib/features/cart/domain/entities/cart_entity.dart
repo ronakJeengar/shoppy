@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:shopp_app/features/coupons/domain/entities/coupon_entity.dart';
 
 part 'cart_entity.freezed.dart';
 
@@ -30,6 +31,10 @@ abstract class CartEntity with _$CartEntity {
     @Default(0.0) double shipping,
     @Default(0.0) double tax,
     @Default(0.0) double total,
+    @Default(0.0) double discount,
+    @Default(0.0) double taxableAmount,
+    String? couponCode,
+    AppliedCouponEntity? appliedCoupon,
   }) = _CartEntity;
 
   const factory CartEntity.empty({
@@ -40,6 +45,10 @@ abstract class CartEntity with _$CartEntity {
     @Default(0.0) double shipping,
     @Default(0.0) double tax,
     @Default(0.0) double total,
+    @Default(0.0) double discount,
+    @Default(0.0) double taxableAmount,
+    String? couponCode,
+    AppliedCouponEntity? appliedCoupon,
   }) = _CartEntityEmpty;
 
   bool get isEmpty => items.isEmpty;
