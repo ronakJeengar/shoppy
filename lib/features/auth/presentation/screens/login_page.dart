@@ -40,7 +40,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
     final success = await ref.read(authStateProvider.notifier).signIn(
           _emailController.text.trim(),
-          _passwordController.text,
+          _passwordController.text.trim(),
         );
 
     if (success && mounted) {
@@ -142,6 +142,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   hintText: AppStrings.auth.enterEmail,
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
+                  textCapitalization: TextCapitalization.none,
+                  autocorrect: false,
                   prefixIcon: AppIcons.email,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
@@ -162,6 +164,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   hintText: AppStrings.auth.enterPassword,
                   controller: _passwordController,
                   obscureText: _obscurePassword,
+                  textCapitalization: TextCapitalization.none,
+                  autocorrect: false,
+                  enableSuggestions: false,
                   prefixIcon: AppIcons.lock,
                   suffixIcon: IconButton(
                     icon: AppIcon(

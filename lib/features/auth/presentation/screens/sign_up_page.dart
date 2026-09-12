@@ -44,7 +44,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
     final success = await ref.read(authStateProvider.notifier).signUp(
           name: _nameController.text.trim(),
           email: _emailController.text.trim(),
-          password: _passwordController.text,
+          password: _passwordController.text.trim(),
         );
 
     if (success && mounted) {
@@ -164,6 +164,8 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                   hintText: AppStrings.auth.enterEmail,
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
+                  textCapitalization: TextCapitalization.none,
+                  autocorrect: false,
                   prefixIcon: AppIcons.email,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
@@ -184,6 +186,9 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                   hintText: AppStrings.auth.passwordRule,
                   controller: _passwordController,
                   obscureText: _obscurePassword,
+                  textCapitalization: TextCapitalization.none,
+                  autocorrect: false,
+                  enableSuggestions: false,
                   prefixIcon: AppIcons.lock,
                   suffixIcon: IconButton(
                     icon: AppIcon(
@@ -217,6 +222,9 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                   hintText: AppStrings.auth.confirmPassword,
                   controller: _confirmPasswordController,
                   obscureText: _obscureConfirmPassword,
+                  textCapitalization: TextCapitalization.none,
+                  autocorrect: false,
+                  enableSuggestions: false,
                   prefixIcon: AppIcons.lockClock,
                   suffixIcon: IconButton(
                     icon: AppIcon(

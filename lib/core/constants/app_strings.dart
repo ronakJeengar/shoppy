@@ -154,7 +154,8 @@ class _CartStrings {
   final String discount = 'Discount';
   final String total = 'Total Amount';
   final String estimatedTotal = 'Estimated Total';
-  final String orderSummary = 'Order Summary';
+  final String priceDetails = 'Price Details';
+  final String orderSummary = 'Price Details';
   final String proceedToCheckout = 'Proceed to Checkout';
   final String removeItem = 'Remove';
   final String freeShippingUnlocked = 'You unlocked FREE Standard Shipping!';

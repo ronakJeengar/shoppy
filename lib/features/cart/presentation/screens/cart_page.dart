@@ -203,7 +203,7 @@ class CartPage extends ConsumerWidget {
           // Coupon & Promotion Section
           CouponSection(cart: cart),
 
-          // Order Summary Card
+          // Price Details Card (Indian e-commerce convention)
           Container(
             margin: const EdgeInsets.symmetric(horizontal: AppDimensions.lg, vertical: AppDimensions.sm),
             padding: const EdgeInsets.all(18),
@@ -216,7 +216,29 @@ class CartPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(AppStrings.cart.orderSummary, style: AppTypography.headingSmall),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: const BoxDecoration(
+                        color: AppColors.primary50,
+                        borderRadius: AppRadius.borderSm,
+                      ),
+                      child: const Center(
+                        child: AppIcon(
+                          AppIcons.priceTag,
+                          color: AppColors.primary,
+                          size: AppIconSizes.action,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      '${AppStrings.cart.priceDetails} (${cart.items.length} ${cart.items.length == 1 ? "Item" : "Items"})',
+                      style: AppTypography.headingSmall,
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 14),
                 _summaryRow(AppStrings.cart.subtotal, CurrencyFormatter.format(cart.subtotal)),
                 if (cart.discount > 0) ...[

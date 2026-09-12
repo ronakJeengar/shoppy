@@ -22,6 +22,9 @@ class AppTextField extends StatelessWidget {
   final bool autofocus;
   final int maxLines;
   final bool enabled;
+  final TextCapitalization textCapitalization;
+  final bool autocorrect;
+  final bool enableSuggestions;
 
   const AppTextField({
     super.key,
@@ -38,6 +41,9 @@ class AppTextField extends StatelessWidget {
     this.autofocus = false,
     this.maxLines = 1,
     this.enabled = true,
+    this.textCapitalization = TextCapitalization.none,
+    this.autocorrect = true,
+    this.enableSuggestions = true,
   });
 
   @override
@@ -60,6 +66,9 @@ class AppTextField extends StatelessWidget {
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
+          textCapitalization: textCapitalization,
+          autocorrect: autocorrect,
+          enableSuggestions: enableSuggestions,
           validator: validator,
           onChanged: onChanged,
           onFieldSubmitted: onSubmitted,
