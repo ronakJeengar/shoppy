@@ -30,6 +30,10 @@ class ApiEndpoints {
   static const String couponsAvailable = 'coupons/available';
   static const String couponValidate = 'coupons/validate';
 
+  // Campaigns & Sale Banners
+  static const String campaignsActive = 'campaigns/active';
+  static String campaignDetail(String id) => 'campaigns/$id';
+
   // Addresses & Checkout
   static const String addresses = 'addresses';
   static const String checkoutValidate = 'checkout/validate';

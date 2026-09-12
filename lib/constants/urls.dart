@@ -36,6 +36,10 @@ class Urls {
   static const String couponsAvailable = ApiEndpoints.couponsAvailable;
   static const String couponValidate = ApiEndpoints.couponValidate;
 
+  // Campaigns & Sale Banners modules
+  static const String campaignsActive = ApiEndpoints.campaignsActive;
+  static String campaignDetail(String id) => ApiEndpoints.campaignDetail(id);
+
   // Address, Checkout & Payment modules
   static const String addresses = ApiEndpoints.addresses;
   static const String checkoutValidate = ApiEndpoints.checkoutValidate;

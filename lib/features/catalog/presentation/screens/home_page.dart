@@ -30,6 +30,7 @@ import 'package:shopp_app/core/widgets/error_state.dart';
 import '../widgets/product_card.dart';
 import 'package:shopp_app/features/recommendations/presentation/widgets/recommendation_carousel.dart';
 import 'package:shopp_app/core/widgets/skeleton_loader.dart';
+import 'package:shopp_app/features/campaigns/presentation/widgets/campaign_banner_carousel.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -40,32 +41,6 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   final ScrollController _scrollController = ScrollController();
-  final PageController _bannerController = PageController();
-  int _activeBannerIndex = 0;
-
-  final List<Map<String, String>> _promoBanners = [
-    {
-      'tag': 'SEASON HIGHLIGHT',
-      'title': 'Next-Gen Sound & Audio Labs',
-      'subtitle': 'Explore noise-cancelling headphones & studio gear.',
-      'action': 'Discover Now',
-      'bgGradient': 'indigo',
-    },
-    {
-      'tag': 'NEW ARRIVALS',
-      'title': 'Timeless Minimalist Essentials',
-      'subtitle': 'Sustainable organic apparel and premium leather goods.',
-      'action': 'Shop Collection',
-      'bgGradient': 'slate',
-    },
-    {
-      'tag': 'LIMITED OFFER',
-      'title': 'Modern Living & Artisan Brews',
-      'subtitle': 'Handcrafted ceramic drippers and dinnerware.',
-      'action': 'Claim 15% Off',
-      'bgGradient': 'amber',
-    },
-  ];
 
   @override
   void initState() {
@@ -77,7 +52,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   void dispose() {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
-    _bannerController.dispose();
     super.dispose();
   }
 
@@ -594,135 +568,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Widget _buildHeroBanner() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Column(
-        children: [
-          SizedBox(
-            height: 156,
-            child: PageView.builder(
-              controller: _bannerController,
-              onPageChanged: (idx) {
-                setState(() {
-                  _activeBannerIndex = idx;
-                });
-              },
-              itemCount: _promoBanners.length,
-              itemBuilder: (context, index) {
-                final b = _promoBanners[index];
-                Gradient gradient;
-                if (b['bgGradient'] == 'slate') {
-                  gradient = const LinearGradient(
-                    colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  );
-                } else if (b['bgGradient'] == 'amber') {
-                  gradient = const LinearGradient(
-                    colors: [Color(0xFF78350F), Color(0xFFB45309)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  );
-                } else {
-                  gradient = AppColors.primaryGradient;
-                }
-
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 2),
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    gradient: gradient,
-                    borderRadius: AppRadius.borderLg,
-                    boxShadow: AppShadows.card,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.white.withValues(alpha: 0.2),
-                              borderRadius: AppRadius.borderFull,
-                            ),
-                            child: Text(
-                              b['tag']!,
-                              style: AppTypography.label.copyWith(
-                                color: AppColors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            b['title']!,
-                            style: AppTypography.headingMedium.copyWith(
-                              color: AppColors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            b['subtitle']!,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: AppTypography.bodySmall.copyWith(
-                              color: AppColors.white.withValues(alpha: 0.85),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Text(
-                            b['action']!,
-                            style: AppTypography.bodySmall.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.white,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          const AppIcon(
-                            AppIcons.arrowForward,
-                            color: AppColors.white,
-                            size: 14,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(
-              _promoBanners.length,
-              (index) => Container(
-                width: _activeBannerIndex == index ? 16 : 6,
-                height: 5,
-                margin: const EdgeInsets.symmetric(horizontal: 2),
-                decoration: BoxDecoration(
-                  color: _activeBannerIndex == index
-                      ? AppColors.primary
-                      : AppColors.slate300,
-                  borderRadius: AppRadius.borderFull,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    return const CampaignBannerCarousel();
   }
 
   Widget _buildCatalogHeader(String title, dynamic productsState, int count) {

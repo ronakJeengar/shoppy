@@ -540,3 +540,26 @@ Shoppy implements a secure, backend-authoritative Indian coupon and promotion sy
   - `CouponSection`: Embedded cart widget with text field, Apply button, applied coupon pill with savings celebration, and remove action.
   - Design compliance: 100% SVG icons (`AppIcons.coupon`, `AppIcons.checkCircle`, `AppIcons.close`), zero Material icon fallback, full dark/light theme support.
 
+---
+
+## 12. Feature 3: Backend-Driven Sale Banner & Campaign System
+
+Shoppy implements a clean architecture, backend-controlled campaign and sale banner system providing promotional visual content throughout the mobile application.
+
+### 12.1 Clean Architecture Flutter Layering
+* **Domain Layer (`lib/features/campaigns/domain/`)**:
+  - `CampaignEntity`: Immutable Freezed entity containing campaign presentation attributes (`id`, `title`, `subtitle`, `description`, `bannerImage`, `mobileImage`, `desktopImage`, `campaignType`, `startAt`, `endAt`, `priority`, `displayOrder`, `targetType`, `targetId`, `ctaLabel`, `ctaAction`, `couponCode`, `metadata`).
+  - `CampaignCtaActionEntity`: Safe structured action model (`type`, `value`).
+  - `CampaignRepository`: Abstract contract defining `getActiveCampaigns({int limit, String? type})`.
+  - `GetActiveCampaignsUseCase`: Domain interactor returning `Result<List<CampaignEntity>>`.
+* **Data Layer (`lib/features/campaigns/data/`)**:
+  - `CampaignModel`: Freezed model with null-safe JSON parsing handling timestamps, numbers, nested `ctaAction`, and metadata.
+  - `CampaignMappers`: Bidirectional mapping between `CampaignModel` and `CampaignEntity`.
+  - `CampaignRemoteDataSource`: Dio HTTP client implementation querying `GET /api/v1/campaigns/active`.
+  - `CampaignRepositoryImpl`: Concrete implementation encapsulating network exceptions into `Result<T>` and `Failure` objects.
+* **Presentation & UI Layer (`lib/features/campaigns/presentation/`)**:
+  - `activeCampaignsProvider`: Riverpod `FutureProvider.autoDispose` delivering live campaigns to the presentation layer.
+  - `CampaignCard`: Visual promotional card with lazy cached network images, gradient scrim overlay for text contrast, tag badges, optional coupon code pills, and allowlisted CTA action dispatcher.
+  - `CampaignBannerCarousel`: Home screen carousel with smooth page controller, animated indicator dots, skeleton shimmer loading state, and graceful empty/error degradation.
+  - Design system compliance: 100% custom SVG icons (`AppIcons.arrowForward`, `AppIcons.coupon`), zero Material/Cupertino icon usage, 60 FPS performance, zero layout shift (fixed aspect ratio).
+
