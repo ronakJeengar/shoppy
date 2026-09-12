@@ -14,14 +14,31 @@ abstract class AddressModel with _$AddressModel {
     required String city,
     required String state,
     required String postalCode,
-    @Default('US') String country,
+    @Default('') String pinCode,
+    @Default('') String district,
+    @Default('') String landmark,
+    @Default('IN') String country,
     @Default(false) bool isDefault,
   }) = _AddressModel;
 
-  String get formattedAddress =>
-      '$streetAddress, $city, $state $postalCode, $country';
+  String get formattedAddress {
+    final code = pinCode.isNotEmpty ? pinCode : postalCode;
+    final parts = [
+      streetAddress,
+      if (landmark.trim().isNotEmpty) landmark.trim(),
+      if (district.trim().isNotEmpty && district.trim() != city.trim()) district.trim(),
+      city.trim(),
+      '${state.trim()} $code'.trim(),
+      country.trim(),
+    ];
+    return parts.where((p) => p.isNotEmpty).join(', ');
+  }
 
   factory AddressModel.fromJson(Map<String, dynamic> json) {
+    final rawPostal = json['postalCode']?.toString() ?? '';
+    final rawPin = json['pinCode']?.toString() ?? '';
+    final effectivePin = rawPin.isNotEmpty ? rawPin : rawPostal;
+
     return AddressModel(
       id: json['id']?.toString() ?? json['_id']?.toString() ?? '',
       fullName: json['fullName']?.toString() ?? '',
@@ -29,8 +46,11 @@ abstract class AddressModel with _$AddressModel {
       streetAddress: json['streetAddress']?.toString() ?? '',
       city: json['city']?.toString() ?? '',
       state: json['state']?.toString() ?? '',
-      postalCode: json['postalCode']?.toString() ?? '',
-      country: json['country']?.toString() ?? 'US',
+      postalCode: effectivePin,
+      pinCode: effectivePin,
+      district: json['district']?.toString() ?? '',
+      landmark: json['landmark']?.toString() ?? '',
+      country: json['country']?.toString() ?? 'IN',
       isDefault: json['isDefault'] == true,
     );
   }
@@ -46,6 +66,9 @@ extension AddressModelX on AddressModel {
       'city': city,
       'state': state,
       'postalCode': postalCode,
+      'pinCode': pinCode.isNotEmpty ? pinCode : postalCode,
+      'district': district,
+      'landmark': landmark,
       'country': country,
       'isDefault': isDefault,
     };

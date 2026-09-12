@@ -11,7 +11,7 @@ abstract class PaymentModel with _$PaymentModel {
     @Default('SIMULATED') String provider,
     @Default('CARD') String paymentMethod,
     required double amount,
-    @Default('USD') String currency,
+    @Default('INR') String currency,
     @Default('PENDING') String status,
   }) = _PaymentModel;
 
@@ -24,7 +24,7 @@ abstract class PaymentModel with _$PaymentModel {
       paymentMethod: json['paymentMethod']?.toString() ?? 'CARD',
       amount:
           (json['amount'] is num) ? (json['amount'] as num).toDouble() : 0.0,
-      currency: json['currency']?.toString() ?? 'USD',
+      currency: json['currency']?.toString() ?? 'INR',
       status: json['status']?.toString() ?? 'PENDING',
     );
   }

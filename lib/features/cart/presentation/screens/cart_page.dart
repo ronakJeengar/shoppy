@@ -12,8 +12,9 @@ import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/core/utils/ui_state.dart';
 import 'package:shopp_app/features/cart/domain/entities/cart_entity.dart';
 import 'package:shopp_app/features/cart/presentation/providers/cart_providers.dart';
-import 'package:shopp_app/features/checkout/presentation/screens/checkout_page.dart';
 import 'package:shopp_app/core/widgets/app_button.dart';
+import 'package:shopp_app/core/utils/currency_formatter.dart';
+import 'package:shopp_app/features/checkout/presentation/screens/checkout_page.dart';
 import '../widgets/cart_item_tile.dart';
 import 'package:shopp_app/core/widgets/empty_state.dart';
 import 'package:shopp_app/core/widgets/error_state.dart';
@@ -119,7 +120,7 @@ class CartPage extends ConsumerWidget {
       );
     }
 
-    const double freeShippingThreshold = 100.0;
+    const double freeShippingThreshold = 499.0;
     final double currentSubtotal = cart.subtotal;
     final bool qualifiesForFreeShipping = currentSubtotal >= freeShippingThreshold;
     final double neededForFreeShipping = (freeShippingThreshold - currentSubtotal).clamp(0.0, freeShippingThreshold);
@@ -213,19 +214,19 @@ class CartPage extends ConsumerWidget {
               children: [
                 Text(AppStrings.cart.orderSummary, style: AppTypography.headingSmall),
                 const SizedBox(height: 14),
-                _summaryRow(AppStrings.cart.subtotal, '\$${cart.subtotal.toStringAsFixed(2)}'),
+                _summaryRow(AppStrings.cart.subtotal, CurrencyFormatter.format(cart.subtotal)),
                 const SizedBox(height: AppDimensions.sm),
                 _summaryRow(
                   AppStrings.cart.shipping,
-                  cart.shipping == 0 ? AppStrings.cart.shippingFree : '\$${cart.shipping.toStringAsFixed(2)}',
+                  cart.shipping == 0 ? AppStrings.cart.shippingFree : CurrencyFormatter.format(cart.shipping),
                   valueColor: cart.shipping == 0 ? AppColors.success : null,
                 ),
                 const SizedBox(height: AppDimensions.sm),
-                _summaryRow(AppStrings.cart.tax, '\$${cart.tax.toStringAsFixed(2)}'),
+                _summaryRow(AppStrings.cart.tax, CurrencyFormatter.format(cart.tax)),
                 const Divider(height: AppDimensions.xxl, color: AppColors.divider),
                 _summaryRow(
                   AppStrings.cart.estimatedTotal,
-                  '\$${cart.total.toStringAsFixed(2)}',
+                  CurrencyFormatter.format(cart.total),
                   isBold: true,
                 ),
               ],
@@ -282,7 +283,7 @@ class CartPage extends ConsumerWidget {
                 style: AppTypography.caption.copyWith(color: AppColors.textSecondary),
               ),
               Text(
-                '\$${cart.total.toStringAsFixed(2)}',
+                CurrencyFormatter.format(cart.total),
                 style: AppTypography.priceCard.copyWith(fontSize: 20),
               ),
             ],

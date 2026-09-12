@@ -311,7 +311,7 @@ void main() {
 
     expect(find.text('Mechanical Gaming Keyboard'), findsOneWidget);
     expect(find.text('KeyCrafters'), findsOneWidget);
-    expect(find.text('\$89.99'), findsOneWidget);
+    expect(find.text('₹89.99'), findsOneWidget);
     expect(find.text('4.8'), findsOneWidget);
 
     await tester.tap(find.text('Mechanical Gaming Keyboard'));
@@ -452,7 +452,7 @@ void main() {
     expect(find.text('CONFIRMED'), findsOneWidget);
     expect(find.text('Jane Doe'), findsOneWidget);
     expect(find.text('Wireless Headphones'), findsOneWidget);
-    expect(find.text('\$161.99'), findsOneWidget);
+    expect(find.text('₹161.99'), findsOneWidget);
     expect(find.text('Continue Shopping'), findsOneWidget);
     expect(find.text('View All Orders'), findsOneWidget);
   });
@@ -1019,7 +1019,7 @@ void main() {
     const confModel = AssistantConfirmationModel(
       confirmationId: 'conf_test_77',
       action: 'cancel_order',
-      summary: 'Cancel order #ORD-2026-A10 (Total: \$89.99)',
+      summary: 'Cancel order #ORD-2026-A10 (Total: ₹89.99)',
       orderId: 'ORD-2026-A10',
       totalAmount: 89.99,
     );
@@ -1045,7 +1045,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Confirmation Required'), findsOneWidget);
-    expect(find.text('Cancel order #ORD-2026-A10 (Total: \$89.99)'), findsOneWidget);
+    expect(find.text('Cancel order #ORD-2026-A10 (Total: ₹89.99)'), findsOneWidget);
     expect(find.text('This action cannot be undone automatically.'), findsOneWidget);
     expect(find.widgetWithText(OutlinedButton, 'Cancel'), findsOneWidget);
     expect(find.widgetWithText(ElevatedButton, 'Confirm'), findsOneWidget);

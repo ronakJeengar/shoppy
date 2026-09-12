@@ -1,5 +1,6 @@
 import 'package:shopp_app/features/addresses/data/mappers/address_mappers.dart';
 import 'package:shopp_app/features/checkout/data/mappers/checkout_mappers.dart';
+import 'package:shopp_app/features/checkout/data/models/tax_breakdown_model.dart';
 import '../../domain/entities/order_entity.dart';
 import '../models/order_model.dart';
 
@@ -13,6 +14,10 @@ extension OrderItemModelMapper on OrderItemModel {
       unitPrice: unitPrice,
       quantity: quantity,
       lineTotal: lineTotal,
+      hsnCode: hsnCode,
+      gstRate: gstRate,
+      isTaxInclusive: isTaxInclusive,
+      taxableAmount: taxableAmount,
     );
   }
 }
@@ -27,6 +32,10 @@ extension OrderItemEntityMapper on OrderItemEntity {
       unitPrice: unitPrice,
       quantity: quantity,
       lineTotal: lineTotal,
+      hsnCode: hsnCode,
+      gstRate: gstRate,
+      isTaxInclusive: isTaxInclusive,
+      taxableAmount: taxableAmount,
     );
   }
 }
@@ -64,6 +73,11 @@ extension OrderModelMapper on OrderModel {
       tax: tax,
       totalAmount: totalAmount,
       currency: currency,
+      currencySymbol: currencySymbol,
+      taxableAmount: taxableAmount,
+      discount: discount,
+      taxBreakdown: taxBreakdown?.toEntity(),
+      customerGstin: customerGstin,
       status: status,
       payment: payment?.toEntity(),
       carrier: carrier,
@@ -89,6 +103,11 @@ extension OrderEntityMapper on OrderEntity {
       tax: tax,
       totalAmount: totalAmount,
       currency: currency,
+      currencySymbol: currencySymbol,
+      taxableAmount: taxableAmount,
+      discount: discount,
+      taxBreakdown: taxBreakdown != null ? TaxBreakdownModel.fromEntity(taxBreakdown!) : null,
+      customerGstin: customerGstin,
       status: status,
       payment: payment?.toModel(),
       carrier: carrier,

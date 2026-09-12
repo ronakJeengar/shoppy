@@ -19,6 +19,11 @@ mixin _$ProductEntity {
   String get sellerName;
   String get description;
   double get price;
+  double? get mrp;
+  String get hsnCode;
+  double get gstRate;
+  bool get isTaxInclusive;
+  bool get isCodEligible;
   int get stock;
   double get productRating;
   int get totalReviews;
@@ -52,6 +57,13 @@ mixin _$ProductEntity {
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.price, price) || other.price == price) &&
+            (identical(other.mrp, mrp) || other.mrp == mrp) &&
+            (identical(other.hsnCode, hsnCode) || other.hsnCode == hsnCode) &&
+            (identical(other.gstRate, gstRate) || other.gstRate == gstRate) &&
+            (identical(other.isTaxInclusive, isTaxInclusive) ||
+                other.isTaxInclusive == isTaxInclusive) &&
+            (identical(other.isCodEligible, isCodEligible) ||
+                other.isCodEligible == isCodEligible) &&
             (identical(other.stock, stock) || other.stock == stock) &&
             (identical(other.productRating, productRating) ||
                 other.productRating == productRating) &&
@@ -74,28 +86,34 @@ mixin _$ProductEntity {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      productName,
-      sellerName,
-      description,
-      price,
-      stock,
-      productRating,
-      totalReviews,
-      productImage,
-      categoryId,
-      categoryName,
-      isActive,
-      const DeepCollectionEquality().hash(images),
-      videoUrl,
-      model3dUrl,
-      const DeepCollectionEquality().hash(media));
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        id,
+        productName,
+        sellerName,
+        description,
+        price,
+        mrp,
+        hsnCode,
+        gstRate,
+        isTaxInclusive,
+        isCodEligible,
+        stock,
+        productRating,
+        totalReviews,
+        productImage,
+        categoryId,
+        categoryName,
+        isActive,
+        const DeepCollectionEquality().hash(images),
+        videoUrl,
+        model3dUrl,
+        const DeepCollectionEquality().hash(media)
+      ]);
 
   @override
   String toString() {
-    return 'ProductEntity(id: $id, productName: $productName, sellerName: $sellerName, description: $description, price: $price, stock: $stock, productRating: $productRating, totalReviews: $totalReviews, productImage: $productImage, categoryId: $categoryId, categoryName: $categoryName, isActive: $isActive, images: $images, videoUrl: $videoUrl, model3dUrl: $model3dUrl, media: $media)';
+    return 'ProductEntity(id: $id, productName: $productName, sellerName: $sellerName, description: $description, price: $price, mrp: $mrp, hsnCode: $hsnCode, gstRate: $gstRate, isTaxInclusive: $isTaxInclusive, isCodEligible: $isCodEligible, stock: $stock, productRating: $productRating, totalReviews: $totalReviews, productImage: $productImage, categoryId: $categoryId, categoryName: $categoryName, isActive: $isActive, images: $images, videoUrl: $videoUrl, model3dUrl: $model3dUrl, media: $media)';
   }
 }
 
@@ -111,6 +129,11 @@ abstract mixin class $ProductEntityCopyWith<$Res> {
       String sellerName,
       String description,
       double price,
+      double? mrp,
+      String hsnCode,
+      double gstRate,
+      bool isTaxInclusive,
+      bool isCodEligible,
       int stock,
       double productRating,
       int totalReviews,
@@ -142,6 +165,11 @@ class _$ProductEntityCopyWithImpl<$Res>
     Object? sellerName = null,
     Object? description = null,
     Object? price = null,
+    Object? mrp = freezed,
+    Object? hsnCode = null,
+    Object? gstRate = null,
+    Object? isTaxInclusive = null,
+    Object? isCodEligible = null,
     Object? stock = null,
     Object? productRating = null,
     Object? totalReviews = null,
@@ -175,6 +203,26 @@ class _$ProductEntityCopyWithImpl<$Res>
           ? _self.price
           : price // ignore: cast_nullable_to_non_nullable
               as double,
+      mrp: freezed == mrp
+          ? _self.mrp
+          : mrp // ignore: cast_nullable_to_non_nullable
+              as double?,
+      hsnCode: null == hsnCode
+          ? _self.hsnCode
+          : hsnCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      gstRate: null == gstRate
+          ? _self.gstRate
+          : gstRate // ignore: cast_nullable_to_non_nullable
+              as double,
+      isTaxInclusive: null == isTaxInclusive
+          ? _self.isTaxInclusive
+          : isTaxInclusive // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isCodEligible: null == isCodEligible
+          ? _self.isCodEligible
+          : isCodEligible // ignore: cast_nullable_to_non_nullable
+              as bool,
       stock: null == stock
           ? _self.stock
           : stock // ignore: cast_nullable_to_non_nullable
@@ -322,6 +370,11 @@ extension ProductEntityPatterns on ProductEntity {
             String sellerName,
             String description,
             double price,
+            double? mrp,
+            String hsnCode,
+            double gstRate,
+            bool isTaxInclusive,
+            bool isCodEligible,
             int stock,
             double productRating,
             int totalReviews,
@@ -345,6 +398,11 @@ extension ProductEntityPatterns on ProductEntity {
             _that.sellerName,
             _that.description,
             _that.price,
+            _that.mrp,
+            _that.hsnCode,
+            _that.gstRate,
+            _that.isTaxInclusive,
+            _that.isCodEligible,
             _that.stock,
             _that.productRating,
             _that.totalReviews,
@@ -382,6 +440,11 @@ extension ProductEntityPatterns on ProductEntity {
             String sellerName,
             String description,
             double price,
+            double? mrp,
+            String hsnCode,
+            double gstRate,
+            bool isTaxInclusive,
+            bool isCodEligible,
             int stock,
             double productRating,
             int totalReviews,
@@ -404,6 +467,11 @@ extension ProductEntityPatterns on ProductEntity {
             _that.sellerName,
             _that.description,
             _that.price,
+            _that.mrp,
+            _that.hsnCode,
+            _that.gstRate,
+            _that.isTaxInclusive,
+            _that.isCodEligible,
             _that.stock,
             _that.productRating,
             _that.totalReviews,
@@ -440,6 +508,11 @@ extension ProductEntityPatterns on ProductEntity {
             String sellerName,
             String description,
             double price,
+            double? mrp,
+            String hsnCode,
+            double gstRate,
+            bool isTaxInclusive,
+            bool isCodEligible,
             int stock,
             double productRating,
             int totalReviews,
@@ -462,6 +535,11 @@ extension ProductEntityPatterns on ProductEntity {
             _that.sellerName,
             _that.description,
             _that.price,
+            _that.mrp,
+            _that.hsnCode,
+            _that.gstRate,
+            _that.isTaxInclusive,
+            _that.isCodEligible,
             _that.stock,
             _that.productRating,
             _that.totalReviews,
@@ -488,6 +566,11 @@ class _ProductEntity extends ProductEntity {
       this.sellerName = 'Shoppy Verified',
       this.description = '',
       required this.price,
+      this.mrp,
+      this.hsnCode = '8518',
+      this.gstRate = 18.0,
+      this.isTaxInclusive = true,
+      this.isCodEligible = true,
       this.stock = 0,
       this.productRating = 0.0,
       this.totalReviews = 0,
@@ -515,6 +598,20 @@ class _ProductEntity extends ProductEntity {
   final String description;
   @override
   final double price;
+  @override
+  final double? mrp;
+  @override
+  @JsonKey()
+  final String hsnCode;
+  @override
+  @JsonKey()
+  final double gstRate;
+  @override
+  @JsonKey()
+  final bool isTaxInclusive;
+  @override
+  @JsonKey()
+  final bool isCodEligible;
   @override
   @JsonKey()
   final int stock;
@@ -576,6 +673,13 @@ class _ProductEntity extends ProductEntity {
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.price, price) || other.price == price) &&
+            (identical(other.mrp, mrp) || other.mrp == mrp) &&
+            (identical(other.hsnCode, hsnCode) || other.hsnCode == hsnCode) &&
+            (identical(other.gstRate, gstRate) || other.gstRate == gstRate) &&
+            (identical(other.isTaxInclusive, isTaxInclusive) ||
+                other.isTaxInclusive == isTaxInclusive) &&
+            (identical(other.isCodEligible, isCodEligible) ||
+                other.isCodEligible == isCodEligible) &&
             (identical(other.stock, stock) || other.stock == stock) &&
             (identical(other.productRating, productRating) ||
                 other.productRating == productRating) &&
@@ -598,28 +702,34 @@ class _ProductEntity extends ProductEntity {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      productName,
-      sellerName,
-      description,
-      price,
-      stock,
-      productRating,
-      totalReviews,
-      productImage,
-      categoryId,
-      categoryName,
-      isActive,
-      const DeepCollectionEquality().hash(_images),
-      videoUrl,
-      model3dUrl,
-      const DeepCollectionEquality().hash(_media));
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        id,
+        productName,
+        sellerName,
+        description,
+        price,
+        mrp,
+        hsnCode,
+        gstRate,
+        isTaxInclusive,
+        isCodEligible,
+        stock,
+        productRating,
+        totalReviews,
+        productImage,
+        categoryId,
+        categoryName,
+        isActive,
+        const DeepCollectionEquality().hash(_images),
+        videoUrl,
+        model3dUrl,
+        const DeepCollectionEquality().hash(_media)
+      ]);
 
   @override
   String toString() {
-    return 'ProductEntity(id: $id, productName: $productName, sellerName: $sellerName, description: $description, price: $price, stock: $stock, productRating: $productRating, totalReviews: $totalReviews, productImage: $productImage, categoryId: $categoryId, categoryName: $categoryName, isActive: $isActive, images: $images, videoUrl: $videoUrl, model3dUrl: $model3dUrl, media: $media)';
+    return 'ProductEntity(id: $id, productName: $productName, sellerName: $sellerName, description: $description, price: $price, mrp: $mrp, hsnCode: $hsnCode, gstRate: $gstRate, isTaxInclusive: $isTaxInclusive, isCodEligible: $isCodEligible, stock: $stock, productRating: $productRating, totalReviews: $totalReviews, productImage: $productImage, categoryId: $categoryId, categoryName: $categoryName, isActive: $isActive, images: $images, videoUrl: $videoUrl, model3dUrl: $model3dUrl, media: $media)';
   }
 }
 
@@ -637,6 +747,11 @@ abstract mixin class _$ProductEntityCopyWith<$Res>
       String sellerName,
       String description,
       double price,
+      double? mrp,
+      String hsnCode,
+      double gstRate,
+      bool isTaxInclusive,
+      bool isCodEligible,
       int stock,
       double productRating,
       int totalReviews,
@@ -668,6 +783,11 @@ class __$ProductEntityCopyWithImpl<$Res>
     Object? sellerName = null,
     Object? description = null,
     Object? price = null,
+    Object? mrp = freezed,
+    Object? hsnCode = null,
+    Object? gstRate = null,
+    Object? isTaxInclusive = null,
+    Object? isCodEligible = null,
     Object? stock = null,
     Object? productRating = null,
     Object? totalReviews = null,
@@ -701,6 +821,26 @@ class __$ProductEntityCopyWithImpl<$Res>
           ? _self.price
           : price // ignore: cast_nullable_to_non_nullable
               as double,
+      mrp: freezed == mrp
+          ? _self.mrp
+          : mrp // ignore: cast_nullable_to_non_nullable
+              as double?,
+      hsnCode: null == hsnCode
+          ? _self.hsnCode
+          : hsnCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      gstRate: null == gstRate
+          ? _self.gstRate
+          : gstRate // ignore: cast_nullable_to_non_nullable
+              as double,
+      isTaxInclusive: null == isTaxInclusive
+          ? _self.isTaxInclusive
+          : isTaxInclusive // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isCodEligible: null == isCodEligible
+          ? _self.isCodEligible
+          : isCodEligible // ignore: cast_nullable_to_non_nullable
+              as bool,
       stock: null == stock
           ? _self.stock
           : stock // ignore: cast_nullable_to_non_nullable

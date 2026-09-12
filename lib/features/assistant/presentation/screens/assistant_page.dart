@@ -11,6 +11,7 @@ import 'package:shopp_app/core/widgets/app_network_image.dart';
 import 'package:shopp_app/features/assistant/data/models/assistant_message_model.dart';
 import 'package:shopp_app/features/assistant/presentation/providers/assistant_providers.dart';
 import 'package:shopp_app/features/catalog/data/mappers/catalog_mappers.dart';
+import 'package:shopp_app/core/utils/currency_formatter.dart';
 import 'package:shopp_app/features/catalog/presentation/screens/product_detail_page.dart';
 
 class AssistantPage extends ConsumerStatefulWidget {
@@ -506,7 +507,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
                       Row(
                         children: [
                           Text(
-                            '\$${p.price.toStringAsFixed(2)}',
+                            CurrencyFormatter.format(p.price, showDecimals: false),
                             style: AppTypography.priceCard,
                           ),
                           const Spacer(),

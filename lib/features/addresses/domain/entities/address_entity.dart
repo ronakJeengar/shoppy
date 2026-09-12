@@ -14,10 +14,23 @@ abstract class AddressEntity with _$AddressEntity {
     required String city,
     required String state,
     required String postalCode,
-    @Default('US') String country,
+    @Default('') String pinCode,
+    @Default('') String district,
+    @Default('') String landmark,
+    @Default('IN') String country,
     @Default(false) bool isDefault,
   }) = _AddressEntity;
 
-  String get formattedAddress =>
-      '$streetAddress, $city, $state $postalCode, $country';
+  String get formattedAddress {
+    final code = pinCode.isNotEmpty ? pinCode : postalCode;
+    final parts = [
+      streetAddress,
+      if (landmark.trim().isNotEmpty) landmark.trim(),
+      if (district.trim().isNotEmpty && district.trim() != city.trim()) district.trim(),
+      city.trim(),
+      '${state.trim()} $code'.trim(),
+      country.trim(),
+    ];
+    return parts.where((p) => p.isNotEmpty).join(', ');
+  }
 }

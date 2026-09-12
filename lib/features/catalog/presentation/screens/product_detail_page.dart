@@ -18,6 +18,7 @@ import 'package:shopp_app/features/reviews/presentation/providers/review_provide
 import 'package:shopp_app/features/wishlist/presentation/providers/wishlist_providers.dart';
 import 'package:shopp_app/features/cart/presentation/screens/cart_page.dart';
 import 'package:shopp_app/core/widgets/app_button.dart';
+import 'package:shopp_app/core/utils/currency_formatter.dart';
 import '../widgets/product_media_gallery.dart';
 import 'package:shopp_app/features/recommendations/presentation/widgets/recommendation_carousel.dart';
 import 'package:shopp_app/features/reviews/presentation/widgets/write_review_dialog.dart';
@@ -261,19 +262,71 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
 
                   const SizedBox(height: 16),
 
-                  // Price & Stock Urgency Row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                  // Price & GST Details
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
                         children: [
-                          Text('Price', style: AppTypography.caption.copyWith(color: AppColors.slate500)),
-                          const SizedBox(height: 2),
                           Text(
-                            '\$${_currentProduct.price.toStringAsFixed(2)}',
+                            CurrencyFormatter.format(_currentProduct.price, showDecimals: false),
                             style: AppTypography.priceHero,
+                          ),
+                          if (_currentProduct.hasDiscount) ...[
+                            const SizedBox(width: 8),
+                            Text(
+                              CurrencyFormatter.format(_currentProduct.mrp, showDecimals: false),
+                              style: AppTypography.bodyMedium.copyWith(
+                                decoration: TextDecoration.lineThrough,
+                                color: AppColors.slate500,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: AppColors.success.withValues(alpha: 0.12),
+                                borderRadius: AppRadius.borderSm,
+                              ),
+                              child: Text(
+                                '${_currentProduct.discountPercentage.toInt()}% OFF',
+                                style: AppTypography.caption.copyWith(
+                                  color: AppColors.success,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppColors.slate100,
+                              borderRadius: AppRadius.borderSm,
+                              border: Border.all(color: AppColors.border),
+                            ),
+                            child: Text(
+                              'Inclusive of all taxes',
+                              style: AppTypography.caption.copyWith(
+                                color: AppColors.slate700,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'GST: ${_currentProduct.gstRate.toInt()}% • HSN: ${_currentProduct.hsnCode}',
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.slate500,
+                              fontSize: 11,
+                            ),
                           ),
                         ],
                       ),

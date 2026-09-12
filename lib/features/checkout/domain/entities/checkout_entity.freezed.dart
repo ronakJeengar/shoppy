@@ -21,6 +21,12 @@ mixin _$CheckoutValidationEntity {
   double get shippingFee;
   double get tax;
   double get grandTotal;
+  double get taxableAmount;
+  double get discount;
+  String get currency;
+  String get currencySymbol;
+  TaxBreakdownEntity? get taxBreakdown;
+  String? get customerGstin;
 
   /// Create a copy of CheckoutValidationEntity
   /// with the given fields replaced by the non-null parameter values.
@@ -46,16 +52,41 @@ mixin _$CheckoutValidationEntity {
                 other.shippingFee == shippingFee) &&
             (identical(other.tax, tax) || other.tax == tax) &&
             (identical(other.grandTotal, grandTotal) ||
-                other.grandTotal == grandTotal));
+                other.grandTotal == grandTotal) &&
+            (identical(other.taxableAmount, taxableAmount) ||
+                other.taxableAmount == taxableAmount) &&
+            (identical(other.discount, discount) ||
+                other.discount == discount) &&
+            (identical(other.currency, currency) ||
+                other.currency == currency) &&
+            (identical(other.currencySymbol, currencySymbol) ||
+                other.currencySymbol == currencySymbol) &&
+            (identical(other.taxBreakdown, taxBreakdown) ||
+                other.taxBreakdown == taxBreakdown) &&
+            (identical(other.customerGstin, customerGstin) ||
+                other.customerGstin == customerGstin));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, valid, shippingAddress,
-      shippingMethod, subtotal, shippingFee, tax, grandTotal);
+  int get hashCode => Object.hash(
+      runtimeType,
+      valid,
+      shippingAddress,
+      shippingMethod,
+      subtotal,
+      shippingFee,
+      tax,
+      grandTotal,
+      taxableAmount,
+      discount,
+      currency,
+      currencySymbol,
+      taxBreakdown,
+      customerGstin);
 
   @override
   String toString() {
-    return 'CheckoutValidationEntity(valid: $valid, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, grandTotal: $grandTotal)';
+    return 'CheckoutValidationEntity(valid: $valid, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, grandTotal: $grandTotal, taxableAmount: $taxableAmount, discount: $discount, currency: $currency, currencySymbol: $currencySymbol, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin)';
   }
 }
 
@@ -72,9 +103,16 @@ abstract mixin class $CheckoutValidationEntityCopyWith<$Res> {
       double subtotal,
       double shippingFee,
       double tax,
-      double grandTotal});
+      double grandTotal,
+      double taxableAmount,
+      double discount,
+      String currency,
+      String currencySymbol,
+      TaxBreakdownEntity? taxBreakdown,
+      String? customerGstin});
 
   $AddressEntityCopyWith<$Res>? get shippingAddress;
+  $TaxBreakdownEntityCopyWith<$Res>? get taxBreakdown;
 }
 
 /// @nodoc
@@ -97,6 +135,12 @@ class _$CheckoutValidationEntityCopyWithImpl<$Res>
     Object? shippingFee = null,
     Object? tax = null,
     Object? grandTotal = null,
+    Object? taxableAmount = null,
+    Object? discount = null,
+    Object? currency = null,
+    Object? currencySymbol = null,
+    Object? taxBreakdown = freezed,
+    Object? customerGstin = freezed,
   }) {
     return _then(_self.copyWith(
       valid: null == valid
@@ -127,6 +171,30 @@ class _$CheckoutValidationEntityCopyWithImpl<$Res>
           ? _self.grandTotal
           : grandTotal // ignore: cast_nullable_to_non_nullable
               as double,
+      taxableAmount: null == taxableAmount
+          ? _self.taxableAmount
+          : taxableAmount // ignore: cast_nullable_to_non_nullable
+              as double,
+      discount: null == discount
+          ? _self.discount
+          : discount // ignore: cast_nullable_to_non_nullable
+              as double,
+      currency: null == currency
+          ? _self.currency
+          : currency // ignore: cast_nullable_to_non_nullable
+              as String,
+      currencySymbol: null == currencySymbol
+          ? _self.currencySymbol
+          : currencySymbol // ignore: cast_nullable_to_non_nullable
+              as String,
+      taxBreakdown: freezed == taxBreakdown
+          ? _self.taxBreakdown
+          : taxBreakdown // ignore: cast_nullable_to_non_nullable
+              as TaxBreakdownEntity?,
+      customerGstin: freezed == customerGstin
+          ? _self.customerGstin
+          : customerGstin // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 
@@ -141,6 +209,20 @@ class _$CheckoutValidationEntityCopyWithImpl<$Res>
 
     return $AddressEntityCopyWith<$Res>(_self.shippingAddress!, (value) {
       return _then(_self.copyWith(shippingAddress: value));
+    });
+  }
+
+  /// Create a copy of CheckoutValidationEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $TaxBreakdownEntityCopyWith<$Res>? get taxBreakdown {
+    if (_self.taxBreakdown == null) {
+      return null;
+    }
+
+    return $TaxBreakdownEntityCopyWith<$Res>(_self.taxBreakdown!, (value) {
+      return _then(_self.copyWith(taxBreakdown: value));
     });
   }
 }
@@ -245,7 +327,13 @@ extension CheckoutValidationEntityPatterns on CheckoutValidationEntity {
             double subtotal,
             double shippingFee,
             double tax,
-            double grandTotal)?
+            double grandTotal,
+            double taxableAmount,
+            double discount,
+            String currency,
+            String currencySymbol,
+            TaxBreakdownEntity? taxBreakdown,
+            String? customerGstin)?
         $default, {
     required TResult orElse(),
   }) {
@@ -259,7 +347,13 @@ extension CheckoutValidationEntityPatterns on CheckoutValidationEntity {
             _that.subtotal,
             _that.shippingFee,
             _that.tax,
-            _that.grandTotal);
+            _that.grandTotal,
+            _that.taxableAmount,
+            _that.discount,
+            _that.currency,
+            _that.currencySymbol,
+            _that.taxBreakdown,
+            _that.customerGstin);
       case _:
         return orElse();
     }
@@ -287,7 +381,13 @@ extension CheckoutValidationEntityPatterns on CheckoutValidationEntity {
             double subtotal,
             double shippingFee,
             double tax,
-            double grandTotal)
+            double grandTotal,
+            double taxableAmount,
+            double discount,
+            String currency,
+            String currencySymbol,
+            TaxBreakdownEntity? taxBreakdown,
+            String? customerGstin)
         $default,
   ) {
     final _that = this;
@@ -300,7 +400,13 @@ extension CheckoutValidationEntityPatterns on CheckoutValidationEntity {
             _that.subtotal,
             _that.shippingFee,
             _that.tax,
-            _that.grandTotal);
+            _that.grandTotal,
+            _that.taxableAmount,
+            _that.discount,
+            _that.currency,
+            _that.currencySymbol,
+            _that.taxBreakdown,
+            _that.customerGstin);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -327,7 +433,13 @@ extension CheckoutValidationEntityPatterns on CheckoutValidationEntity {
             double subtotal,
             double shippingFee,
             double tax,
-            double grandTotal)?
+            double grandTotal,
+            double taxableAmount,
+            double discount,
+            String currency,
+            String currencySymbol,
+            TaxBreakdownEntity? taxBreakdown,
+            String? customerGstin)?
         $default,
   ) {
     final _that = this;
@@ -340,7 +452,13 @@ extension CheckoutValidationEntityPatterns on CheckoutValidationEntity {
             _that.subtotal,
             _that.shippingFee,
             _that.tax,
-            _that.grandTotal);
+            _that.grandTotal,
+            _that.taxableAmount,
+            _that.discount,
+            _that.currency,
+            _that.currencySymbol,
+            _that.taxBreakdown,
+            _that.customerGstin);
       case _:
         return null;
     }
@@ -357,7 +475,13 @@ class _CheckoutValidationEntity implements CheckoutValidationEntity {
       required this.subtotal,
       required this.shippingFee,
       required this.tax,
-      required this.grandTotal});
+      required this.grandTotal,
+      this.taxableAmount = 0.0,
+      this.discount = 0.0,
+      this.currency = 'INR',
+      this.currencySymbol = '₹',
+      this.taxBreakdown,
+      this.customerGstin});
 
   @override
   final bool valid;
@@ -374,6 +498,22 @@ class _CheckoutValidationEntity implements CheckoutValidationEntity {
   final double tax;
   @override
   final double grandTotal;
+  @override
+  @JsonKey()
+  final double taxableAmount;
+  @override
+  @JsonKey()
+  final double discount;
+  @override
+  @JsonKey()
+  final String currency;
+  @override
+  @JsonKey()
+  final String currencySymbol;
+  @override
+  final TaxBreakdownEntity? taxBreakdown;
+  @override
+  final String? customerGstin;
 
   /// Create a copy of CheckoutValidationEntity
   /// with the given fields replaced by the non-null parameter values.
@@ -400,16 +540,41 @@ class _CheckoutValidationEntity implements CheckoutValidationEntity {
                 other.shippingFee == shippingFee) &&
             (identical(other.tax, tax) || other.tax == tax) &&
             (identical(other.grandTotal, grandTotal) ||
-                other.grandTotal == grandTotal));
+                other.grandTotal == grandTotal) &&
+            (identical(other.taxableAmount, taxableAmount) ||
+                other.taxableAmount == taxableAmount) &&
+            (identical(other.discount, discount) ||
+                other.discount == discount) &&
+            (identical(other.currency, currency) ||
+                other.currency == currency) &&
+            (identical(other.currencySymbol, currencySymbol) ||
+                other.currencySymbol == currencySymbol) &&
+            (identical(other.taxBreakdown, taxBreakdown) ||
+                other.taxBreakdown == taxBreakdown) &&
+            (identical(other.customerGstin, customerGstin) ||
+                other.customerGstin == customerGstin));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, valid, shippingAddress,
-      shippingMethod, subtotal, shippingFee, tax, grandTotal);
+  int get hashCode => Object.hash(
+      runtimeType,
+      valid,
+      shippingAddress,
+      shippingMethod,
+      subtotal,
+      shippingFee,
+      tax,
+      grandTotal,
+      taxableAmount,
+      discount,
+      currency,
+      currencySymbol,
+      taxBreakdown,
+      customerGstin);
 
   @override
   String toString() {
-    return 'CheckoutValidationEntity(valid: $valid, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, grandTotal: $grandTotal)';
+    return 'CheckoutValidationEntity(valid: $valid, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, grandTotal: $grandTotal, taxableAmount: $taxableAmount, discount: $discount, currency: $currency, currencySymbol: $currencySymbol, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin)';
   }
 }
 
@@ -428,10 +593,18 @@ abstract mixin class _$CheckoutValidationEntityCopyWith<$Res>
       double subtotal,
       double shippingFee,
       double tax,
-      double grandTotal});
+      double grandTotal,
+      double taxableAmount,
+      double discount,
+      String currency,
+      String currencySymbol,
+      TaxBreakdownEntity? taxBreakdown,
+      String? customerGstin});
 
   @override
   $AddressEntityCopyWith<$Res>? get shippingAddress;
+  @override
+  $TaxBreakdownEntityCopyWith<$Res>? get taxBreakdown;
 }
 
 /// @nodoc
@@ -454,6 +627,12 @@ class __$CheckoutValidationEntityCopyWithImpl<$Res>
     Object? shippingFee = null,
     Object? tax = null,
     Object? grandTotal = null,
+    Object? taxableAmount = null,
+    Object? discount = null,
+    Object? currency = null,
+    Object? currencySymbol = null,
+    Object? taxBreakdown = freezed,
+    Object? customerGstin = freezed,
   }) {
     return _then(_CheckoutValidationEntity(
       valid: null == valid
@@ -484,6 +663,30 @@ class __$CheckoutValidationEntityCopyWithImpl<$Res>
           ? _self.grandTotal
           : grandTotal // ignore: cast_nullable_to_non_nullable
               as double,
+      taxableAmount: null == taxableAmount
+          ? _self.taxableAmount
+          : taxableAmount // ignore: cast_nullable_to_non_nullable
+              as double,
+      discount: null == discount
+          ? _self.discount
+          : discount // ignore: cast_nullable_to_non_nullable
+              as double,
+      currency: null == currency
+          ? _self.currency
+          : currency // ignore: cast_nullable_to_non_nullable
+              as String,
+      currencySymbol: null == currencySymbol
+          ? _self.currencySymbol
+          : currencySymbol // ignore: cast_nullable_to_non_nullable
+              as String,
+      taxBreakdown: freezed == taxBreakdown
+          ? _self.taxBreakdown
+          : taxBreakdown // ignore: cast_nullable_to_non_nullable
+              as TaxBreakdownEntity?,
+      customerGstin: freezed == customerGstin
+          ? _self.customerGstin
+          : customerGstin // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 
@@ -498,6 +701,20 @@ class __$CheckoutValidationEntityCopyWithImpl<$Res>
 
     return $AddressEntityCopyWith<$Res>(_self.shippingAddress!, (value) {
       return _then(_self.copyWith(shippingAddress: value));
+    });
+  }
+
+  /// Create a copy of CheckoutValidationEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $TaxBreakdownEntityCopyWith<$Res>? get taxBreakdown {
+    if (_self.taxBreakdown == null) {
+      return null;
+    }
+
+    return $TaxBreakdownEntityCopyWith<$Res>(_self.taxBreakdown!, (value) {
+      return _then(_self.copyWith(taxBreakdown: value));
     });
   }
 }

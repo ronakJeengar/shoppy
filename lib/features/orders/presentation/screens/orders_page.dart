@@ -13,6 +13,7 @@ import 'package:shopp_app/features/catalog/presentation/screens/home_page.dart';
 import 'order_detail_page.dart';
 import 'package:shopp_app/core/widgets/app_network_image.dart';
 import 'package:shopp_app/core/widgets/empty_state.dart';
+import 'package:shopp_app/core/utils/currency_formatter.dart';
 
 class OrdersPage extends ConsumerStatefulWidget {
   const OrdersPage({super.key});
@@ -230,7 +231,7 @@ class _OrdersPageState extends ConsumerState<OrdersPage> {
                       style: AppTypography.caption.copyWith(color: AppColors.slate500),
                     ),
                     Text(
-                      '\$${order.totalAmount.toStringAsFixed(2)}',
+                      CurrencyFormatter.format(order.totalAmount),
                       style: AppTypography.priceCard,
                     ),
                   ],

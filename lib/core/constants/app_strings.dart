@@ -142,7 +142,12 @@ class _CartStrings {
   final String clearCart = 'Clear Cart';
   final String clearCartConfirm = 'Are you sure you want to remove all items from your cart?';
   final String subtotal = 'Subtotal';
-  final String tax = 'Estimated Tax (8%)';
+  final String tax = 'Estimated GST (Incl.)';
+  final String cgst = 'CGST';
+  final String sgst = 'SGST';
+  final String igst = 'IGST';
+  final String taxableAmount = 'Taxable Value';
+  final String inclusiveTaxes = 'Inclusive of all taxes';
   final String shipping = 'Shipping';
   final String shippingFree = 'FREE';
   final String discount = 'Discount';
@@ -153,7 +158,7 @@ class _CartStrings {
   final String removeItem = 'Remove';
   final String freeShippingUnlocked = 'You unlocked FREE Standard Shipping!';
   String freeShippingAddMore(double amount) =>
-      'Add \$${amount.toStringAsFixed(2)} more for FREE Delivery';
+      'Add ₹${amount.toStringAsFixed(0)} more for FREE Delivery';
 }
 
 class _CheckoutStrings {

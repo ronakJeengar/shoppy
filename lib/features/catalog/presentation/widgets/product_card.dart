@@ -14,6 +14,7 @@ import 'package:shopp_app/features/catalog/domain/entities/product_entity.dart';
 import 'package:shopp_app/features/wishlist/presentation/providers/wishlist_providers.dart';
 import '../screens/product_detail_page.dart';
 import 'package:shopp_app/core/widgets/app_network_image.dart';
+import 'package:shopp_app/core/utils/currency_formatter.dart';
 
 /// A modern, Figma-quality e-commerce product card with ratings, wishlist toggle,
 /// stock urgency badge, and instant add-to-cart button.
@@ -182,9 +183,32 @@ class ProductCard extends ConsumerWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.baseline,
+                              textBaseline: TextBaseline.alphabetic,
+                              children: [
+                                Text(
+                                  CurrencyFormatter.format(product.price),
+                                  style: AppTypography.priceCard,
+                                ),
+                                if (product.hasDiscount) ...[
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    CurrencyFormatter.format(product.mrp),
+                                    style: AppTypography.caption.copyWith(
+                                      decoration: TextDecoration.lineThrough,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
                             Text(
-                              '\$${product.price.toStringAsFixed(2)}',
-                              style: AppTypography.priceCard,
+                              'Incl. GST',
+                              style: AppTypography.caption.copyWith(
+                                fontSize: 10,
+                                color: AppColors.textSecondary,
+                              ),
                             ),
                             if (product.stock <= 5 && product.stock > 0)
                               Text(

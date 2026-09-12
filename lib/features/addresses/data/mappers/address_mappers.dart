@@ -11,6 +11,9 @@ extension AddressModelMapper on AddressModel {
       city: city,
       state: state,
       postalCode: postalCode,
+      pinCode: pinCode.isNotEmpty ? pinCode : postalCode,
+      district: district,
+      landmark: landmark,
       country: country,
       isDefault: isDefault,
     );
@@ -27,6 +30,9 @@ extension AddressEntityMapper on AddressEntity {
       city: city,
       state: state,
       postalCode: postalCode,
+      pinCode: pinCode.isNotEmpty ? pinCode : postalCode,
+      district: district,
+      landmark: landmark,
       country: country,
       isDefault: isDefault,
     );
@@ -40,6 +46,9 @@ extension AddressEntityMapper on AddressEntity {
       'city': city,
       'state': state,
       'postalCode': postalCode,
+      'pinCode': pinCode.isNotEmpty ? pinCode : postalCode,
+      'district': district,
+      'landmark': landmark,
       'country': country,
       'isDefault': isDefault,
     };

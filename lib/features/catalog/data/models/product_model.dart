@@ -13,6 +13,11 @@ abstract class ProductModel with _$ProductModel {
     @Default('Shoppy Verified') String sellerName,
     @Default('') String description,
     required double price,
+    double? mrp,
+    @Default('8518') String hsnCode,
+    @Default(18.0) double gstRate,
+    @Default(true) bool isTaxInclusive,
+    @Default(true) bool isCodEligible,
     @Default(0) int stock,
     @Default(0.0) double productRating,
     @Default(0) int totalReviews,
@@ -29,6 +34,10 @@ abstract class ProductModel with _$ProductModel {
   String get name => productName;
   String get imageUrl => productImage;
   bool get isInStock => stock > 0;
+
+  bool get hasDiscount => mrp != null && mrp! > price;
+  double get discountPercentage =>
+      hasDiscount ? (((mrp! - price) / mrp!) * 100).roundToDouble() : 0.0;
 
   List<String> get allImages {
     if (images.isNotEmpty) return images;
@@ -87,6 +96,9 @@ abstract class ProductModel with _$ProductModel {
     }
 
     final num rawPrice = json['price'] is num ? json['price'] as num : 0;
+    final double? parsedMrp = (json['mrp'] is num)
+        ? (json['mrp'] as num).toDouble()
+        : null;
     final num rawRating =
         json['productRating'] is num ? json['productRating'] as num : 0;
     final int parsedStock = json['stock'] is int
@@ -126,6 +138,17 @@ abstract class ProductModel with _$ProductModel {
       sellerName: (json['sellerName'] ?? 'Shoppy Verified').toString(),
       description: (json['description'] ?? '').toString(),
       price: rawPrice.toDouble(),
+      mrp: parsedMrp,
+      hsnCode: json['hsnCode']?.toString() ?? '8518',
+      gstRate: (json['gstRate'] is num)
+          ? (json['gstRate'] as num).toDouble()
+          : 18.0,
+      isTaxInclusive: json['isTaxInclusive'] != null
+          ? json['isTaxInclusive'] == true
+          : true,
+      isCodEligible: json['isCodEligible'] != null
+          ? json['isCodEligible'] == true
+          : true,
       stock: parsedStock,
       productRating: rawRating.toDouble(),
       totalReviews: parsedTotalReviews,
@@ -147,6 +170,11 @@ abstract class ProductModel with _$ProductModel {
       'sellerName': sellerName,
       'description': description,
       'price': price,
+      'mrp': mrp,
+      'hsnCode': hsnCode,
+      'gstRate': gstRate,
+      'isTaxInclusive': isTaxInclusive,
+      'isCodEligible': isCodEligible,
       'stock': stock,
       'productRating': productRating,
       'totalReviews': totalReviews,

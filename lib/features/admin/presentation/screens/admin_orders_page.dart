@@ -4,6 +4,7 @@ import 'package:shopp_app/core/constants/app_icon_sizes.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/features/orders/data/models/order_model.dart';
+import 'package:shopp_app/core/utils/currency_formatter.dart';
 import 'package:shopp_app/features/admin/presentation/providers/admin_providers.dart';
 
 class AdminOrdersPage extends ConsumerStatefulWidget {
@@ -74,7 +75,7 @@ class _AdminOrdersPageState extends ConsumerState<AdminOrdersPage> {
                 ],
               ),
               const SizedBox(height: 12),
-              Text('Total Amount: \$${order.totalAmount.toStringAsFixed(2)}'),
+              Text('Total Amount: ${CurrencyFormatter.format(order.totalAmount)}'),
               if (order.shippingAddress != null) ...[
                 const SizedBox(height: 4),
                 Text(
@@ -296,7 +297,7 @@ class _AdminOrdersPageState extends ConsumerState<AdminOrdersPage> {
                                   ),
                                 ),
                                 subtitle: Text(
-                                  '${o.shippingAddress?.fullName ?? 'Customer'} • \$${o.totalAmount.toStringAsFixed(2)}',
+                                  '${o.shippingAddress?.fullName ?? 'Customer'} • ${CurrencyFormatter.format(o.totalAmount)}',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: Colors.grey.shade600,

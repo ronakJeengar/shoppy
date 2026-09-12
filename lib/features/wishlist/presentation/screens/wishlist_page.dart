@@ -15,6 +15,7 @@ import 'package:shopp_app/features/catalog/domain/entities/product_entity.dart';
 import 'package:shopp_app/features/wishlist/presentation/providers/wishlist_providers.dart';
 import 'package:shopp_app/features/catalog/presentation/screens/home_page.dart';
 import 'package:shopp_app/features/catalog/presentation/screens/product_detail_page.dart';
+import 'package:shopp_app/core/utils/currency_formatter.dart';
 import 'package:shopp_app/core/widgets/app_button.dart';
 import 'package:shopp_app/core/widgets/app_network_image.dart';
 import 'package:shopp_app/core/widgets/empty_state.dart';
@@ -175,9 +176,23 @@ class WishlistPage extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(height: AppDimensions.xs),
-                          Text(
-                            '\$${product.price.toStringAsFixed(2)}',
-                            style: AppTypography.priceCard,
+                          Row(
+                            children: [
+                              Text(
+                                CurrencyFormatter.format(product.price, showDecimals: false),
+                                style: AppTypography.priceCard,
+                              ),
+                              if (product.hasDiscount && product.mrp != null) ...[
+                                const SizedBox(width: AppDimensions.xs),
+                                Text(
+                                  CurrencyFormatter.format(product.mrp!, showDecimals: false),
+                                  style: AppTypography.bodySmall.copyWith(
+                                    decoration: TextDecoration.lineThrough,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                           const SizedBox(height: AppDimensions.sm),
                           AppButton(

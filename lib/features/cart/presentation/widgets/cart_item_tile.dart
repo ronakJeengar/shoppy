@@ -10,6 +10,7 @@ import 'package:shopp_app/core/theme/app_typography.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:shopp_app/features/cart/domain/entities/cart_entity.dart';
 import 'package:shopp_app/core/widgets/app_network_image.dart';
+import 'package:shopp_app/core/utils/currency_formatter.dart';
 
 class CartItemTile extends StatelessWidget {
   final CartItemEntity item;
@@ -107,7 +108,7 @@ class CartItemTile extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '\$${item.price.toStringAsFixed(2)}',
+                        CurrencyFormatter.format(item.price),
                         style: AppTypography.priceCard,
                       ),
                       Container(

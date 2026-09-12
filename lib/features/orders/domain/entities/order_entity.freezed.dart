@@ -21,6 +21,10 @@ mixin _$OrderItemEntity {
   double get unitPrice;
   int get quantity;
   double get lineTotal;
+  String get hsnCode;
+  double get gstRate;
+  bool get isTaxInclusive;
+  double get taxableAmount;
 
   /// Create a copy of OrderItemEntity
   /// with the given fields replaced by the non-null parameter values.
@@ -48,16 +52,33 @@ mixin _$OrderItemEntity {
             (identical(other.quantity, quantity) ||
                 other.quantity == quantity) &&
             (identical(other.lineTotal, lineTotal) ||
-                other.lineTotal == lineTotal));
+                other.lineTotal == lineTotal) &&
+            (identical(other.hsnCode, hsnCode) || other.hsnCode == hsnCode) &&
+            (identical(other.gstRate, gstRate) || other.gstRate == gstRate) &&
+            (identical(other.isTaxInclusive, isTaxInclusive) ||
+                other.isTaxInclusive == isTaxInclusive) &&
+            (identical(other.taxableAmount, taxableAmount) ||
+                other.taxableAmount == taxableAmount));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, productId, productName,
-      productImage, sellerName, unitPrice, quantity, lineTotal);
+  int get hashCode => Object.hash(
+      runtimeType,
+      productId,
+      productName,
+      productImage,
+      sellerName,
+      unitPrice,
+      quantity,
+      lineTotal,
+      hsnCode,
+      gstRate,
+      isTaxInclusive,
+      taxableAmount);
 
   @override
   String toString() {
-    return 'OrderItemEntity(productId: $productId, productName: $productName, productImage: $productImage, sellerName: $sellerName, unitPrice: $unitPrice, quantity: $quantity, lineTotal: $lineTotal)';
+    return 'OrderItemEntity(productId: $productId, productName: $productName, productImage: $productImage, sellerName: $sellerName, unitPrice: $unitPrice, quantity: $quantity, lineTotal: $lineTotal, hsnCode: $hsnCode, gstRate: $gstRate, isTaxInclusive: $isTaxInclusive, taxableAmount: $taxableAmount)';
   }
 }
 
@@ -74,7 +95,11 @@ abstract mixin class $OrderItemEntityCopyWith<$Res> {
       String sellerName,
       double unitPrice,
       int quantity,
-      double lineTotal});
+      double lineTotal,
+      String hsnCode,
+      double gstRate,
+      bool isTaxInclusive,
+      double taxableAmount});
 }
 
 /// @nodoc
@@ -97,6 +122,10 @@ class _$OrderItemEntityCopyWithImpl<$Res>
     Object? unitPrice = null,
     Object? quantity = null,
     Object? lineTotal = null,
+    Object? hsnCode = null,
+    Object? gstRate = null,
+    Object? isTaxInclusive = null,
+    Object? taxableAmount = null,
   }) {
     return _then(_self.copyWith(
       productId: null == productId
@@ -126,6 +155,22 @@ class _$OrderItemEntityCopyWithImpl<$Res>
       lineTotal: null == lineTotal
           ? _self.lineTotal
           : lineTotal // ignore: cast_nullable_to_non_nullable
+              as double,
+      hsnCode: null == hsnCode
+          ? _self.hsnCode
+          : hsnCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      gstRate: null == gstRate
+          ? _self.gstRate
+          : gstRate // ignore: cast_nullable_to_non_nullable
+              as double,
+      isTaxInclusive: null == isTaxInclusive
+          ? _self.isTaxInclusive
+          : isTaxInclusive // ignore: cast_nullable_to_non_nullable
+              as bool,
+      taxableAmount: null == taxableAmount
+          ? _self.taxableAmount
+          : taxableAmount // ignore: cast_nullable_to_non_nullable
               as double,
     ));
   }
@@ -231,15 +276,29 @@ extension OrderItemEntityPatterns on OrderItemEntity {
             String sellerName,
             double unitPrice,
             int quantity,
-            double lineTotal)?
+            double lineTotal,
+            String hsnCode,
+            double gstRate,
+            bool isTaxInclusive,
+            double taxableAmount)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _OrderItemEntity() when $default != null:
-        return $default(_that.productId, _that.productName, _that.productImage,
-            _that.sellerName, _that.unitPrice, _that.quantity, _that.lineTotal);
+        return $default(
+            _that.productId,
+            _that.productName,
+            _that.productImage,
+            _that.sellerName,
+            _that.unitPrice,
+            _that.quantity,
+            _that.lineTotal,
+            _that.hsnCode,
+            _that.gstRate,
+            _that.isTaxInclusive,
+            _that.taxableAmount);
       case _:
         return orElse();
     }
@@ -260,15 +319,35 @@ extension OrderItemEntityPatterns on OrderItemEntity {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String productId, String productName, String productImage,
-            String sellerName, double unitPrice, int quantity, double lineTotal)
+    TResult Function(
+            String productId,
+            String productName,
+            String productImage,
+            String sellerName,
+            double unitPrice,
+            int quantity,
+            double lineTotal,
+            String hsnCode,
+            double gstRate,
+            bool isTaxInclusive,
+            double taxableAmount)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _OrderItemEntity():
-        return $default(_that.productId, _that.productName, _that.productImage,
-            _that.sellerName, _that.unitPrice, _that.quantity, _that.lineTotal);
+        return $default(
+            _that.productId,
+            _that.productName,
+            _that.productImage,
+            _that.sellerName,
+            _that.unitPrice,
+            _that.quantity,
+            _that.lineTotal,
+            _that.hsnCode,
+            _that.gstRate,
+            _that.isTaxInclusive,
+            _that.taxableAmount);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -295,14 +374,28 @@ extension OrderItemEntityPatterns on OrderItemEntity {
             String sellerName,
             double unitPrice,
             int quantity,
-            double lineTotal)?
+            double lineTotal,
+            String hsnCode,
+            double gstRate,
+            bool isTaxInclusive,
+            double taxableAmount)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _OrderItemEntity() when $default != null:
-        return $default(_that.productId, _that.productName, _that.productImage,
-            _that.sellerName, _that.unitPrice, _that.quantity, _that.lineTotal);
+        return $default(
+            _that.productId,
+            _that.productName,
+            _that.productImage,
+            _that.sellerName,
+            _that.unitPrice,
+            _that.quantity,
+            _that.lineTotal,
+            _that.hsnCode,
+            _that.gstRate,
+            _that.isTaxInclusive,
+            _that.taxableAmount);
       case _:
         return null;
     }
@@ -319,7 +412,11 @@ class _OrderItemEntity implements OrderItemEntity {
       required this.sellerName,
       required this.unitPrice,
       required this.quantity,
-      required this.lineTotal});
+      required this.lineTotal,
+      this.hsnCode = '8518',
+      this.gstRate = 18.0,
+      this.isTaxInclusive = true,
+      this.taxableAmount = 0.0});
 
   @override
   final String productId;
@@ -335,6 +432,18 @@ class _OrderItemEntity implements OrderItemEntity {
   final int quantity;
   @override
   final double lineTotal;
+  @override
+  @JsonKey()
+  final String hsnCode;
+  @override
+  @JsonKey()
+  final double gstRate;
+  @override
+  @JsonKey()
+  final bool isTaxInclusive;
+  @override
+  @JsonKey()
+  final double taxableAmount;
 
   /// Create a copy of OrderItemEntity
   /// with the given fields replaced by the non-null parameter values.
@@ -362,16 +471,33 @@ class _OrderItemEntity implements OrderItemEntity {
             (identical(other.quantity, quantity) ||
                 other.quantity == quantity) &&
             (identical(other.lineTotal, lineTotal) ||
-                other.lineTotal == lineTotal));
+                other.lineTotal == lineTotal) &&
+            (identical(other.hsnCode, hsnCode) || other.hsnCode == hsnCode) &&
+            (identical(other.gstRate, gstRate) || other.gstRate == gstRate) &&
+            (identical(other.isTaxInclusive, isTaxInclusive) ||
+                other.isTaxInclusive == isTaxInclusive) &&
+            (identical(other.taxableAmount, taxableAmount) ||
+                other.taxableAmount == taxableAmount));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, productId, productName,
-      productImage, sellerName, unitPrice, quantity, lineTotal);
+  int get hashCode => Object.hash(
+      runtimeType,
+      productId,
+      productName,
+      productImage,
+      sellerName,
+      unitPrice,
+      quantity,
+      lineTotal,
+      hsnCode,
+      gstRate,
+      isTaxInclusive,
+      taxableAmount);
 
   @override
   String toString() {
-    return 'OrderItemEntity(productId: $productId, productName: $productName, productImage: $productImage, sellerName: $sellerName, unitPrice: $unitPrice, quantity: $quantity, lineTotal: $lineTotal)';
+    return 'OrderItemEntity(productId: $productId, productName: $productName, productImage: $productImage, sellerName: $sellerName, unitPrice: $unitPrice, quantity: $quantity, lineTotal: $lineTotal, hsnCode: $hsnCode, gstRate: $gstRate, isTaxInclusive: $isTaxInclusive, taxableAmount: $taxableAmount)';
   }
 }
 
@@ -390,7 +516,11 @@ abstract mixin class _$OrderItemEntityCopyWith<$Res>
       String sellerName,
       double unitPrice,
       int quantity,
-      double lineTotal});
+      double lineTotal,
+      String hsnCode,
+      double gstRate,
+      bool isTaxInclusive,
+      double taxableAmount});
 }
 
 /// @nodoc
@@ -413,6 +543,10 @@ class __$OrderItemEntityCopyWithImpl<$Res>
     Object? unitPrice = null,
     Object? quantity = null,
     Object? lineTotal = null,
+    Object? hsnCode = null,
+    Object? gstRate = null,
+    Object? isTaxInclusive = null,
+    Object? taxableAmount = null,
   }) {
     return _then(_OrderItemEntity(
       productId: null == productId
@@ -442,6 +576,22 @@ class __$OrderItemEntityCopyWithImpl<$Res>
       lineTotal: null == lineTotal
           ? _self.lineTotal
           : lineTotal // ignore: cast_nullable_to_non_nullable
+              as double,
+      hsnCode: null == hsnCode
+          ? _self.hsnCode
+          : hsnCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      gstRate: null == gstRate
+          ? _self.gstRate
+          : gstRate // ignore: cast_nullable_to_non_nullable
+              as double,
+      isTaxInclusive: null == isTaxInclusive
+          ? _self.isTaxInclusive
+          : isTaxInclusive // ignore: cast_nullable_to_non_nullable
+              as bool,
+      taxableAmount: null == taxableAmount
+          ? _self.taxableAmount
+          : taxableAmount // ignore: cast_nullable_to_non_nullable
               as double,
     ));
   }
@@ -781,6 +931,11 @@ mixin _$OrderEntity {
   double get tax;
   double get totalAmount;
   String get currency;
+  String get currencySymbol;
+  double get taxableAmount;
+  double get discount;
+  TaxBreakdownEntity? get taxBreakdown;
+  String? get customerGstin;
   String get status;
   PaymentEntity? get payment;
   String get carrier;
@@ -820,6 +975,16 @@ mixin _$OrderEntity {
                 other.totalAmount == totalAmount) &&
             (identical(other.currency, currency) ||
                 other.currency == currency) &&
+            (identical(other.currencySymbol, currencySymbol) ||
+                other.currencySymbol == currencySymbol) &&
+            (identical(other.taxableAmount, taxableAmount) ||
+                other.taxableAmount == taxableAmount) &&
+            (identical(other.discount, discount) ||
+                other.discount == discount) &&
+            (identical(other.taxBreakdown, taxBreakdown) ||
+                other.taxBreakdown == taxBreakdown) &&
+            (identical(other.customerGstin, customerGstin) ||
+                other.customerGstin == customerGstin) &&
             (identical(other.status, status) || other.status == status) &&
             (identical(other.payment, payment) || other.payment == payment) &&
             (identical(other.carrier, carrier) || other.carrier == carrier) &&
@@ -836,30 +1001,36 @@ mixin _$OrderEntity {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      orderNumber,
-      const DeepCollectionEquality().hash(orderItems),
-      shippingAddress,
-      shippingMethod,
-      subtotal,
-      shippingFee,
-      tax,
-      totalAmount,
-      currency,
-      status,
-      payment,
-      carrier,
-      trackingNumber,
-      cancellationReason,
-      canCancel,
-      const DeepCollectionEquality().hash(statusHistory),
-      createdAt);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        id,
+        orderNumber,
+        const DeepCollectionEquality().hash(orderItems),
+        shippingAddress,
+        shippingMethod,
+        subtotal,
+        shippingFee,
+        tax,
+        totalAmount,
+        currency,
+        currencySymbol,
+        taxableAmount,
+        discount,
+        taxBreakdown,
+        customerGstin,
+        status,
+        payment,
+        carrier,
+        trackingNumber,
+        cancellationReason,
+        canCancel,
+        const DeepCollectionEquality().hash(statusHistory),
+        createdAt
+      ]);
 
   @override
   String toString() {
-    return 'OrderEntity(id: $id, orderNumber: $orderNumber, orderItems: $orderItems, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, totalAmount: $totalAmount, currency: $currency, status: $status, payment: $payment, carrier: $carrier, trackingNumber: $trackingNumber, cancellationReason: $cancellationReason, canCancel: $canCancel, statusHistory: $statusHistory, createdAt: $createdAt)';
+    return 'OrderEntity(id: $id, orderNumber: $orderNumber, orderItems: $orderItems, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, totalAmount: $totalAmount, currency: $currency, currencySymbol: $currencySymbol, taxableAmount: $taxableAmount, discount: $discount, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, status: $status, payment: $payment, carrier: $carrier, trackingNumber: $trackingNumber, cancellationReason: $cancellationReason, canCancel: $canCancel, statusHistory: $statusHistory, createdAt: $createdAt)';
   }
 }
 
@@ -880,6 +1051,11 @@ abstract mixin class $OrderEntityCopyWith<$Res> {
       double tax,
       double totalAmount,
       String currency,
+      String currencySymbol,
+      double taxableAmount,
+      double discount,
+      TaxBreakdownEntity? taxBreakdown,
+      String? customerGstin,
       String status,
       PaymentEntity? payment,
       String carrier,
@@ -890,6 +1066,7 @@ abstract mixin class $OrderEntityCopyWith<$Res> {
       DateTime createdAt});
 
   $AddressEntityCopyWith<$Res>? get shippingAddress;
+  $TaxBreakdownEntityCopyWith<$Res>? get taxBreakdown;
   $PaymentEntityCopyWith<$Res>? get payment;
 }
 
@@ -915,6 +1092,11 @@ class _$OrderEntityCopyWithImpl<$Res> implements $OrderEntityCopyWith<$Res> {
     Object? tax = null,
     Object? totalAmount = null,
     Object? currency = null,
+    Object? currencySymbol = null,
+    Object? taxableAmount = null,
+    Object? discount = null,
+    Object? taxBreakdown = freezed,
+    Object? customerGstin = freezed,
     Object? status = null,
     Object? payment = freezed,
     Object? carrier = null,
@@ -965,6 +1147,26 @@ class _$OrderEntityCopyWithImpl<$Res> implements $OrderEntityCopyWith<$Res> {
           ? _self.currency
           : currency // ignore: cast_nullable_to_non_nullable
               as String,
+      currencySymbol: null == currencySymbol
+          ? _self.currencySymbol
+          : currencySymbol // ignore: cast_nullable_to_non_nullable
+              as String,
+      taxableAmount: null == taxableAmount
+          ? _self.taxableAmount
+          : taxableAmount // ignore: cast_nullable_to_non_nullable
+              as double,
+      discount: null == discount
+          ? _self.discount
+          : discount // ignore: cast_nullable_to_non_nullable
+              as double,
+      taxBreakdown: freezed == taxBreakdown
+          ? _self.taxBreakdown
+          : taxBreakdown // ignore: cast_nullable_to_non_nullable
+              as TaxBreakdownEntity?,
+      customerGstin: freezed == customerGstin
+          ? _self.customerGstin
+          : customerGstin // ignore: cast_nullable_to_non_nullable
+              as String?,
       status: null == status
           ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
@@ -1011,6 +1213,20 @@ class _$OrderEntityCopyWithImpl<$Res> implements $OrderEntityCopyWith<$Res> {
 
     return $AddressEntityCopyWith<$Res>(_self.shippingAddress!, (value) {
       return _then(_self.copyWith(shippingAddress: value));
+    });
+  }
+
+  /// Create a copy of OrderEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $TaxBreakdownEntityCopyWith<$Res>? get taxBreakdown {
+    if (_self.taxBreakdown == null) {
+      return null;
+    }
+
+    return $TaxBreakdownEntityCopyWith<$Res>(_self.taxBreakdown!, (value) {
+      return _then(_self.copyWith(taxBreakdown: value));
     });
   }
 
@@ -1133,6 +1349,11 @@ extension OrderEntityPatterns on OrderEntity {
             double tax,
             double totalAmount,
             String currency,
+            String currencySymbol,
+            double taxableAmount,
+            double discount,
+            TaxBreakdownEntity? taxBreakdown,
+            String? customerGstin,
             String status,
             PaymentEntity? payment,
             String carrier,
@@ -1158,6 +1379,11 @@ extension OrderEntityPatterns on OrderEntity {
             _that.tax,
             _that.totalAmount,
             _that.currency,
+            _that.currencySymbol,
+            _that.taxableAmount,
+            _that.discount,
+            _that.taxBreakdown,
+            _that.customerGstin,
             _that.status,
             _that.payment,
             _that.carrier,
@@ -1197,6 +1423,11 @@ extension OrderEntityPatterns on OrderEntity {
             double tax,
             double totalAmount,
             String currency,
+            String currencySymbol,
+            double taxableAmount,
+            double discount,
+            TaxBreakdownEntity? taxBreakdown,
+            String? customerGstin,
             String status,
             PaymentEntity? payment,
             String carrier,
@@ -1221,6 +1452,11 @@ extension OrderEntityPatterns on OrderEntity {
             _that.tax,
             _that.totalAmount,
             _that.currency,
+            _that.currencySymbol,
+            _that.taxableAmount,
+            _that.discount,
+            _that.taxBreakdown,
+            _that.customerGstin,
             _that.status,
             _that.payment,
             _that.carrier,
@@ -1259,6 +1495,11 @@ extension OrderEntityPatterns on OrderEntity {
             double tax,
             double totalAmount,
             String currency,
+            String currencySymbol,
+            double taxableAmount,
+            double discount,
+            TaxBreakdownEntity? taxBreakdown,
+            String? customerGstin,
             String status,
             PaymentEntity? payment,
             String carrier,
@@ -1283,6 +1524,11 @@ extension OrderEntityPatterns on OrderEntity {
             _that.tax,
             _that.totalAmount,
             _that.currency,
+            _that.currencySymbol,
+            _that.taxableAmount,
+            _that.discount,
+            _that.taxBreakdown,
+            _that.customerGstin,
             _that.status,
             _that.payment,
             _that.carrier,
@@ -1310,7 +1556,12 @@ class _OrderEntity extends OrderEntity {
       required this.shippingFee,
       required this.tax,
       required this.totalAmount,
-      this.currency = 'USD',
+      this.currency = 'INR',
+      this.currencySymbol = '₹',
+      this.taxableAmount = 0.0,
+      this.discount = 0.0,
+      this.taxBreakdown,
+      this.customerGstin,
       required this.status,
       this.payment,
       this.carrier = '',
@@ -1352,6 +1603,19 @@ class _OrderEntity extends OrderEntity {
   @override
   @JsonKey()
   final String currency;
+  @override
+  @JsonKey()
+  final String currencySymbol;
+  @override
+  @JsonKey()
+  final double taxableAmount;
+  @override
+  @JsonKey()
+  final double discount;
+  @override
+  final TaxBreakdownEntity? taxBreakdown;
+  @override
+  final String? customerGstin;
   @override
   final String status;
   @override
@@ -1411,6 +1675,16 @@ class _OrderEntity extends OrderEntity {
                 other.totalAmount == totalAmount) &&
             (identical(other.currency, currency) ||
                 other.currency == currency) &&
+            (identical(other.currencySymbol, currencySymbol) ||
+                other.currencySymbol == currencySymbol) &&
+            (identical(other.taxableAmount, taxableAmount) ||
+                other.taxableAmount == taxableAmount) &&
+            (identical(other.discount, discount) ||
+                other.discount == discount) &&
+            (identical(other.taxBreakdown, taxBreakdown) ||
+                other.taxBreakdown == taxBreakdown) &&
+            (identical(other.customerGstin, customerGstin) ||
+                other.customerGstin == customerGstin) &&
             (identical(other.status, status) || other.status == status) &&
             (identical(other.payment, payment) || other.payment == payment) &&
             (identical(other.carrier, carrier) || other.carrier == carrier) &&
@@ -1427,30 +1701,36 @@ class _OrderEntity extends OrderEntity {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      orderNumber,
-      const DeepCollectionEquality().hash(_orderItems),
-      shippingAddress,
-      shippingMethod,
-      subtotal,
-      shippingFee,
-      tax,
-      totalAmount,
-      currency,
-      status,
-      payment,
-      carrier,
-      trackingNumber,
-      cancellationReason,
-      canCancel,
-      const DeepCollectionEquality().hash(_statusHistory),
-      createdAt);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        id,
+        orderNumber,
+        const DeepCollectionEquality().hash(_orderItems),
+        shippingAddress,
+        shippingMethod,
+        subtotal,
+        shippingFee,
+        tax,
+        totalAmount,
+        currency,
+        currencySymbol,
+        taxableAmount,
+        discount,
+        taxBreakdown,
+        customerGstin,
+        status,
+        payment,
+        carrier,
+        trackingNumber,
+        cancellationReason,
+        canCancel,
+        const DeepCollectionEquality().hash(_statusHistory),
+        createdAt
+      ]);
 
   @override
   String toString() {
-    return 'OrderEntity(id: $id, orderNumber: $orderNumber, orderItems: $orderItems, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, totalAmount: $totalAmount, currency: $currency, status: $status, payment: $payment, carrier: $carrier, trackingNumber: $trackingNumber, cancellationReason: $cancellationReason, canCancel: $canCancel, statusHistory: $statusHistory, createdAt: $createdAt)';
+    return 'OrderEntity(id: $id, orderNumber: $orderNumber, orderItems: $orderItems, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, totalAmount: $totalAmount, currency: $currency, currencySymbol: $currencySymbol, taxableAmount: $taxableAmount, discount: $discount, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, status: $status, payment: $payment, carrier: $carrier, trackingNumber: $trackingNumber, cancellationReason: $cancellationReason, canCancel: $canCancel, statusHistory: $statusHistory, createdAt: $createdAt)';
   }
 }
 
@@ -1473,6 +1753,11 @@ abstract mixin class _$OrderEntityCopyWith<$Res>
       double tax,
       double totalAmount,
       String currency,
+      String currencySymbol,
+      double taxableAmount,
+      double discount,
+      TaxBreakdownEntity? taxBreakdown,
+      String? customerGstin,
       String status,
       PaymentEntity? payment,
       String carrier,
@@ -1484,6 +1769,8 @@ abstract mixin class _$OrderEntityCopyWith<$Res>
 
   @override
   $AddressEntityCopyWith<$Res>? get shippingAddress;
+  @override
+  $TaxBreakdownEntityCopyWith<$Res>? get taxBreakdown;
   @override
   $PaymentEntityCopyWith<$Res>? get payment;
 }
@@ -1510,6 +1797,11 @@ class __$OrderEntityCopyWithImpl<$Res> implements _$OrderEntityCopyWith<$Res> {
     Object? tax = null,
     Object? totalAmount = null,
     Object? currency = null,
+    Object? currencySymbol = null,
+    Object? taxableAmount = null,
+    Object? discount = null,
+    Object? taxBreakdown = freezed,
+    Object? customerGstin = freezed,
     Object? status = null,
     Object? payment = freezed,
     Object? carrier = null,
@@ -1560,6 +1852,26 @@ class __$OrderEntityCopyWithImpl<$Res> implements _$OrderEntityCopyWith<$Res> {
           ? _self.currency
           : currency // ignore: cast_nullable_to_non_nullable
               as String,
+      currencySymbol: null == currencySymbol
+          ? _self.currencySymbol
+          : currencySymbol // ignore: cast_nullable_to_non_nullable
+              as String,
+      taxableAmount: null == taxableAmount
+          ? _self.taxableAmount
+          : taxableAmount // ignore: cast_nullable_to_non_nullable
+              as double,
+      discount: null == discount
+          ? _self.discount
+          : discount // ignore: cast_nullable_to_non_nullable
+              as double,
+      taxBreakdown: freezed == taxBreakdown
+          ? _self.taxBreakdown
+          : taxBreakdown // ignore: cast_nullable_to_non_nullable
+              as TaxBreakdownEntity?,
+      customerGstin: freezed == customerGstin
+          ? _self.customerGstin
+          : customerGstin // ignore: cast_nullable_to_non_nullable
+              as String?,
       status: null == status
           ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
@@ -1606,6 +1918,20 @@ class __$OrderEntityCopyWithImpl<$Res> implements _$OrderEntityCopyWith<$Res> {
 
     return $AddressEntityCopyWith<$Res>(_self.shippingAddress!, (value) {
       return _then(_self.copyWith(shippingAddress: value));
+    });
+  }
+
+  /// Create a copy of OrderEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $TaxBreakdownEntityCopyWith<$Res>? get taxBreakdown {
+    if (_self.taxBreakdown == null) {
+      return null;
+    }
+
+    return $TaxBreakdownEntityCopyWith<$Res>(_self.taxBreakdown!, (value) {
+      return _then(_self.copyWith(taxBreakdown: value));
     });
   }
 

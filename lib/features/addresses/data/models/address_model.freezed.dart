@@ -21,6 +21,9 @@ mixin _$AddressModel {
   String get city;
   String get state;
   String get postalCode;
+  String get pinCode;
+  String get district;
+  String get landmark;
   String get country;
   bool get isDefault;
 
@@ -47,18 +50,35 @@ mixin _$AddressModel {
             (identical(other.state, state) || other.state == state) &&
             (identical(other.postalCode, postalCode) ||
                 other.postalCode == postalCode) &&
+            (identical(other.pinCode, pinCode) || other.pinCode == pinCode) &&
+            (identical(other.district, district) ||
+                other.district == district) &&
+            (identical(other.landmark, landmark) ||
+                other.landmark == landmark) &&
             (identical(other.country, country) || other.country == country) &&
             (identical(other.isDefault, isDefault) ||
                 other.isDefault == isDefault));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, fullName, phone,
-      streetAddress, city, state, postalCode, country, isDefault);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      fullName,
+      phone,
+      streetAddress,
+      city,
+      state,
+      postalCode,
+      pinCode,
+      district,
+      landmark,
+      country,
+      isDefault);
 
   @override
   String toString() {
-    return 'AddressModel(id: $id, fullName: $fullName, phone: $phone, streetAddress: $streetAddress, city: $city, state: $state, postalCode: $postalCode, country: $country, isDefault: $isDefault)';
+    return 'AddressModel(id: $id, fullName: $fullName, phone: $phone, streetAddress: $streetAddress, city: $city, state: $state, postalCode: $postalCode, pinCode: $pinCode, district: $district, landmark: $landmark, country: $country, isDefault: $isDefault)';
   }
 }
 
@@ -76,6 +96,9 @@ abstract mixin class $AddressModelCopyWith<$Res> {
       String city,
       String state,
       String postalCode,
+      String pinCode,
+      String district,
+      String landmark,
       String country,
       bool isDefault});
 }
@@ -99,6 +122,9 @@ class _$AddressModelCopyWithImpl<$Res> implements $AddressModelCopyWith<$Res> {
     Object? city = null,
     Object? state = null,
     Object? postalCode = null,
+    Object? pinCode = null,
+    Object? district = null,
+    Object? landmark = null,
     Object? country = null,
     Object? isDefault = null,
   }) {
@@ -130,6 +156,18 @@ class _$AddressModelCopyWithImpl<$Res> implements $AddressModelCopyWith<$Res> {
       postalCode: null == postalCode
           ? _self.postalCode
           : postalCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      pinCode: null == pinCode
+          ? _self.pinCode
+          : pinCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      district: null == district
+          ? _self.district
+          : district // ignore: cast_nullable_to_non_nullable
+              as String,
+      landmark: null == landmark
+          ? _self.landmark
+          : landmark // ignore: cast_nullable_to_non_nullable
               as String,
       country: null == country
           ? _self.country
@@ -244,6 +282,9 @@ extension AddressModelPatterns on AddressModel {
             String city,
             String state,
             String postalCode,
+            String pinCode,
+            String district,
+            String landmark,
             String country,
             bool isDefault)?
         $default, {
@@ -260,6 +301,9 @@ extension AddressModelPatterns on AddressModel {
             _that.city,
             _that.state,
             _that.postalCode,
+            _that.pinCode,
+            _that.district,
+            _that.landmark,
             _that.country,
             _that.isDefault);
       case _:
@@ -290,6 +334,9 @@ extension AddressModelPatterns on AddressModel {
             String city,
             String state,
             String postalCode,
+            String pinCode,
+            String district,
+            String landmark,
             String country,
             bool isDefault)
         $default,
@@ -305,6 +352,9 @@ extension AddressModelPatterns on AddressModel {
             _that.city,
             _that.state,
             _that.postalCode,
+            _that.pinCode,
+            _that.district,
+            _that.landmark,
             _that.country,
             _that.isDefault);
       case _:
@@ -334,6 +384,9 @@ extension AddressModelPatterns on AddressModel {
             String city,
             String state,
             String postalCode,
+            String pinCode,
+            String district,
+            String landmark,
             String country,
             bool isDefault)?
         $default,
@@ -349,6 +402,9 @@ extension AddressModelPatterns on AddressModel {
             _that.city,
             _that.state,
             _that.postalCode,
+            _that.pinCode,
+            _that.district,
+            _that.landmark,
             _that.country,
             _that.isDefault);
       case _:
@@ -368,7 +424,10 @@ class _AddressModel extends AddressModel {
       required this.city,
       required this.state,
       required this.postalCode,
-      this.country = 'US',
+      this.pinCode = '',
+      this.district = '',
+      this.landmark = '',
+      this.country = 'IN',
       this.isDefault = false})
       : super._();
 
@@ -386,6 +445,15 @@ class _AddressModel extends AddressModel {
   final String state;
   @override
   final String postalCode;
+  @override
+  @JsonKey()
+  final String pinCode;
+  @override
+  @JsonKey()
+  final String district;
+  @override
+  @JsonKey()
+  final String landmark;
   @override
   @JsonKey()
   final String country;
@@ -416,18 +484,35 @@ class _AddressModel extends AddressModel {
             (identical(other.state, state) || other.state == state) &&
             (identical(other.postalCode, postalCode) ||
                 other.postalCode == postalCode) &&
+            (identical(other.pinCode, pinCode) || other.pinCode == pinCode) &&
+            (identical(other.district, district) ||
+                other.district == district) &&
+            (identical(other.landmark, landmark) ||
+                other.landmark == landmark) &&
             (identical(other.country, country) || other.country == country) &&
             (identical(other.isDefault, isDefault) ||
                 other.isDefault == isDefault));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, fullName, phone,
-      streetAddress, city, state, postalCode, country, isDefault);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      fullName,
+      phone,
+      streetAddress,
+      city,
+      state,
+      postalCode,
+      pinCode,
+      district,
+      landmark,
+      country,
+      isDefault);
 
   @override
   String toString() {
-    return 'AddressModel(id: $id, fullName: $fullName, phone: $phone, streetAddress: $streetAddress, city: $city, state: $state, postalCode: $postalCode, country: $country, isDefault: $isDefault)';
+    return 'AddressModel(id: $id, fullName: $fullName, phone: $phone, streetAddress: $streetAddress, city: $city, state: $state, postalCode: $postalCode, pinCode: $pinCode, district: $district, landmark: $landmark, country: $country, isDefault: $isDefault)';
   }
 }
 
@@ -447,6 +532,9 @@ abstract mixin class _$AddressModelCopyWith<$Res>
       String city,
       String state,
       String postalCode,
+      String pinCode,
+      String district,
+      String landmark,
       String country,
       bool isDefault});
 }
@@ -471,6 +559,9 @@ class __$AddressModelCopyWithImpl<$Res>
     Object? city = null,
     Object? state = null,
     Object? postalCode = null,
+    Object? pinCode = null,
+    Object? district = null,
+    Object? landmark = null,
     Object? country = null,
     Object? isDefault = null,
   }) {
@@ -502,6 +593,18 @@ class __$AddressModelCopyWithImpl<$Res>
       postalCode: null == postalCode
           ? _self.postalCode
           : postalCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      pinCode: null == pinCode
+          ? _self.pinCode
+          : pinCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      district: null == district
+          ? _self.district
+          : district // ignore: cast_nullable_to_non_nullable
+              as String,
+      landmark: null == landmark
+          ? _self.landmark
+          : landmark // ignore: cast_nullable_to_non_nullable
               as String,
       country: null == country
           ? _self.country

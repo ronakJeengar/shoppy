@@ -58,7 +58,7 @@ class AssistantState {
     this.pendingConfirmation,
     this.errorMessage,
     this.suggestedPrompts = const [
-      "Find wireless headphones under \$200",
+      "Find wireless headphones under ₹2,000",
       "What is your return & refund policy?",
       "What is currently in my cart?",
       "Track my latest order status",

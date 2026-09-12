@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:shopp_app/features/addresses/domain/entities/address_entity.dart';
 import 'package:shopp_app/features/checkout/domain/entities/payment_entity.dart';
+import 'package:shopp_app/features/checkout/domain/entities/tax_breakdown_entity.dart';
 
 part 'order_entity.freezed.dart';
 
@@ -14,6 +15,10 @@ abstract class OrderItemEntity with _$OrderItemEntity {
     required double unitPrice,
     required int quantity,
     required double lineTotal,
+    @Default('8518') String hsnCode,
+    @Default(18.0) double gstRate,
+    @Default(true) bool isTaxInclusive,
+    @Default(0.0) double taxableAmount,
   }) = _OrderItemEntity;
 }
 
@@ -40,7 +45,12 @@ abstract class OrderEntity with _$OrderEntity {
     required double shippingFee,
     required double tax,
     required double totalAmount,
-    @Default('USD') String currency,
+    @Default('INR') String currency,
+    @Default('₹') String currencySymbol,
+    @Default(0.0) double taxableAmount,
+    @Default(0.0) double discount,
+    TaxBreakdownEntity? taxBreakdown,
+    String? customerGstin,
     required String status,
     PaymentEntity? payment,
     @Default('') String carrier,

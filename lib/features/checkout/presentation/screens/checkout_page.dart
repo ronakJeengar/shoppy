@@ -16,6 +16,7 @@ import 'package:shopp_app/features/checkout/presentation/providers/checkout_prov
 import 'order_confirmation_page.dart';
 import 'package:shopp_app/features/addresses/presentation/widgets/address_form_dialog.dart';
 import 'package:shopp_app/core/widgets/app_button.dart';
+import 'package:shopp_app/core/utils/currency_formatter.dart';
 
 class CheckoutPage extends ConsumerStatefulWidget {
   const CheckoutPage({super.key});
@@ -267,7 +268,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
           const SizedBox(height: 14),
           _buildSelectionTile(
             title: 'Standard Delivery (3-5 Days)',
-            subtitle: 'Free on orders over \$100.00, otherwise \$15.00',
+            subtitle: 'Free on orders over ₹499.00, otherwise ₹49.00',
             isSelected: isStandard,
             onTap: () {
               ref.read(checkoutNotifierProvider.notifier).setShippingMethod('STANDARD');
@@ -278,7 +279,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
           ),
           _buildSelectionTile(
             title: 'Express Delivery (1-2 Days)',
-            subtitle: 'Flat rate \$25.00 with priority fulfillment',
+            subtitle: 'Flat rate ₹99.00 with priority fulfillment',
             isSelected: !isStandard,
             onTap: () {
               ref.read(checkoutNotifierProvider.notifier).setShippingMethod('EXPRESS');
@@ -346,9 +347,10 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
   ) {
     final validation = checkoutState.validation;
     final subtotal = validation?.subtotal ?? cart.subtotal;
-    final shipping = validation?.shippingFee ?? (checkoutState.selectedShippingMethod == 'EXPRESS' ? 25.0 : (subtotal >= 100 ? 0.0 : 15.0));
+    final shipping = validation?.shippingFee ?? (checkoutState.selectedShippingMethod == 'EXPRESS' ? 99.0 : (subtotal >= 499 ? 0.0 : 49.0));
     final tax = validation?.tax ?? cart.tax;
-    final total = validation?.grandTotal ?? (subtotal + shipping + tax);
+    final total = validation?.grandTotal ?? (subtotal + shipping);
+    final taxBreakdown = validation?.taxBreakdown;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -376,20 +378,39 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
             ],
           ),
           const SizedBox(height: 14),
-          _summaryRow('Items Subtotal', '\$${subtotal.toStringAsFixed(2)}'),
+          _summaryRow('Items Subtotal', CurrencyFormatter.format(subtotal)),
           const SizedBox(height: 8),
           _summaryRow(
             'Shipping Fee',
-            shipping == 0 ? 'FREE' : '\$${shipping.toStringAsFixed(2)}',
+            shipping == 0 ? 'FREE' : CurrencyFormatter.format(shipping),
             valueColor: shipping == 0 ? AppColors.success : null,
           ),
           const SizedBox(height: 8),
-          _summaryRow('Estimated Tax (8%)', '\$${tax.toStringAsFixed(2)}'),
+          if (taxBreakdown != null) ...[
+            if (taxBreakdown.taxableAmount > 0) ...[
+              _summaryRow('Taxable Value', CurrencyFormatter.format(taxBreakdown.taxableAmount)),
+              const SizedBox(height: 8),
+            ],
+            if (taxBreakdown.isInterState)
+              _summaryRow('IGST (Inter-State)', CurrencyFormatter.format(taxBreakdown.igst))
+            else ...[
+              _summaryRow('CGST (Central Tax)', CurrencyFormatter.format(taxBreakdown.cgst)),
+              const SizedBox(height: 8),
+              _summaryRow('SGST (State Tax)', CurrencyFormatter.format(taxBreakdown.sgst)),
+            ],
+          ] else ...[
+            _summaryRow('Estimated GST (Incl.)', CurrencyFormatter.format(tax)),
+          ],
           const Divider(height: 24, color: AppColors.slate200),
           _summaryRow(
             'Order Total',
-            '\$${total.toStringAsFixed(2)}',
+            CurrencyFormatter.format(total),
             isBold: true,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Prices are inclusive of all taxes (GST)',
+            style: AppTypography.caption.copyWith(color: AppColors.slate500, fontSize: 11),
           ),
         ],
       ),
@@ -503,9 +524,8 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
   ) {
     final validation = checkoutState.validation;
     final subtotal = validation?.subtotal ?? cart.subtotal;
-    final shipping = validation?.shippingFee ?? (checkoutState.selectedShippingMethod == 'EXPRESS' ? 25.0 : (subtotal >= 100 ? 0.0 : 15.0));
-    final tax = validation?.tax ?? cart.tax;
-    final displayTotal = validation?.grandTotal ?? (subtotal + shipping + tax);
+    final shipping = validation?.shippingFee ?? (checkoutState.selectedShippingMethod == 'EXPRESS' ? 99.0 : (subtotal >= 499 ? 0.0 : 49.0));
+    final displayTotal = validation?.grandTotal ?? (subtotal + shipping);
     final canPlace = selectedAddress != null && !checkoutState.isPlacingOrder;
 
     return Container(
@@ -527,7 +547,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                   style: AppTypography.caption.copyWith(color: AppColors.slate500),
                 ),
                 Text(
-                  '\$${displayTotal.toStringAsFixed(2)}',
+                  CurrencyFormatter.format(displayTotal),
                   style: AppTypography.priceCard.copyWith(fontSize: 20),
                 ),
               ],

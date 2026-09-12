@@ -146,7 +146,7 @@ abstract class AssistantConfirmationModel with _$AssistantConfirmationModel {
     String? orderId,
     String? orderNumber,
     double? totalAmount,
-    @Default('USD') String currency,
+    @Default('INR') String currency,
     @Default({}) Map<String, dynamic> details,
   }) = _AssistantConfirmationModel;
 
@@ -159,7 +159,7 @@ abstract class AssistantConfirmationModel with _$AssistantConfirmationModel {
       orderId: json['orderId']?.toString(),
       orderNumber: json['orderNumber']?.toString(),
       totalAmount: rawTotal?.toDouble(),
-      currency: (json['currency'] ?? 'USD').toString(),
+      currency: (json['currency'] ?? 'INR').toString(),
       details: json['details'] is Map<String, dynamic>
           ? Map<String, dynamic>.from(json['details'] as Map)
           : {},

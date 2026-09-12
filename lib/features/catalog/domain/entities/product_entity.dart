@@ -13,6 +13,11 @@ abstract class ProductEntity with _$ProductEntity {
     @Default('Shoppy Verified') String sellerName,
     @Default('') String description,
     required double price,
+    double? mrp,
+    @Default('8518') String hsnCode,
+    @Default(18.0) double gstRate,
+    @Default(true) bool isTaxInclusive,
+    @Default(true) bool isCodEligible,
     @Default(0) int stock,
     @Default(0.0) double productRating,
     @Default(0) int totalReviews,
@@ -29,6 +34,10 @@ abstract class ProductEntity with _$ProductEntity {
   String get name => productName;
   String get imageUrl => productImage;
   bool get isInStock => stock > 0;
+
+  bool get hasDiscount => mrp != null && mrp! > price;
+  double get discountPercentage =>
+      hasDiscount ? (((mrp! - price) / mrp!) * 100).roundToDouble() : 0.0;
 
   List<String> get allImages {
     if (images.isNotEmpty) return images;

@@ -11,7 +11,7 @@ abstract class PaymentEntity with _$PaymentEntity {
     @Default('SIMULATED') String provider,
     @Default('CARD') String paymentMethod,
     required double amount,
-    @Default('USD') String currency,
+    @Default('INR') String currency,
     @Default('PENDING') String status,
   }) = _PaymentEntity;
 }

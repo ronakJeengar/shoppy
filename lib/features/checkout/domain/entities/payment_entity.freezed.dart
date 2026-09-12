@@ -354,7 +354,7 @@ class _PaymentEntity implements PaymentEntity {
       this.provider = 'SIMULATED',
       this.paymentMethod = 'CARD',
       required this.amount,
-      this.currency = 'USD',
+      this.currency = 'INR',
       this.status = 'PENDING'});
 
   @override

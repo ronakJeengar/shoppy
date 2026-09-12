@@ -9,6 +9,7 @@ import 'package:shopp_app/features/admin/presentation/screens/admin_audit_logs_p
 import 'package:shopp_app/features/admin/presentation/screens/admin_orders_page.dart';
 import 'package:shopp_app/features/admin/presentation/screens/admin_products_page.dart';
 import 'package:shopp_app/features/admin/presentation/screens/admin_reviews_page.dart';
+import 'package:shopp_app/core/utils/currency_formatter.dart';
 import 'package:shopp_app/features/admin/presentation/screens/admin_users_page.dart';
 
 class AdminDashboardPage extends ConsumerWidget {
@@ -164,7 +165,7 @@ class AdminDashboardPage extends ConsumerWidget {
       children: [
         _buildKPICard(
           title: 'Total Revenue',
-          value: '\$${revenue.toStringAsFixed(2)}',
+          value: CurrencyFormatter.format(revenue),
           icon: AppIcons.dollar,
           color: Colors.green,
         ),
@@ -512,7 +513,7 @@ class AdminDashboardPage extends ConsumerWidget {
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
             subtitle: Text(
-              '${o.customerName} • \$${o.totalAmount.toStringAsFixed(2)}',
+              '${o.customerName} • ${CurrencyFormatter.format(o.totalAmount)}',
               style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
             ),
             trailing: Container(

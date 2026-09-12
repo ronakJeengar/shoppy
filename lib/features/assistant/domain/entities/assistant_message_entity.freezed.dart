@@ -1609,7 +1609,7 @@ class _AssistantConfirmationEntity implements AssistantConfirmationEntity {
       this.orderId,
       this.orderNumber,
       this.totalAmount,
-      this.currency = 'USD',
+      this.currency = 'INR',
       final Map<String, dynamic> details = const {}})
       : _details = details;
 

@@ -47,7 +47,7 @@ abstract class AssistantConfirmationEntity with _$AssistantConfirmationEntity {
     String? orderId,
     String? orderNumber,
     double? totalAmount,
-    @Default('USD') String currency,
+    @Default('INR') String currency,
     @Default({}) Map<String, dynamic> details,
   }) = _AssistantConfirmationEntity;
 }

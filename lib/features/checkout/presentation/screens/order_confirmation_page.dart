@@ -12,6 +12,7 @@ import 'package:shopp_app/features/catalog/presentation/screens/home_page.dart';
 import 'package:shopp_app/features/orders/presentation/screens/orders_page.dart';
 import 'package:shopp_app/core/widgets/app_button.dart';
 import 'package:shopp_app/core/widgets/app_network_image.dart';
+import 'package:shopp_app/core/utils/currency_formatter.dart';
 
 class OrderConfirmationPage extends StatelessWidget {
   final OrderEntity? order;
@@ -259,14 +260,14 @@ class OrderConfirmationPage extends StatelessWidget {
                                     style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
                                   ),
                                   Text(
-                                    'Qty: ${item.quantity} × \$${item.unitPrice.toStringAsFixed(2)}',
+                                    'Qty: ${item.quantity} × ${CurrencyFormatter.format(item.unitPrice)}',
                                     style: AppTypography.caption.copyWith(color: AppColors.slate500),
                                   ),
                                 ],
                               ),
                             ),
                             Text(
-                              '\$${item.lineTotal.toStringAsFixed(2)}',
+                              CurrencyFormatter.format(item.lineTotal),
                               style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
                             ),
                           ],
@@ -274,19 +275,33 @@ class OrderConfirmationPage extends StatelessWidget {
                       );
                     }),
                     const Divider(height: 24, color: AppColors.slate200),
-                    _summaryRow('Subtotal', '\$${order!.subtotal.toStringAsFixed(2)}'),
+                    _summaryRow('Subtotal', CurrencyFormatter.format(order!.subtotal)),
                     const SizedBox(height: 6),
                     _summaryRow(
                       'Shipping',
-                      order!.shippingFee == 0 ? 'FREE' : '\$${order!.shippingFee.toStringAsFixed(2)}',
+                      order!.shippingFee == 0 ? 'FREE' : CurrencyFormatter.format(order!.shippingFee),
                       color: order!.shippingFee == 0 ? AppColors.success : null,
                     ),
                     const SizedBox(height: 6),
-                    _summaryRow('Estimated Tax (8%)', '\$${order!.tax.toStringAsFixed(2)}'),
+                    if (order!.taxBreakdown != null) ...[
+                      if (order!.taxBreakdown!.taxableAmount > 0) ...[
+                        _summaryRow('Taxable Value', CurrencyFormatter.format(order!.taxBreakdown!.taxableAmount)),
+                        const SizedBox(height: 6),
+                      ],
+                      if (order!.taxBreakdown!.isInterState)
+                        _summaryRow('IGST (Inter-State)', CurrencyFormatter.format(order!.taxBreakdown!.igst))
+                      else ...[
+                        _summaryRow('CGST (Central)', CurrencyFormatter.format(order!.taxBreakdown!.cgst)),
+                        const SizedBox(height: 6),
+                        _summaryRow('SGST (State)', CurrencyFormatter.format(order!.taxBreakdown!.sgst)),
+                      ],
+                    ] else ...[
+                      _summaryRow('Estimated GST (Incl.)', CurrencyFormatter.format(order!.tax)),
+                    ],
                     const Divider(height: 20, color: AppColors.slate200),
                     _summaryRow(
                       'Total Paid',
-                      '\$${order!.totalAmount.toStringAsFixed(2)}',
+                      CurrencyFormatter.format(order!.totalAmount),
                       isTotal: true,
                       color: AppColors.primary,
                     ),

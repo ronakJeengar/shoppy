@@ -3,6 +3,7 @@ import '../../domain/entities/checkout_entity.dart';
 import '../../domain/entities/payment_entity.dart';
 import '../models/checkout_validation_model.dart';
 import '../models/payment_model.dart';
+import '../models/tax_breakdown_model.dart';
 
 extension PaymentModelMapper on PaymentModel {
   PaymentEntity toEntity() {
@@ -44,6 +45,12 @@ extension CheckoutValidationModelMapper on CheckoutValidationModel {
       shippingFee: shippingFee,
       tax: tax,
       grandTotal: grandTotal,
+      taxableAmount: taxableAmount,
+      discount: discount,
+      currency: currency,
+      currencySymbol: currencySymbol,
+      taxBreakdown: taxBreakdown?.toEntity(),
+      customerGstin: customerGstin,
     );
   }
 }
@@ -58,6 +65,12 @@ extension CheckoutValidationEntityMapper on CheckoutValidationEntity {
       shippingFee: shippingFee,
       tax: tax,
       grandTotal: grandTotal,
+      taxableAmount: taxableAmount,
+      discount: discount,
+      currency: currency,
+      currencySymbol: currencySymbol,
+      taxBreakdown: taxBreakdown != null ? TaxBreakdownModel.fromEntity(taxBreakdown!) : null,
+      customerGstin: customerGstin,
     );
   }
 }

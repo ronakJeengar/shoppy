@@ -4,6 +4,7 @@ import 'package:shopp_app/core/constants/app_icon_sizes.dart';
 import 'package:shopp_app/core/widgets/app_icon.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/features/catalog/data/models/product_model.dart';
+import 'package:shopp_app/core/utils/currency_formatter.dart';
 import 'package:shopp_app/features/admin/presentation/providers/admin_providers.dart';
 
 class AdminProductsPage extends ConsumerStatefulWidget {
@@ -90,7 +91,7 @@ class _AdminProductsPageState extends ConsumerState<AdminProductsPage> {
                             keyboardType: const TextInputType.numberWithOptions(
                                 decimal: true),
                             decoration:
-                                const InputDecoration(labelText: 'Price (\$) *'),
+                                const InputDecoration(labelText: 'Price (₹) *'),
                             validator: (val) {
                               if (val == null || val.isEmpty) {
                                 return 'Required';
@@ -443,7 +444,7 @@ class _AdminProductsPageState extends ConsumerState<AdminProductsPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '${p.sellerName} • \$${p.price.toStringAsFixed(2)}',
+                                      '${p.sellerName} • ${CurrencyFormatter.format(p.price)}',
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: Colors.grey.shade600,

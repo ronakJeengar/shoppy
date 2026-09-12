@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:shopp_app/features/addresses/data/models/address_model.dart';
 import 'package:shopp_app/features/checkout/data/models/payment_model.dart';
+import 'package:shopp_app/features/checkout/data/models/tax_breakdown_model.dart';
 
 part 'order_model.freezed.dart';
 
@@ -14,6 +15,10 @@ abstract class OrderItemModel with _$OrderItemModel {
     required double unitPrice,
     required int quantity,
     required double lineTotal,
+    @Default('8518') String hsnCode,
+    @Default(18.0) double gstRate,
+    @Default(true) bool isTaxInclusive,
+    @Default(0.0) double taxableAmount,
   }) = _OrderItemModel;
 
   factory OrderItemModel.fromJson(Map<String, dynamic> json) {
@@ -28,6 +33,16 @@ abstract class OrderItemModel with _$OrderItemModel {
           (json['quantity'] is num) ? (json['quantity'] as num).toInt() : 1,
       lineTotal:
           (json['lineTotal'] is num) ? (json['lineTotal'] as num).toDouble() : 0.0,
+      hsnCode: json['hsnCode']?.toString() ?? '8518',
+      gstRate: (json['gstRate'] is num)
+          ? (json['gstRate'] as num).toDouble()
+          : 18.0,
+      isTaxInclusive: json['isTaxInclusive'] != null
+          ? json['isTaxInclusive'] == true
+          : true,
+      taxableAmount: (json['taxableAmount'] is num)
+          ? (json['taxableAmount'] as num).toDouble()
+          : 0.0,
     );
   }
 }
@@ -42,6 +57,10 @@ extension OrderItemModelX on OrderItemModel {
       'unitPrice': unitPrice,
       'quantity': quantity,
       'lineTotal': lineTotal,
+      'hsnCode': hsnCode,
+      'gstRate': gstRate,
+      'isTaxInclusive': isTaxInclusive,
+      'taxableAmount': taxableAmount,
     };
   }
 }
@@ -91,7 +110,12 @@ abstract class OrderModel with _$OrderModel {
     required double shippingFee,
     required double tax,
     required double totalAmount,
-    @Default('USD') String currency,
+    @Default('INR') String currency,
+    @Default('₹') String currencySymbol,
+    @Default(0.0) double taxableAmount,
+    @Default(0.0) double discount,
+    TaxBreakdownModel? taxBreakdown,
+    String? customerGstin,
     required String status,
     PaymentModel? payment,
     @Default('') String carrier,
@@ -159,6 +183,13 @@ abstract class OrderModel with _$OrderModel {
       }
     }
 
+    TaxBreakdownModel? taxBreakdown;
+    if (json['taxBreakdown'] is Map<String, dynamic>) {
+      taxBreakdown = TaxBreakdownModel.fromJson(
+        json['taxBreakdown'] as Map<String, dynamic>,
+      );
+    }
+
     DateTime parsedDate = DateTime.now();
     if (json['createdAt'] != null) {
       parsedDate = DateTime.tryParse(json['createdAt'].toString()) ?? DateTime.now();
@@ -187,7 +218,16 @@ abstract class OrderModel with _$OrderModel {
           : (json['orderPrice'] is num)
               ? (json['orderPrice'] as num).toDouble()
               : 0.0,
-      currency: json['currency']?.toString() ?? 'USD',
+      currency: json['currency']?.toString() ?? 'INR',
+      currencySymbol: json['currencySymbol']?.toString() ?? '₹',
+      taxableAmount: (json['taxableAmount'] is num)
+          ? (json['taxableAmount'] as num).toDouble()
+          : 0.0,
+      discount: (json['discount'] is num)
+          ? (json['discount'] as num).toDouble()
+          : 0.0,
+      taxBreakdown: taxBreakdown,
+      customerGstin: json['customerGstin']?.toString(),
       status: rawStatus,
       payment: paymentObj,
       carrier: json['carrier']?.toString() ?? '',

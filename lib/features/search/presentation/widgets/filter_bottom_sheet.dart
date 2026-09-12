@@ -165,7 +165,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
 
               // Price Range
               Text(
-                'Price Range (\$)',
+                'Price Range (₹)',
                 style: AppTypography.titleSmall.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -179,7 +179,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         labelText: 'Min Price',
-                        prefixText: '\$ ',
+                        prefixText: '₹ ',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(AppRadius.sm),
                         ),
@@ -205,7 +205,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         labelText: 'Max Price',
-                        prefixText: '\$ ',
+                        prefixText: '₹ ',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(AppRadius.sm),
                         ),
