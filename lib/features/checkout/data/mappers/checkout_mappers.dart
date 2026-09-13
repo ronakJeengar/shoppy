@@ -51,6 +51,9 @@ extension CheckoutValidationModelMapper on CheckoutValidationModel {
       currencySymbol: currencySymbol,
       taxBreakdown: taxBreakdown?.toEntity(),
       customerGstin: customerGstin,
+      deliveryWindow: deliveryWindow,
+      isFreeShipping: isFreeShipping,
+      shippingDetails: shippingDetails,
     );
   }
 }
@@ -71,6 +74,9 @@ extension CheckoutValidationEntityMapper on CheckoutValidationEntity {
       currencySymbol: currencySymbol,
       taxBreakdown: taxBreakdown != null ? TaxBreakdownModel.fromEntity(taxBreakdown!) : null,
       customerGstin: customerGstin,
+      deliveryWindow: deliveryWindow,
+      isFreeShipping: isFreeShipping,
+      shippingDetails: shippingDetails,
     );
   }
 }

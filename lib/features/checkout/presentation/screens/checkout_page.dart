@@ -13,6 +13,8 @@ import 'package:shopp_app/features/addresses/presentation/providers/address_prov
 import 'package:shopp_app/features/cart/domain/entities/cart_entity.dart';
 import 'package:shopp_app/features/cart/presentation/providers/cart_providers.dart';
 import 'package:shopp_app/features/checkout/presentation/providers/checkout_providers.dart';
+import 'package:shopp_app/features/shipping/domain/entities/shipping_entity.dart';
+import 'package:shopp_app/features/shipping/presentation/providers/shipping_providers.dart';
 import 'order_confirmation_page.dart';
 import 'package:shopp_app/features/addresses/presentation/widgets/address_form_dialog.dart';
 import 'package:shopp_app/core/widgets/app_button.dart';
@@ -124,6 +126,24 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
     final checkoutState = ref.watch(checkoutNotifierProvider);
     final cart = ref.watch(cartNotifierProvider).dataOrNull ?? const CartEntity.empty();
 
+    // Query authoritative shipping quote for selected address PIN
+    final pinCode = selectedAddress != null
+        ? (selectedAddress.pinCode.isNotEmpty ? selectedAddress.pinCode : selectedAddress.postalCode).trim()
+        : null;
+
+    final quoteAsync = (pinCode != null && pinCode.length == 6)
+        ? ref.watch(
+            shippingQuoteProvider(
+              ShippingQuoteParams(
+                pinCode: pinCode,
+                subtotal: cart.subtotal,
+                shippingMethod: checkoutState.selectedShippingMethod,
+              ),
+            ),
+          )
+        : null;
+    final shippingQuote = quoteAsync?.valueOrNull;
+
     return Scaffold(
       backgroundColor: AppColors.slate50,
       appBar: AppBar(
@@ -142,13 +162,13 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildAddressSection(selectedAddress),
+            _buildAddressSection(selectedAddress, shippingQuote),
             const SizedBox(height: 16),
-            _buildShippingMethodSection(checkoutState, selectedAddress),
+            _buildShippingMethodSection(checkoutState, selectedAddress, shippingQuote),
             const SizedBox(height: 16),
-            _buildPaymentMethodSection(checkoutState),
+            _buildPaymentMethodSection(checkoutState, shippingQuote),
             const SizedBox(height: 16),
-            _buildOrderReviewSection(cart, checkoutState),
+            _buildOrderReviewSection(cart, checkoutState, shippingQuote),
             const SizedBox(height: 32),
           ],
         ),
@@ -158,17 +178,23 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
         selectedAddress,
         cart,
         checkoutState,
+        shippingQuote,
       ),
     );
   }
 
-  Widget _buildAddressSection(AddressEntity? selected) {
+  Widget _buildAddressSection(AddressEntity? selected, ShippingQuoteEntity? quote) {
+    final isUnserviceable = quote != null && !quote.serviceable;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: AppRadius.borderMd,
-        border: Border.all(color: AppColors.slate200),
+        border: Border.all(
+          color: isUnserviceable ? AppColors.error : AppColors.slate200,
+          width: isUnserviceable ? 1.5 : 1.0,
+        ),
         boxShadow: AppShadows.card,
       ),
       child: Column(
@@ -181,11 +207,17 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(6),
-                    decoration: const BoxDecoration(
-                      color: AppColors.primary50,
+                    decoration: BoxDecoration(
+                      color: isUnserviceable ? AppColors.error.withValues(alpha: 0.1) : AppColors.primary50,
                       borderRadius: AppRadius.borderSm,
                     ),
-                    child: const Center(child: AppIcon(AppIcons.address, color: AppColors.primary, size: AppIconSizes.action)),
+                    child: Center(
+                      child: AppIcon(
+                        isUnserviceable ? AppIcons.locationOff : AppIcons.address,
+                        color: isUnserviceable ? AppColors.error : AppColors.primary,
+                        size: AppIconSizes.action,
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 10),
                   const Text('Delivery Address', style: AppTypography.headingSmall),
@@ -228,6 +260,59 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
               'Phone: ${selected.phone}',
               style: AppTypography.caption.copyWith(color: AppColors.slate500),
             ),
+
+            // Serviceability Banner
+            if (quote != null) ...[
+              const SizedBox(height: 10),
+              if (quote.serviceable)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.success.withValues(alpha: 0.08),
+                    borderRadius: AppRadius.borderSm,
+                    border: Border.all(color: AppColors.success.withValues(alpha: 0.2)),
+                  ),
+                  child: Row(
+                    children: [
+                      const AppIcon(AppIcons.checkCircle, color: AppColors.success, size: AppIconSizes.small),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          'Serviceable to ${quote.city ?? selected.city}, ${quote.state ?? selected.state} (${quote.pinCode}) • ${quote.deliveryEstimate?.formattedWindow ?? 'Fast Delivery'}',
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.success,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.error.withValues(alpha: 0.08),
+                    borderRadius: AppRadius.borderSm,
+                    border: Border.all(color: AppColors.error.withValues(alpha: 0.25)),
+                  ),
+                  child: Row(
+                    children: [
+                      const AppIcon(AppIcons.locationOff, color: AppColors.error, size: AppIconSizes.action),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          quote.message ?? 'Delivery is unavailable to PIN code ${quote.pinCode}. Please select or add an address in a serviceable area.',
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.error,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
           ],
         ],
       ),
@@ -237,8 +322,43 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
   Widget _buildShippingMethodSection(
     CheckoutState checkoutState,
     AddressEntity? selectedAddress,
+    ShippingQuoteEntity? quote,
   ) {
     final isStandard = checkoutState.selectedShippingMethod == 'STANDARD';
+
+    // Check if express is available for destination PIN
+    final expressAvailable = quote == null ||
+        quote.availableMethods.any((m) => m.code == 'EXPRESS');
+
+    final standardMethod = quote?.availableMethods.firstWhere(
+      (m) => m.code == 'STANDARD',
+      orElse: () => const AvailableShippingMethodEntity(
+        code: 'STANDARD',
+        name: 'Standard Delivery',
+        formattedWindow: '3-5 Days',
+        baseCharge: 49.0,
+      ),
+    );
+
+    final expressMethod = quote?.availableMethods.firstWhere(
+      (m) => m.code == 'EXPRESS',
+      orElse: () => const AvailableShippingMethodEntity(
+        code: 'EXPRESS',
+        name: 'Express Delivery',
+        formattedWindow: '1-2 Days',
+        baseCharge: 99.0,
+      ),
+    );
+
+    final standardSubtitle = quote != null
+        ? (quote.freeShipping
+            ? 'FREE on orders over ₹${quote.freeShippingThreshold.toInt()}'
+            : '₹${standardMethod?.baseCharge.toInt() ?? 49}.00 (Add ₹${quote.amountNeededForFreeShipping.toInt()} for FREE shipping)')
+        : 'Free on orders over ₹999, otherwise ₹49.00';
+
+    final expressSubtitle = expressAvailable
+        ? 'Priority delivery at ₹${expressMethod?.baseCharge.toInt() ?? 99}.00'
+        : 'Not available for ${quote.city != null && quote.city!.isNotEmpty ? quote.city : 'this area'}';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -259,7 +379,9 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                   color: AppColors.primary50,
                   borderRadius: AppRadius.borderSm,
                 ),
-                child: const Center(child: AppIcon(AppIcons.shipping, color: AppColors.primary, size: AppIconSizes.action)),
+                child: const Center(
+                  child: AppIcon(AppIcons.shipping, color: AppColors.primary, size: AppIconSizes.action),
+                ),
               ),
               const SizedBox(width: 10),
               const Text('Shipping Method', style: AppTypography.headingSmall),
@@ -267,9 +389,12 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
           ),
           const SizedBox(height: 14),
           _buildSelectionTile(
-            title: 'Standard Delivery (3-5 Days)',
-            subtitle: 'Free on orders over ₹499.00, otherwise ₹49.00',
+            title: standardMethod != null && standardMethod.formattedWindow.isNotEmpty
+                ? 'Standard Delivery (${standardMethod.formattedWindow})'
+                : 'Standard Delivery (3-5 Days)',
+            subtitle: standardSubtitle,
             isSelected: isStandard,
+            enabled: quote?.serviceable != false,
             onTap: () {
               ref.read(checkoutNotifierProvider.notifier).setShippingMethod('STANDARD');
               if (selectedAddress != null) {
@@ -278,23 +403,32 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
             },
           ),
           _buildSelectionTile(
-            title: 'Express Delivery (1-2 Days)',
-            subtitle: 'Flat rate ₹99.00 with priority fulfillment',
+            title: expressMethod != null && expressMethod.formattedWindow.isNotEmpty
+                ? 'Express Delivery (${expressMethod.formattedWindow})'
+                : 'Express Delivery (1-2 Days)',
+            subtitle: expressSubtitle,
             isSelected: !isStandard,
-            onTap: () {
-              ref.read(checkoutNotifierProvider.notifier).setShippingMethod('EXPRESS');
-              if (selectedAddress != null) {
-                ref.read(checkoutNotifierProvider.notifier).validateCheckout(selectedAddress.id);
-              }
-            },
+            enabled: expressAvailable && quote?.serviceable != false,
+            onTap: expressAvailable
+                ? () {
+                    ref.read(checkoutNotifierProvider.notifier).setShippingMethod('EXPRESS');
+                    if (selectedAddress != null) {
+                      ref.read(checkoutNotifierProvider.notifier).validateCheckout(selectedAddress.id);
+                    }
+                  }
+                : () {},
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPaymentMethodSection(CheckoutState checkoutState) {
+  Widget _buildPaymentMethodSection(
+    CheckoutState checkoutState,
+    ShippingQuoteEntity? quote,
+  ) {
     final currentMethod = checkoutState.selectedPaymentMethod;
+    final isRemote = quote?.shippingZone == 'REMOTE';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -315,7 +449,9 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                   color: AppColors.primary50,
                   borderRadius: AppRadius.borderSm,
                 ),
-                child: const Center(child: AppIcon(AppIcons.payment, color: AppColors.primary, size: AppIconSizes.action)),
+                child: const Center(
+                  child: AppIcon(AppIcons.payment, color: AppColors.primary, size: AppIconSizes.action),
+                ),
               ),
               const SizedBox(width: 10),
               const Text('Payment Method', style: AppTypography.headingSmall),
@@ -331,10 +467,15 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
           ),
           _buildSelectionTile(
             title: 'Cash on Delivery (COD)',
-            subtitle: 'Pay with cash upon receipt of order',
+            subtitle: isRemote
+                ? 'COD not supported for remote delivery zones'
+                : 'Pay with cash upon receipt of order',
             isSelected: currentMethod == 'COD',
             icon: AppIcons.cash,
-            onTap: () => ref.read(checkoutNotifierProvider.notifier).setPaymentMethod('COD'),
+            enabled: !isRemote,
+            onTap: !isRemote
+                ? () => ref.read(checkoutNotifierProvider.notifier).setPaymentMethod('COD')
+                : () {},
           ),
         ],
       ),
@@ -344,14 +485,16 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
   Widget _buildOrderReviewSection(
     CartEntity cart,
     CheckoutState checkoutState,
+    ShippingQuoteEntity? quote,
   ) {
     final validation = checkoutState.validation;
     final subtotal = validation?.subtotal ?? cart.subtotal;
     final discount = validation?.discount ?? cart.discount;
-    final shipping = validation?.shippingFee ?? (checkoutState.selectedShippingMethod == 'EXPRESS' ? 99.0 : (subtotal >= 499 ? 0.0 : 49.0));
+    final shipping = validation?.shippingFee ?? quote?.shippingAmount;
     final tax = validation?.tax ?? cart.tax;
-    final total = validation?.grandTotal ?? (subtotal - discount + shipping);
+    final total = validation?.grandTotal ?? (shipping != null ? (subtotal - discount + shipping) : (subtotal - discount));
     final taxBreakdown = validation?.taxBreakdown;
+    final deliveryWindow = validation?.deliveryWindow ?? quote?.deliveryEstimate?.formattedWindow;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -372,7 +515,9 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                   color: AppColors.primary50,
                   borderRadius: AppRadius.borderSm,
                 ),
-                child: const Center(child: AppIcon(AppIcons.orders, color: AppColors.primary, size: AppIconSizes.action)),
+                child: const Center(
+                  child: AppIcon(AppIcons.orders, color: AppColors.primary, size: AppIconSizes.action),
+                ),
               ),
               const SizedBox(width: 10),
               const Text('Order Summary', style: AppTypography.headingSmall),
@@ -391,9 +536,24 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
           const SizedBox(height: 8),
           _summaryRow(
             'Shipping Fee',
-            shipping == 0 ? 'FREE' : CurrencyFormatter.format(shipping),
+            shipping == null
+                ? 'Calculated at checkout'
+                : (shipping == 0 ? 'FREE' : CurrencyFormatter.format(shipping)),
             valueColor: shipping == 0 ? AppColors.success : null,
           ),
+          if (deliveryWindow != null && deliveryWindow.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                const AppIcon(AppIcons.deliveryTruck, color: AppColors.slate500, size: AppIconSizes.small),
+                const SizedBox(width: 6),
+                Text(
+                  'Estimated: $deliveryWindow',
+                  style: AppTypography.caption.copyWith(color: AppColors.slate600),
+                ),
+              ],
+            ),
+          ],
           const SizedBox(height: 8),
           if (taxBreakdown != null) ...[
             if (taxBreakdown.taxableAmount > 0) ...[
@@ -432,19 +592,24 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
     required bool isSelected,
     required VoidCallback onTap,
     String? icon,
+    bool enabled = true,
   }) {
     return InkWell(
-      onTap: onTap,
+      onTap: enabled ? onTap : null,
       borderRadius: AppRadius.borderMd,
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary50.withValues(alpha: 0.5) : AppColors.slate50,
+          color: !enabled
+              ? AppColors.slate100.withValues(alpha: 0.6)
+              : (isSelected ? AppColors.primary50.withValues(alpha: 0.5) : AppColors.slate50),
           borderRadius: AppRadius.borderMd,
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.slate200,
-            width: isSelected ? 1.5 : 1,
+            color: !enabled
+                ? AppColors.slate200
+                : (isSelected ? AppColors.primary : AppColors.slate200),
+            width: isSelected && enabled ? 1.5 : 1,
           ),
         ),
         child: Row(
@@ -456,11 +621,13 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? AppColors.primary : AppColors.slate400,
+                  color: !enabled
+                      ? AppColors.slate300
+                      : (isSelected ? AppColors.primary : AppColors.slate400),
                   width: 2,
                 ),
               ),
-              child: isSelected
+              child: isSelected && enabled
                   ? Center(
                       child: Container(
                         width: 10,
@@ -474,7 +641,13 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                   : null,
             ),
             if (icon != null) ...[
-              AppIcon(icon, size: AppIconSizes.medium, color: isSelected ? AppColors.primary : AppColors.slate600),
+              AppIcon(
+                icon,
+                size: AppIconSizes.medium,
+                color: !enabled
+                    ? AppColors.slate400
+                    : (isSelected ? AppColors.primary : AppColors.slate600),
+              ),
               const SizedBox(width: 10),
             ],
             Expanded(
@@ -485,17 +658,35 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                     title,
                     style: AppTypography.bodySmall.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.slate900,
+                      color: !enabled ? AppColors.slate400 : AppColors.slate900,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: AppTypography.caption.copyWith(color: AppColors.slate500),
+                    style: AppTypography.caption.copyWith(
+                      color: !enabled ? AppColors.slate400 : AppColors.slate500,
+                    ),
                   ),
                 ],
               ),
             ),
+            if (!enabled)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: const BoxDecoration(
+                  color: AppColors.slate200,
+                  borderRadius: AppRadius.borderSm,
+                ),
+                child: Text(
+                  'Unavailable',
+                  style: AppTypography.caption.copyWith(
+                    fontSize: 10,
+                    color: AppColors.slate600,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -530,12 +721,16 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
     AddressEntity? selectedAddress,
     CartEntity cart,
     CheckoutState checkoutState,
+    ShippingQuoteEntity? quote,
   ) {
     final validation = checkoutState.validation;
     final subtotal = validation?.subtotal ?? cart.subtotal;
-    final shipping = validation?.shippingFee ?? (checkoutState.selectedShippingMethod == 'EXPRESS' ? 99.0 : (subtotal >= 499 ? 0.0 : 49.0));
-    final displayTotal = validation?.grandTotal ?? (subtotal + shipping);
-    final canPlace = selectedAddress != null && !checkoutState.isPlacingOrder;
+    final discount = validation?.discount ?? cart.discount;
+    final shipping = validation?.shippingFee ?? quote?.shippingAmount ?? 0.0;
+    final displayTotal = validation?.grandTotal ?? (subtotal - discount + shipping);
+
+    final isServiceable = quote == null || quote.serviceable;
+    final canPlace = selectedAddress != null && isServiceable && !checkoutState.isPlacingOrder;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
@@ -564,7 +759,9 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
             const SizedBox(width: 20),
             Expanded(
               child: AppButton(
-                label: checkoutState.isPlacingOrder ? 'Processing...' : 'Place Order',
+                label: checkoutState.isPlacingOrder
+                    ? 'Processing...'
+                    : (!isServiceable ? 'Delivery Unavailable' : 'Place Order'),
                 icon: AppIcons.lock,
                 isLoading: checkoutState.isPlacingOrder,
                 isFullWidth: true,

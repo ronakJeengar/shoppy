@@ -27,6 +27,9 @@ mixin _$CheckoutValidationEntity {
   String get currencySymbol;
   TaxBreakdownEntity? get taxBreakdown;
   String? get customerGstin;
+  String? get deliveryWindow;
+  bool? get isFreeShipping;
+  Map<String, dynamic>? get shippingDetails;
 
   /// Create a copy of CheckoutValidationEntity
   /// with the given fields replaced by the non-null parameter values.
@@ -64,7 +67,13 @@ mixin _$CheckoutValidationEntity {
             (identical(other.taxBreakdown, taxBreakdown) ||
                 other.taxBreakdown == taxBreakdown) &&
             (identical(other.customerGstin, customerGstin) ||
-                other.customerGstin == customerGstin));
+                other.customerGstin == customerGstin) &&
+            (identical(other.deliveryWindow, deliveryWindow) ||
+                other.deliveryWindow == deliveryWindow) &&
+            (identical(other.isFreeShipping, isFreeShipping) ||
+                other.isFreeShipping == isFreeShipping) &&
+            const DeepCollectionEquality()
+                .equals(other.shippingDetails, shippingDetails));
   }
 
   @override
@@ -82,11 +91,14 @@ mixin _$CheckoutValidationEntity {
       currency,
       currencySymbol,
       taxBreakdown,
-      customerGstin);
+      customerGstin,
+      deliveryWindow,
+      isFreeShipping,
+      const DeepCollectionEquality().hash(shippingDetails));
 
   @override
   String toString() {
-    return 'CheckoutValidationEntity(valid: $valid, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, grandTotal: $grandTotal, taxableAmount: $taxableAmount, discount: $discount, currency: $currency, currencySymbol: $currencySymbol, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin)';
+    return 'CheckoutValidationEntity(valid: $valid, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, grandTotal: $grandTotal, taxableAmount: $taxableAmount, discount: $discount, currency: $currency, currencySymbol: $currencySymbol, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, deliveryWindow: $deliveryWindow, isFreeShipping: $isFreeShipping, shippingDetails: $shippingDetails)';
   }
 }
 
@@ -109,7 +121,10 @@ abstract mixin class $CheckoutValidationEntityCopyWith<$Res> {
       String currency,
       String currencySymbol,
       TaxBreakdownEntity? taxBreakdown,
-      String? customerGstin});
+      String? customerGstin,
+      String? deliveryWindow,
+      bool? isFreeShipping,
+      Map<String, dynamic>? shippingDetails});
 
   $AddressEntityCopyWith<$Res>? get shippingAddress;
   $TaxBreakdownEntityCopyWith<$Res>? get taxBreakdown;
@@ -141,6 +156,9 @@ class _$CheckoutValidationEntityCopyWithImpl<$Res>
     Object? currencySymbol = null,
     Object? taxBreakdown = freezed,
     Object? customerGstin = freezed,
+    Object? deliveryWindow = freezed,
+    Object? isFreeShipping = freezed,
+    Object? shippingDetails = freezed,
   }) {
     return _then(_self.copyWith(
       valid: null == valid
@@ -195,6 +213,18 @@ class _$CheckoutValidationEntityCopyWithImpl<$Res>
           ? _self.customerGstin
           : customerGstin // ignore: cast_nullable_to_non_nullable
               as String?,
+      deliveryWindow: freezed == deliveryWindow
+          ? _self.deliveryWindow
+          : deliveryWindow // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isFreeShipping: freezed == isFreeShipping
+          ? _self.isFreeShipping
+          : isFreeShipping // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      shippingDetails: freezed == shippingDetails
+          ? _self.shippingDetails
+          : shippingDetails // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ));
   }
 
@@ -333,7 +363,10 @@ extension CheckoutValidationEntityPatterns on CheckoutValidationEntity {
             String currency,
             String currencySymbol,
             TaxBreakdownEntity? taxBreakdown,
-            String? customerGstin)?
+            String? customerGstin,
+            String? deliveryWindow,
+            bool? isFreeShipping,
+            Map<String, dynamic>? shippingDetails)?
         $default, {
     required TResult orElse(),
   }) {
@@ -353,7 +386,10 @@ extension CheckoutValidationEntityPatterns on CheckoutValidationEntity {
             _that.currency,
             _that.currencySymbol,
             _that.taxBreakdown,
-            _that.customerGstin);
+            _that.customerGstin,
+            _that.deliveryWindow,
+            _that.isFreeShipping,
+            _that.shippingDetails);
       case _:
         return orElse();
     }
@@ -387,7 +423,10 @@ extension CheckoutValidationEntityPatterns on CheckoutValidationEntity {
             String currency,
             String currencySymbol,
             TaxBreakdownEntity? taxBreakdown,
-            String? customerGstin)
+            String? customerGstin,
+            String? deliveryWindow,
+            bool? isFreeShipping,
+            Map<String, dynamic>? shippingDetails)
         $default,
   ) {
     final _that = this;
@@ -406,7 +445,10 @@ extension CheckoutValidationEntityPatterns on CheckoutValidationEntity {
             _that.currency,
             _that.currencySymbol,
             _that.taxBreakdown,
-            _that.customerGstin);
+            _that.customerGstin,
+            _that.deliveryWindow,
+            _that.isFreeShipping,
+            _that.shippingDetails);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -439,7 +481,10 @@ extension CheckoutValidationEntityPatterns on CheckoutValidationEntity {
             String currency,
             String currencySymbol,
             TaxBreakdownEntity? taxBreakdown,
-            String? customerGstin)?
+            String? customerGstin,
+            String? deliveryWindow,
+            bool? isFreeShipping,
+            Map<String, dynamic>? shippingDetails)?
         $default,
   ) {
     final _that = this;
@@ -458,7 +503,10 @@ extension CheckoutValidationEntityPatterns on CheckoutValidationEntity {
             _that.currency,
             _that.currencySymbol,
             _that.taxBreakdown,
-            _that.customerGstin);
+            _that.customerGstin,
+            _that.deliveryWindow,
+            _that.isFreeShipping,
+            _that.shippingDetails);
       case _:
         return null;
     }
@@ -481,7 +529,11 @@ class _CheckoutValidationEntity implements CheckoutValidationEntity {
       this.currency = 'INR',
       this.currencySymbol = '₹',
       this.taxBreakdown,
-      this.customerGstin});
+      this.customerGstin,
+      this.deliveryWindow,
+      this.isFreeShipping,
+      final Map<String, dynamic>? shippingDetails})
+      : _shippingDetails = shippingDetails;
 
   @override
   final bool valid;
@@ -514,6 +566,19 @@ class _CheckoutValidationEntity implements CheckoutValidationEntity {
   final TaxBreakdownEntity? taxBreakdown;
   @override
   final String? customerGstin;
+  @override
+  final String? deliveryWindow;
+  @override
+  final bool? isFreeShipping;
+  final Map<String, dynamic>? _shippingDetails;
+  @override
+  Map<String, dynamic>? get shippingDetails {
+    final value = _shippingDetails;
+    if (value == null) return null;
+    if (_shippingDetails is EqualUnmodifiableMapView) return _shippingDetails;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
 
   /// Create a copy of CheckoutValidationEntity
   /// with the given fields replaced by the non-null parameter values.
@@ -552,7 +617,13 @@ class _CheckoutValidationEntity implements CheckoutValidationEntity {
             (identical(other.taxBreakdown, taxBreakdown) ||
                 other.taxBreakdown == taxBreakdown) &&
             (identical(other.customerGstin, customerGstin) ||
-                other.customerGstin == customerGstin));
+                other.customerGstin == customerGstin) &&
+            (identical(other.deliveryWindow, deliveryWindow) ||
+                other.deliveryWindow == deliveryWindow) &&
+            (identical(other.isFreeShipping, isFreeShipping) ||
+                other.isFreeShipping == isFreeShipping) &&
+            const DeepCollectionEquality()
+                .equals(other._shippingDetails, _shippingDetails));
   }
 
   @override
@@ -570,11 +641,14 @@ class _CheckoutValidationEntity implements CheckoutValidationEntity {
       currency,
       currencySymbol,
       taxBreakdown,
-      customerGstin);
+      customerGstin,
+      deliveryWindow,
+      isFreeShipping,
+      const DeepCollectionEquality().hash(_shippingDetails));
 
   @override
   String toString() {
-    return 'CheckoutValidationEntity(valid: $valid, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, grandTotal: $grandTotal, taxableAmount: $taxableAmount, discount: $discount, currency: $currency, currencySymbol: $currencySymbol, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin)';
+    return 'CheckoutValidationEntity(valid: $valid, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, grandTotal: $grandTotal, taxableAmount: $taxableAmount, discount: $discount, currency: $currency, currencySymbol: $currencySymbol, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, deliveryWindow: $deliveryWindow, isFreeShipping: $isFreeShipping, shippingDetails: $shippingDetails)';
   }
 }
 
@@ -599,7 +673,10 @@ abstract mixin class _$CheckoutValidationEntityCopyWith<$Res>
       String currency,
       String currencySymbol,
       TaxBreakdownEntity? taxBreakdown,
-      String? customerGstin});
+      String? customerGstin,
+      String? deliveryWindow,
+      bool? isFreeShipping,
+      Map<String, dynamic>? shippingDetails});
 
   @override
   $AddressEntityCopyWith<$Res>? get shippingAddress;
@@ -633,6 +710,9 @@ class __$CheckoutValidationEntityCopyWithImpl<$Res>
     Object? currencySymbol = null,
     Object? taxBreakdown = freezed,
     Object? customerGstin = freezed,
+    Object? deliveryWindow = freezed,
+    Object? isFreeShipping = freezed,
+    Object? shippingDetails = freezed,
   }) {
     return _then(_CheckoutValidationEntity(
       valid: null == valid
@@ -687,6 +767,18 @@ class __$CheckoutValidationEntityCopyWithImpl<$Res>
           ? _self.customerGstin
           : customerGstin // ignore: cast_nullable_to_non_nullable
               as String?,
+      deliveryWindow: freezed == deliveryWindow
+          ? _self.deliveryWindow
+          : deliveryWindow // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isFreeShipping: freezed == isFreeShipping
+          ? _self.isFreeShipping
+          : isFreeShipping // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      shippingDetails: freezed == shippingDetails
+          ? _self._shippingDetails
+          : shippingDetails // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ));
   }
 

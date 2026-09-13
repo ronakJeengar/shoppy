@@ -28,6 +28,9 @@ mixin _$CheckoutValidationModel {
   String get currencySymbol;
   TaxBreakdownModel? get taxBreakdown;
   String? get customerGstin;
+  String? get deliveryWindow;
+  bool? get isFreeShipping;
+  Map<String, dynamic>? get shippingDetails;
 
   /// Create a copy of CheckoutValidationModel
   /// with the given fields replaced by the non-null parameter values.
@@ -66,7 +69,13 @@ mixin _$CheckoutValidationModel {
             (identical(other.taxBreakdown, taxBreakdown) ||
                 other.taxBreakdown == taxBreakdown) &&
             (identical(other.customerGstin, customerGstin) ||
-                other.customerGstin == customerGstin));
+                other.customerGstin == customerGstin) &&
+            (identical(other.deliveryWindow, deliveryWindow) ||
+                other.deliveryWindow == deliveryWindow) &&
+            (identical(other.isFreeShipping, isFreeShipping) ||
+                other.isFreeShipping == isFreeShipping) &&
+            const DeepCollectionEquality()
+                .equals(other.shippingDetails, shippingDetails));
   }
 
   @override
@@ -85,11 +94,14 @@ mixin _$CheckoutValidationModel {
       currency,
       currencySymbol,
       taxBreakdown,
-      customerGstin);
+      customerGstin,
+      deliveryWindow,
+      isFreeShipping,
+      const DeepCollectionEquality().hash(shippingDetails));
 
   @override
   String toString() {
-    return 'CheckoutValidationModel(valid: $valid, items: $items, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, grandTotal: $grandTotal, taxableAmount: $taxableAmount, discount: $discount, currency: $currency, currencySymbol: $currencySymbol, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin)';
+    return 'CheckoutValidationModel(valid: $valid, items: $items, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, grandTotal: $grandTotal, taxableAmount: $taxableAmount, discount: $discount, currency: $currency, currencySymbol: $currencySymbol, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, deliveryWindow: $deliveryWindow, isFreeShipping: $isFreeShipping, shippingDetails: $shippingDetails)';
   }
 }
 
@@ -113,7 +125,10 @@ abstract mixin class $CheckoutValidationModelCopyWith<$Res> {
       String currency,
       String currencySymbol,
       TaxBreakdownModel? taxBreakdown,
-      String? customerGstin});
+      String? customerGstin,
+      String? deliveryWindow,
+      bool? isFreeShipping,
+      Map<String, dynamic>? shippingDetails});
 
   $AddressModelCopyWith<$Res>? get shippingAddress;
   $TaxBreakdownModelCopyWith<$Res>? get taxBreakdown;
@@ -146,6 +161,9 @@ class _$CheckoutValidationModelCopyWithImpl<$Res>
     Object? currencySymbol = null,
     Object? taxBreakdown = freezed,
     Object? customerGstin = freezed,
+    Object? deliveryWindow = freezed,
+    Object? isFreeShipping = freezed,
+    Object? shippingDetails = freezed,
   }) {
     return _then(_self.copyWith(
       valid: null == valid
@@ -204,6 +222,18 @@ class _$CheckoutValidationModelCopyWithImpl<$Res>
           ? _self.customerGstin
           : customerGstin // ignore: cast_nullable_to_non_nullable
               as String?,
+      deliveryWindow: freezed == deliveryWindow
+          ? _self.deliveryWindow
+          : deliveryWindow // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isFreeShipping: freezed == isFreeShipping
+          ? _self.isFreeShipping
+          : isFreeShipping // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      shippingDetails: freezed == shippingDetails
+          ? _self.shippingDetails
+          : shippingDetails // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ));
   }
 
@@ -343,7 +373,10 @@ extension CheckoutValidationModelPatterns on CheckoutValidationModel {
             String currency,
             String currencySymbol,
             TaxBreakdownModel? taxBreakdown,
-            String? customerGstin)?
+            String? customerGstin,
+            String? deliveryWindow,
+            bool? isFreeShipping,
+            Map<String, dynamic>? shippingDetails)?
         $default, {
     required TResult orElse(),
   }) {
@@ -364,7 +397,10 @@ extension CheckoutValidationModelPatterns on CheckoutValidationModel {
             _that.currency,
             _that.currencySymbol,
             _that.taxBreakdown,
-            _that.customerGstin);
+            _that.customerGstin,
+            _that.deliveryWindow,
+            _that.isFreeShipping,
+            _that.shippingDetails);
       case _:
         return orElse();
     }
@@ -399,7 +435,10 @@ extension CheckoutValidationModelPatterns on CheckoutValidationModel {
             String currency,
             String currencySymbol,
             TaxBreakdownModel? taxBreakdown,
-            String? customerGstin)
+            String? customerGstin,
+            String? deliveryWindow,
+            bool? isFreeShipping,
+            Map<String, dynamic>? shippingDetails)
         $default,
   ) {
     final _that = this;
@@ -419,7 +458,10 @@ extension CheckoutValidationModelPatterns on CheckoutValidationModel {
             _that.currency,
             _that.currencySymbol,
             _that.taxBreakdown,
-            _that.customerGstin);
+            _that.customerGstin,
+            _that.deliveryWindow,
+            _that.isFreeShipping,
+            _that.shippingDetails);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -453,7 +495,10 @@ extension CheckoutValidationModelPatterns on CheckoutValidationModel {
             String currency,
             String currencySymbol,
             TaxBreakdownModel? taxBreakdown,
-            String? customerGstin)?
+            String? customerGstin,
+            String? deliveryWindow,
+            bool? isFreeShipping,
+            Map<String, dynamic>? shippingDetails)?
         $default,
   ) {
     final _that = this;
@@ -473,7 +518,10 @@ extension CheckoutValidationModelPatterns on CheckoutValidationModel {
             _that.currency,
             _that.currencySymbol,
             _that.taxBreakdown,
-            _that.customerGstin);
+            _that.customerGstin,
+            _that.deliveryWindow,
+            _that.isFreeShipping,
+            _that.shippingDetails);
       case _:
         return null;
     }
@@ -497,8 +545,12 @@ class _CheckoutValidationModel implements CheckoutValidationModel {
       this.currency = 'INR',
       this.currencySymbol = '₹',
       this.taxBreakdown,
-      this.customerGstin})
-      : _items = items;
+      this.customerGstin,
+      this.deliveryWindow,
+      this.isFreeShipping,
+      final Map<String, dynamic>? shippingDetails})
+      : _items = items,
+        _shippingDetails = shippingDetails;
 
   @override
   final bool valid;
@@ -540,6 +592,19 @@ class _CheckoutValidationModel implements CheckoutValidationModel {
   final TaxBreakdownModel? taxBreakdown;
   @override
   final String? customerGstin;
+  @override
+  final String? deliveryWindow;
+  @override
+  final bool? isFreeShipping;
+  final Map<String, dynamic>? _shippingDetails;
+  @override
+  Map<String, dynamic>? get shippingDetails {
+    final value = _shippingDetails;
+    if (value == null) return null;
+    if (_shippingDetails is EqualUnmodifiableMapView) return _shippingDetails;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
 
   /// Create a copy of CheckoutValidationModel
   /// with the given fields replaced by the non-null parameter values.
@@ -579,7 +644,13 @@ class _CheckoutValidationModel implements CheckoutValidationModel {
             (identical(other.taxBreakdown, taxBreakdown) ||
                 other.taxBreakdown == taxBreakdown) &&
             (identical(other.customerGstin, customerGstin) ||
-                other.customerGstin == customerGstin));
+                other.customerGstin == customerGstin) &&
+            (identical(other.deliveryWindow, deliveryWindow) ||
+                other.deliveryWindow == deliveryWindow) &&
+            (identical(other.isFreeShipping, isFreeShipping) ||
+                other.isFreeShipping == isFreeShipping) &&
+            const DeepCollectionEquality()
+                .equals(other._shippingDetails, _shippingDetails));
   }
 
   @override
@@ -598,11 +669,14 @@ class _CheckoutValidationModel implements CheckoutValidationModel {
       currency,
       currencySymbol,
       taxBreakdown,
-      customerGstin);
+      customerGstin,
+      deliveryWindow,
+      isFreeShipping,
+      const DeepCollectionEquality().hash(_shippingDetails));
 
   @override
   String toString() {
-    return 'CheckoutValidationModel(valid: $valid, items: $items, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, grandTotal: $grandTotal, taxableAmount: $taxableAmount, discount: $discount, currency: $currency, currencySymbol: $currencySymbol, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin)';
+    return 'CheckoutValidationModel(valid: $valid, items: $items, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, grandTotal: $grandTotal, taxableAmount: $taxableAmount, discount: $discount, currency: $currency, currencySymbol: $currencySymbol, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, deliveryWindow: $deliveryWindow, isFreeShipping: $isFreeShipping, shippingDetails: $shippingDetails)';
   }
 }
 
@@ -628,7 +702,10 @@ abstract mixin class _$CheckoutValidationModelCopyWith<$Res>
       String currency,
       String currencySymbol,
       TaxBreakdownModel? taxBreakdown,
-      String? customerGstin});
+      String? customerGstin,
+      String? deliveryWindow,
+      bool? isFreeShipping,
+      Map<String, dynamic>? shippingDetails});
 
   @override
   $AddressModelCopyWith<$Res>? get shippingAddress;
@@ -663,6 +740,9 @@ class __$CheckoutValidationModelCopyWithImpl<$Res>
     Object? currencySymbol = null,
     Object? taxBreakdown = freezed,
     Object? customerGstin = freezed,
+    Object? deliveryWindow = freezed,
+    Object? isFreeShipping = freezed,
+    Object? shippingDetails = freezed,
   }) {
     return _then(_CheckoutValidationModel(
       valid: null == valid
@@ -721,6 +801,18 @@ class __$CheckoutValidationModelCopyWithImpl<$Res>
           ? _self.customerGstin
           : customerGstin // ignore: cast_nullable_to_non_nullable
               as String?,
+      deliveryWindow: freezed == deliveryWindow
+          ? _self.deliveryWindow
+          : deliveryWindow // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isFreeShipping: freezed == isFreeShipping
+          ? _self.isFreeShipping
+          : isFreeShipping // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      shippingDetails: freezed == shippingDetails
+          ? _self._shippingDetails
+          : shippingDetails // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ));
   }
 

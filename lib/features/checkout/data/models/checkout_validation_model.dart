@@ -22,6 +22,9 @@ abstract class CheckoutValidationModel with _$CheckoutValidationModel {
     @Default('₹') String currencySymbol,
     TaxBreakdownModel? taxBreakdown,
     String? customerGstin,
+    String? deliveryWindow,
+    bool? isFreeShipping,
+    Map<String, dynamic>? shippingDetails,
   }) = _CheckoutValidationModel;
 
   factory CheckoutValidationModel.fromJson(Map<String, dynamic> json) {
@@ -49,6 +52,14 @@ abstract class CheckoutValidationModel with _$CheckoutValidationModel {
       );
     }
 
+    final shipDetails = json['shippingDetails'] is Map<String, dynamic>
+        ? json['shippingDetails'] as Map<String, dynamic>
+        : null;
+    final isFree = shipDetails?['isFreeShipping'] == true;
+    final delWindow = shipDetails?['deliveryEstimate'] is Map<String, dynamic>
+        ? shipDetails!['deliveryEstimate']['formattedWindow']?.toString()
+        : null;
+
     return CheckoutValidationModel(
       valid: json['valid'] == true,
       items: items,
@@ -73,6 +84,9 @@ abstract class CheckoutValidationModel with _$CheckoutValidationModel {
       currencySymbol: json['currencySymbol']?.toString() ?? '₹',
       taxBreakdown: taxBreakdown,
       customerGstin: json['customerGstin']?.toString(),
+      deliveryWindow: delWindow,
+      isFreeShipping: isFree,
+      shippingDetails: shipDetails,
     );
   }
 }

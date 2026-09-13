@@ -54,6 +54,11 @@ class Urls {
   static const String paymentsFail = ApiEndpoints.paymentsFail;
   static const String orders = ApiEndpoints.orders;
 
+  // Shipping & Serviceability modules
+  static String shippingServiceability(String pinCode) => ApiEndpoints.shippingServiceability(pinCode);
+  static const String shippingQuote = ApiEndpoints.shippingQuote;
+  static const String shippingMethods = ApiEndpoints.shippingMethods;
+
   // Notifications module
   static const String notifications = ApiEndpoints.notifications;
   static const String notificationPreferences = ApiEndpoints.notificationPreferences;

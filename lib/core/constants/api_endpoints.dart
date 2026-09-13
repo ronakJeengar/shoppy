@@ -47,6 +47,11 @@ class ApiEndpoints {
   static const String paymentsVerify = 'payments/verify';
   static const String paymentsFail = 'payments/fail';
 
+  // Shipping & Serviceability
+  static String shippingServiceability(String pinCode) => 'shipping/serviceability/$pinCode';
+  static const String shippingQuote = 'shipping/quote';
+  static const String shippingMethods = 'shipping/methods';
+
   // Orders
   static const String orders = 'orders';
   static String orderDetail(String id) => 'orders/$id';

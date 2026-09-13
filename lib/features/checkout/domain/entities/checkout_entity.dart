@@ -20,5 +20,8 @@ abstract class CheckoutValidationEntity with _$CheckoutValidationEntity {
     @Default('₹') String currencySymbol,
     TaxBreakdownEntity? taxBreakdown,
     String? customerGstin,
+    String? deliveryWindow,
+    bool? isFreeShipping,
+    Map<String, dynamic>? shippingDetails,
   }) = _CheckoutValidationEntity;
 }

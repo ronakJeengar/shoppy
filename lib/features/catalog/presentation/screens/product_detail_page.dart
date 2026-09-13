@@ -24,6 +24,7 @@ import 'package:shopp_app/features/recommendations/presentation/widgets/recommen
 import 'package:shopp_app/features/reviews/presentation/widgets/write_review_dialog.dart';
 import 'package:shopp_app/features/flash_sales/presentation/providers/flash_sale_providers.dart';
 import 'package:shopp_app/features/flash_sales/presentation/widgets/product_detail_flash_sale_badge.dart';
+import 'package:shopp_app/features/shipping/presentation/widgets/pin_serviceability_card.dart';
 
 class ProductDetailPage extends ConsumerStatefulWidget {
   final ProductEntity? product;
@@ -350,6 +351,11 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                       ),
                     ],
                   ),
+
+                  const SizedBox(height: 16),
+
+                  // Delivery & Serviceability Checker
+                  const PinServiceabilityCard(),
 
                   const SizedBox(height: 20),
 
