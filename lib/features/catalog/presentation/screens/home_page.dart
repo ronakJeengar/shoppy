@@ -27,10 +27,12 @@ import 'package:shopp_app/features/wishlist/presentation/screens/wishlist_page.d
 import '../widgets/category_selector.dart';
 import 'package:shopp_app/core/widgets/empty_state.dart';
 import 'package:shopp_app/core/widgets/error_state.dart';
+import 'package:shopp_app/core/widgets/skeleton_loader.dart';
 import '../widgets/product_card.dart';
 import 'package:shopp_app/features/recommendations/presentation/widgets/recommendation_carousel.dart';
-import 'package:shopp_app/core/widgets/skeleton_loader.dart';
 import 'package:shopp_app/features/campaigns/presentation/widgets/campaign_banner_carousel.dart';
+import 'package:shopp_app/features/flash_sales/presentation/providers/flash_sale_providers.dart';
+import 'package:shopp_app/features/flash_sales/presentation/widgets/flash_sale_section.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -307,6 +309,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           ]);
           ref.invalidate(personalizedRecommendationsProvider);
           ref.invalidate(trendingRecommendationsProvider);
+          ref.invalidate(activeFlashSalesProvider);
         },
         child: CustomScrollView(
           controller: _scrollController,
@@ -413,8 +416,28 @@ class _HomePageState extends ConsumerState<HomePage> {
   }) {
     switch (section.id) {
       case 'hero_banner':
+        final hasDedicatedFlashSection =
+            ref.read(homeSectionsProvider).any((s) => s.id == 'flash_sales' || s.id == 'flash_sale');
         return [
           SliverToBoxAdapter(child: _buildHeroBanner()),
+          if (!hasDedicatedFlashSection)
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: FlashSaleSection(),
+              ),
+            ),
+        ];
+
+      case 'flash_sales':
+      case 'flash_sale':
+        return const [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: FlashSaleSection(),
+            ),
+          ),
         ];
 
       case 'categories':

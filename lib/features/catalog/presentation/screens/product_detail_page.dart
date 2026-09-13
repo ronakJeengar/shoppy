@@ -22,6 +22,8 @@ import 'package:shopp_app/core/utils/currency_formatter.dart';
 import '../widgets/product_media_gallery.dart';
 import 'package:shopp_app/features/recommendations/presentation/widgets/recommendation_carousel.dart';
 import 'package:shopp_app/features/reviews/presentation/widgets/write_review_dialog.dart';
+import 'package:shopp_app/features/flash_sales/presentation/providers/flash_sale_providers.dart';
+import 'package:shopp_app/features/flash_sales/presentation/widgets/product_detail_flash_sale_badge.dart';
 
 class ProductDetailPage extends ConsumerStatefulWidget {
   final ProductEntity? product;
@@ -105,6 +107,16 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
     final reviewsResult = ref.watch(productReviewsProvider(_currentProduct.id)).valueOrNull;
     final fbtAsync = ref.watch(frequentlyBoughtTogetherProvider(_currentProduct.id)).valueOrNull;
     final fbtItems = fbtAsync?.items ?? [];
+    final flashPromo = ref.watch(productFlashSaleProvider(_currentProduct.id)).valueOrNull;
+    final displayPrice = (flashPromo != null && flashPromo.salePrice > 0)
+        ? flashPromo.salePrice
+        : _currentProduct.price;
+    final strikePrice = (flashPromo != null && flashPromo.regularPrice > 0)
+        ? flashPromo.regularPrice
+        : (_currentProduct.hasDiscount ? _currentProduct.mrp : null);
+    final discountPct = (flashPromo != null && flashPromo.discountPercentage > 0)
+        ? flashPromo.discountPercentage
+        : (_currentProduct.hasDiscount ? _currentProduct.discountPercentage.toInt() : null);
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -260,7 +272,10 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                     style: AppTypography.caption.copyWith(color: AppColors.slate500),
                   ),
 
-                  const SizedBox(height: 16),
+                  // Flash Sale Promotional Badge
+                  ProductDetailFlashSaleBadge(productId: _currentProduct.id),
+
+                  const SizedBox(height: 12),
 
                   // Price & GST Details
                   Column(
@@ -271,29 +286,32 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                         textBaseline: TextBaseline.alphabetic,
                         children: [
                           Text(
-                            CurrencyFormatter.format(_currentProduct.price, showDecimals: false),
+                            CurrencyFormatter.format(displayPrice, showDecimals: false),
                             style: AppTypography.priceHero,
                           ),
-                          if (_currentProduct.hasDiscount) ...[
+                          if (strikePrice != null) ...[
                             const SizedBox(width: 8),
                             Text(
-                              CurrencyFormatter.format(_currentProduct.mrp, showDecimals: false),
+                              CurrencyFormatter.format(strikePrice, showDecimals: false),
                               style: AppTypography.bodyMedium.copyWith(
                                 decoration: TextDecoration.lineThrough,
                                 color: AppColors.slate500,
                               ),
                             ),
+                          ],
+                          if (discountPct != null && discountPct > 0) ...[
                             const SizedBox(width: 8),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: AppColors.success.withValues(alpha: 0.12),
+                                color: (flashPromo != null ? const Color(0xFFDC2626) : AppColors.success)
+                                    .withValues(alpha: 0.12),
                                 borderRadius: AppRadius.borderSm,
                               ),
                               child: Text(
-                                '${_currentProduct.discountPercentage.toInt()}% OFF',
+                                '$discountPct% OFF',
                                 style: AppTypography.caption.copyWith(
-                                  color: AppColors.success,
+                                  color: flashPromo != null ? const Color(0xFFDC2626) : AppColors.success,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),

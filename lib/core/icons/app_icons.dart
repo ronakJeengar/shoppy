@@ -45,6 +45,8 @@ abstract final class AppIcons {
   static const String deliveryTruck = 'assets/icons/commerce/delivery_truck.svg';
   static const String shipping = 'assets/icons/commerce/delivery_truck.svg';
   static const String dollar = 'assets/icons/commerce/dollar.svg';
+  static const String flash = 'assets/icons/commerce/flash.svg';
+  static const String flashSale = 'assets/icons/commerce/flash.svg';
 
   // Product
   static const String favorite = 'assets/icons/product/favorite.svg';

@@ -40,6 +40,12 @@ class Urls {
   static const String campaignsActive = ApiEndpoints.campaignsActive;
   static String campaignDetail(String id) => ApiEndpoints.campaignDetail(id);
 
+  // Flash Sales & Quick Sales modules
+  static const String flashSalesActive = ApiEndpoints.flashSalesActive;
+  static const String flashSalesUpcoming = ApiEndpoints.flashSalesUpcoming;
+  static String flashSaleDetail(String id) => ApiEndpoints.flashSaleDetail(id);
+  static String productFlashSale(String productId) => ApiEndpoints.productFlashSale(productId);
+
   // Address, Checkout & Payment modules
   static const String addresses = ApiEndpoints.addresses;
   static const String checkoutValidate = ApiEndpoints.checkoutValidate;

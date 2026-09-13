@@ -34,6 +34,12 @@ class ApiEndpoints {
   static const String campaignsActive = 'campaigns/active';
   static String campaignDetail(String id) => 'campaigns/$id';
 
+  // Flash Sales & Quick Sales
+  static const String flashSalesActive = 'flash-sales/active';
+  static const String flashSalesUpcoming = 'flash-sales/upcoming';
+  static String flashSaleDetail(String id) => 'flash-sales/$id';
+  static String productFlashSale(String productId) => 'flash-sales/product/$productId';
+
   // Addresses & Checkout
   static const String addresses = 'addresses';
   static const String checkoutValidate = 'checkout/validate';
