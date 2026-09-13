@@ -35,6 +35,78 @@ extension PaymentEntityMapper on PaymentEntity {
   }
 }
 
+extension PaymentMethodOptionModelMapper on PaymentMethodOptionModel {
+  PaymentMethodOptionEntity toEntity() {
+    return PaymentMethodOptionEntity(
+      type: type,
+      name: name,
+      available: available,
+      fee: fee,
+      standardFee: standardFee,
+      isFeeFree: isFeeFree,
+      reasonCode: reasonCode,
+      message: message,
+      freeAboveAmount: freeAboveAmount,
+      minOrderValue: minOrderValue,
+      maxOrderValue: maxOrderValue,
+    );
+  }
+}
+
+extension PaymentMethodOptionEntityMapper on PaymentMethodOptionEntity {
+  PaymentMethodOptionModel toModel() {
+    return PaymentMethodOptionModel(
+      type: type,
+      name: name,
+      available: available,
+      fee: fee,
+      standardFee: standardFee,
+      isFeeFree: isFeeFree,
+      reasonCode: reasonCode,
+      message: message,
+      freeAboveAmount: freeAboveAmount,
+      minOrderValue: minOrderValue,
+      maxOrderValue: maxOrderValue,
+    );
+  }
+}
+
+extension CodDetailsModelMapper on CodDetailsModel {
+  CodDetailsEntity toEntity() {
+    return CodDetailsEntity(
+      isCod: isCod,
+      fee: fee,
+      standardFee: standardFee,
+      isFeeFree: isFeeFree,
+      freeAboveAmount: freeAboveAmount,
+      minOrderValue: minOrderValue,
+      maxOrderValue: maxOrderValue,
+      isEligible: isEligible,
+      reasonCode: reasonCode,
+      message: message,
+      eligibleShippingZones: eligibleShippingZones,
+    );
+  }
+}
+
+extension CodDetailsEntityMapper on CodDetailsEntity {
+  CodDetailsModel toModel() {
+    return CodDetailsModel(
+      isCod: isCod,
+      fee: fee,
+      standardFee: standardFee,
+      isFeeFree: isFeeFree,
+      freeAboveAmount: freeAboveAmount,
+      minOrderValue: minOrderValue,
+      maxOrderValue: maxOrderValue,
+      isEligible: isEligible,
+      reasonCode: reasonCode,
+      message: message,
+      eligibleShippingZones: eligibleShippingZones,
+    );
+  }
+}
+
 extension CheckoutValidationModelMapper on CheckoutValidationModel {
   CheckoutValidationEntity toEntity() {
     return CheckoutValidationEntity(
@@ -54,6 +126,9 @@ extension CheckoutValidationModelMapper on CheckoutValidationModel {
       deliveryWindow: deliveryWindow,
       isFreeShipping: isFreeShipping,
       shippingDetails: shippingDetails,
+      codFee: codFee,
+      codDetails: codDetails?.toEntity(),
+      paymentMethods: paymentMethods.map((p) => p.toEntity()).toList(),
     );
   }
 }
@@ -77,6 +152,9 @@ extension CheckoutValidationEntityMapper on CheckoutValidationEntity {
       deliveryWindow: deliveryWindow,
       isFreeShipping: isFreeShipping,
       shippingDetails: shippingDetails,
+      codFee: codFee,
+      codDetails: codDetails?.toModel(),
+      paymentMethods: paymentMethods.map((p) => p.toModel()).toList(),
     );
   }
 }

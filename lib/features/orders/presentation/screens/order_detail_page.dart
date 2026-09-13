@@ -510,7 +510,7 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
                   style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
                 ),
                 Text(
-                  payment?.paymentMethod ?? 'CARD',
+                  order.isCod ? 'Cash on Delivery (COD)' : (payment?.paymentMethod ?? 'CARD'),
                   style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
                 ),
               ],
@@ -524,14 +524,18 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
                   style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
                 ),
                 Text(
-                  payment?.status ?? 'COMPLETED',
+                  order.isCod && payment?.status == 'PENDING'
+                      ? 'Pending (Pay on Delivery)'
+                      : (payment?.status ?? 'COMPLETED'),
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.bold,
                     color: (payment?.status == 'REFUNDED')
                         ? AppColors.warning
                         : (payment?.status == 'COMPLETED')
                             ? AppColors.success
-                            : AppColors.slate900,
+                            : (order.isCod)
+                                ? AppColors.info
+                                : AppColors.slate900,
                   ),
                 ),
               ],
@@ -584,6 +588,14 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
                   : CurrencyFormatter.format(order.shippingFee),
               valueColor: order.shippingFee == 0 ? AppColors.success : null,
             ),
+            if (order.isCod) ...[
+              const SizedBox(height: 6),
+              _summaryRow(
+                'COD Fee',
+                order.codFee == 0 ? 'FREE' : CurrencyFormatter.format(order.codFee),
+                valueColor: order.codFee == 0 ? AppColors.success : null,
+              ),
+            ],
             const SizedBox(height: 6),
             if (order.taxBreakdown != null) ...[
               if (order.taxBreakdown!.taxableAmount > 0) ...[
@@ -602,7 +614,7 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
             ],
             const Divider(height: 20),
             _summaryRow(
-              'Total Paid',
+              order.isCod && !order.isDelivered ? 'Total (Payable on Delivery)' : 'Total Paid',
               CurrencyFormatter.format(order.totalAmount),
               isTotal: true,
               valueColor: theme.primaryColor,

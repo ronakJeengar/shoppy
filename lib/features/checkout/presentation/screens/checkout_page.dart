@@ -166,7 +166,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
             const SizedBox(height: 16),
             _buildShippingMethodSection(checkoutState, selectedAddress, shippingQuote),
             const SizedBox(height: 16),
-            _buildPaymentMethodSection(checkoutState, shippingQuote),
+            _buildPaymentMethodSection(checkoutState, selectedAddress, shippingQuote),
             const SizedBox(height: 16),
             _buildOrderReviewSection(cart, checkoutState, shippingQuote),
             const SizedBox(height: 32),
@@ -425,10 +425,37 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
 
   Widget _buildPaymentMethodSection(
     CheckoutState checkoutState,
+    AddressEntity? selectedAddress,
     ShippingQuoteEntity? quote,
   ) {
     final currentMethod = checkoutState.selectedPaymentMethod;
+    final paymentOptions = checkoutState.validation?.paymentMethods ?? [];
+    final codOption = paymentOptions.where((p) => p.type == 'COD').firstOrNull;
+    final cardOption = paymentOptions.where((p) => p.type == 'CARD').firstOrNull;
+
     final isRemote = quote?.shippingZone == 'REMOTE';
+    final isCodAvailable = codOption != null
+        ? codOption.available
+        : !isRemote;
+
+    final codFee = codOption?.fee ?? 40.0;
+    final isFeeFree = codOption?.isFeeFree ?? false;
+    final freeThreshold = codOption?.freeAboveAmount ?? 1499.0;
+
+    String codSubtitle;
+    if (!isCodAvailable) {
+      codSubtitle = codOption?.message ??
+          (isRemote
+              ? 'COD not supported for remote delivery zones'
+              : 'Cash on Delivery not available for this order');
+    } else if (isFeeFree) {
+      codSubtitle = 'Pay with cash upon delivery (Free COD fee)';
+    } else {
+      codSubtitle =
+          'Pay with cash upon delivery (₹${codFee.toInt()} fee applies • Free above ₹${freeThreshold.toInt()})';
+    }
+
+    final isCardAvailable = cardOption?.available ?? true;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -459,22 +486,31 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
           ),
           const SizedBox(height: 14),
           _buildSelectionTile(
-            title: 'Credit / Debit Card',
-            subtitle: 'Instant secure checkout via Stripe',
+            title: cardOption?.name ?? 'Credit / Debit Card',
+            subtitle: 'Instant secure checkout via card',
             isSelected: currentMethod == 'CARD',
             icon: AppIcons.creditCard,
-            onTap: () => ref.read(checkoutNotifierProvider.notifier).setPaymentMethod('CARD'),
+            enabled: isCardAvailable,
+            onTap: () {
+              ref.read(checkoutNotifierProvider.notifier).setPaymentMethod('CARD');
+              if (selectedAddress != null) {
+                ref.read(checkoutNotifierProvider.notifier).validateCheckout(selectedAddress.id);
+              }
+            },
           ),
           _buildSelectionTile(
-            title: 'Cash on Delivery (COD)',
-            subtitle: isRemote
-                ? 'COD not supported for remote delivery zones'
-                : 'Pay with cash upon receipt of order',
+            title: codOption?.name ?? 'Cash on Delivery (COD)',
+            subtitle: codSubtitle,
             isSelected: currentMethod == 'COD',
             icon: AppIcons.cash,
-            enabled: !isRemote,
-            onTap: !isRemote
-                ? () => ref.read(checkoutNotifierProvider.notifier).setPaymentMethod('COD')
+            enabled: isCodAvailable,
+            onTap: isCodAvailable
+                ? () {
+                    ref.read(checkoutNotifierProvider.notifier).setPaymentMethod('COD');
+                    if (selectedAddress != null) {
+                      ref.read(checkoutNotifierProvider.notifier).validateCheckout(selectedAddress.id);
+                    }
+                  }
                 : () {},
           ),
         ],
@@ -570,9 +606,23 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
           ] else ...[
             _summaryRow('Estimated GST (Incl.)', CurrencyFormatter.format(tax)),
           ],
+          if (checkoutState.selectedPaymentMethod == 'COD') ...[
+            const SizedBox(height: 8),
+            _summaryRow(
+              'COD Fee',
+              (validation?.codFee == 0 || validation?.codDetails?.isFeeFree == true)
+                  ? 'FREE'
+                  : CurrencyFormatter.format(validation?.codFee ?? 40.0),
+              valueColor: (validation?.codFee == 0 || validation?.codDetails?.isFeeFree == true)
+                  ? AppColors.success
+                  : null,
+            ),
+          ],
           const Divider(height: 24, color: AppColors.slate200),
           _summaryRow(
-            'Order Total',
+            checkoutState.selectedPaymentMethod == 'COD'
+                ? 'Order Total (Pay on Delivery)'
+                : 'Order Total',
             CurrencyFormatter.format(total),
             isBold: true,
           ),
@@ -581,6 +631,32 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
             'Prices are inclusive of all taxes (GST)',
             style: AppTypography.caption.copyWith(color: AppColors.slate500, fontSize: 11),
           ),
+          if (checkoutState.selectedPaymentMethod == 'COD') ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.primary50,
+                borderRadius: AppRadius.borderSm,
+                border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+              ),
+              child: Row(
+                children: [
+                  const AppIcon(AppIcons.info, color: AppColors.primary, size: AppIconSizes.small),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Please keep exact cash ready at delivery. Payment is collected upon package handover.',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -730,7 +806,28 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
     final displayTotal = validation?.grandTotal ?? (subtotal - discount + shipping);
 
     final isServiceable = quote == null || quote.serviceable;
-    final canPlace = selectedAddress != null && isServiceable && !checkoutState.isPlacingOrder;
+    final isCod = checkoutState.selectedPaymentMethod == 'COD';
+    final codOption = checkoutState.validation?.paymentMethods.where((p) => p.type == 'COD').firstOrNull;
+    final isCodEligible = !isCod ||
+        (codOption != null
+            ? codOption.available
+            : quote?.shippingZone != 'REMOTE');
+
+    final canPlace = selectedAddress != null &&
+        isServiceable &&
+        isCodEligible &&
+        !checkoutState.isPlacingOrder;
+
+    String buttonLabel = 'Place Order';
+    if (checkoutState.isPlacingOrder) {
+      buttonLabel = 'Processing...';
+    } else if (!isServiceable) {
+      buttonLabel = 'Delivery Unavailable';
+    } else if (isCod && !isCodEligible) {
+      buttonLabel = 'COD Unavailable';
+    } else if (isCod) {
+      buttonLabel = 'Confirm COD Order';
+    }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
@@ -747,7 +844,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Total Payable',
+                  isCod ? 'Pay on Delivery' : 'Total Payable',
                   style: AppTypography.caption.copyWith(color: AppColors.slate500),
                 ),
                 Text(
@@ -759,10 +856,8 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
             const SizedBox(width: 20),
             Expanded(
               child: AppButton(
-                label: checkoutState.isPlacingOrder
-                    ? 'Processing...'
-                    : (!isServiceable ? 'Delivery Unavailable' : 'Place Order'),
-                icon: AppIcons.lock,
+                label: buttonLabel,
+                icon: isCod ? AppIcons.cash : AppIcons.lock,
                 isLoading: checkoutState.isPlacingOrder,
                 isFullWidth: true,
                 onPressed: canPlace

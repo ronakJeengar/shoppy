@@ -94,6 +94,7 @@ class CheckoutNotifier extends StateNotifier<CheckoutState> {
     final result = await _validateUseCase(
       addressId,
       shippingMethod: state.selectedShippingMethod,
+      paymentMethod: state.selectedPaymentMethod,
     );
 
     result.fold(

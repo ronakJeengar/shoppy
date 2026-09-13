@@ -11,8 +11,13 @@ class ValidateCheckoutUseCase {
   Future<Result<CheckoutValidationEntity>> call(
     String addressId, {
     String shippingMethod = 'STANDARD',
+    String paymentMethod = 'CARD',
   }) {
-    return _repository.validateCheckout(addressId, shippingMethod: shippingMethod);
+    return _repository.validateCheckout(
+      addressId,
+      shippingMethod: shippingMethod,
+      paymentMethod: paymentMethod,
+    );
   }
 }
 

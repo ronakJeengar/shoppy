@@ -5,7 +5,11 @@ import '../models/payment_model.dart';
 import '../../../orders/data/models/order_model.dart';
 
 abstract class CheckoutRemoteDataSource {
-  Future<CheckoutValidationModel> validateCheckout(String addressId, String shippingMethod);
+  Future<CheckoutValidationModel> validateCheckout(
+    String addressId,
+    String shippingMethod, {
+    String paymentMethod = 'CARD',
+  });
   Future<Map<String, dynamic>> createOrder({
     required String addressId,
     required String shippingMethod,
@@ -31,12 +35,16 @@ class CheckoutRemoteDataSourceImpl implements CheckoutRemoteDataSource {
 
   @override
   Future<CheckoutValidationModel> validateCheckout(
-      String addressId, String shippingMethod) async {
+    String addressId,
+    String shippingMethod, {
+    String paymentMethod = 'CARD',
+  }) async {
     final response = await _client.post(
       Urls.checkoutValidate,
       data: {
         'addressId': addressId,
         'shippingMethod': shippingMethod,
+        'paymentMethod': paymentMethod,
       },
     );
     final data = response.data;

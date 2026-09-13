@@ -936,6 +936,8 @@ mixin _$OrderModel {
   double get discount;
   TaxBreakdownModel? get taxBreakdown;
   String? get customerGstin;
+  double get codFee;
+  Map<String, dynamic>? get codDetails;
   String get status;
   PaymentModel? get payment;
   String get carrier;
@@ -985,6 +987,9 @@ mixin _$OrderModel {
                 other.taxBreakdown == taxBreakdown) &&
             (identical(other.customerGstin, customerGstin) ||
                 other.customerGstin == customerGstin) &&
+            (identical(other.codFee, codFee) || other.codFee == codFee) &&
+            const DeepCollectionEquality()
+                .equals(other.codDetails, codDetails) &&
             (identical(other.status, status) || other.status == status) &&
             (identical(other.payment, payment) || other.payment == payment) &&
             (identical(other.carrier, carrier) || other.carrier == carrier) &&
@@ -1018,6 +1023,8 @@ mixin _$OrderModel {
         discount,
         taxBreakdown,
         customerGstin,
+        codFee,
+        const DeepCollectionEquality().hash(codDetails),
         status,
         payment,
         carrier,
@@ -1030,7 +1037,7 @@ mixin _$OrderModel {
 
   @override
   String toString() {
-    return 'OrderModel(id: $id, orderNumber: $orderNumber, orderItems: $orderItems, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, totalAmount: $totalAmount, currency: $currency, currencySymbol: $currencySymbol, taxableAmount: $taxableAmount, discount: $discount, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, status: $status, payment: $payment, carrier: $carrier, trackingNumber: $trackingNumber, cancellationReason: $cancellationReason, canCancel: $canCancel, statusHistory: $statusHistory, createdAt: $createdAt)';
+    return 'OrderModel(id: $id, orderNumber: $orderNumber, orderItems: $orderItems, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, totalAmount: $totalAmount, currency: $currency, currencySymbol: $currencySymbol, taxableAmount: $taxableAmount, discount: $discount, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, codFee: $codFee, codDetails: $codDetails, status: $status, payment: $payment, carrier: $carrier, trackingNumber: $trackingNumber, cancellationReason: $cancellationReason, canCancel: $canCancel, statusHistory: $statusHistory, createdAt: $createdAt)';
   }
 }
 
@@ -1056,6 +1063,8 @@ abstract mixin class $OrderModelCopyWith<$Res> {
       double discount,
       TaxBreakdownModel? taxBreakdown,
       String? customerGstin,
+      double codFee,
+      Map<String, dynamic>? codDetails,
       String status,
       PaymentModel? payment,
       String carrier,
@@ -1097,6 +1106,8 @@ class _$OrderModelCopyWithImpl<$Res> implements $OrderModelCopyWith<$Res> {
     Object? discount = null,
     Object? taxBreakdown = freezed,
     Object? customerGstin = freezed,
+    Object? codFee = null,
+    Object? codDetails = freezed,
     Object? status = null,
     Object? payment = freezed,
     Object? carrier = null,
@@ -1167,6 +1178,14 @@ class _$OrderModelCopyWithImpl<$Res> implements $OrderModelCopyWith<$Res> {
           ? _self.customerGstin
           : customerGstin // ignore: cast_nullable_to_non_nullable
               as String?,
+      codFee: null == codFee
+          ? _self.codFee
+          : codFee // ignore: cast_nullable_to_non_nullable
+              as double,
+      codDetails: freezed == codDetails
+          ? _self.codDetails
+          : codDetails // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
       status: null == status
           ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
@@ -1354,6 +1373,8 @@ extension OrderModelPatterns on OrderModel {
             double discount,
             TaxBreakdownModel? taxBreakdown,
             String? customerGstin,
+            double codFee,
+            Map<String, dynamic>? codDetails,
             String status,
             PaymentModel? payment,
             String carrier,
@@ -1384,6 +1405,8 @@ extension OrderModelPatterns on OrderModel {
             _that.discount,
             _that.taxBreakdown,
             _that.customerGstin,
+            _that.codFee,
+            _that.codDetails,
             _that.status,
             _that.payment,
             _that.carrier,
@@ -1428,6 +1451,8 @@ extension OrderModelPatterns on OrderModel {
             double discount,
             TaxBreakdownModel? taxBreakdown,
             String? customerGstin,
+            double codFee,
+            Map<String, dynamic>? codDetails,
             String status,
             PaymentModel? payment,
             String carrier,
@@ -1457,6 +1482,8 @@ extension OrderModelPatterns on OrderModel {
             _that.discount,
             _that.taxBreakdown,
             _that.customerGstin,
+            _that.codFee,
+            _that.codDetails,
             _that.status,
             _that.payment,
             _that.carrier,
@@ -1500,6 +1527,8 @@ extension OrderModelPatterns on OrderModel {
             double discount,
             TaxBreakdownModel? taxBreakdown,
             String? customerGstin,
+            double codFee,
+            Map<String, dynamic>? codDetails,
             String status,
             PaymentModel? payment,
             String carrier,
@@ -1529,6 +1558,8 @@ extension OrderModelPatterns on OrderModel {
             _that.discount,
             _that.taxBreakdown,
             _that.customerGstin,
+            _that.codFee,
+            _that.codDetails,
             _that.status,
             _that.payment,
             _that.carrier,
@@ -1562,6 +1593,8 @@ class _OrderModel extends OrderModel {
       this.discount = 0.0,
       this.taxBreakdown,
       this.customerGstin,
+      this.codFee = 0.0,
+      final Map<String, dynamic>? codDetails,
       required this.status,
       this.payment,
       this.carrier = '',
@@ -1571,6 +1604,7 @@ class _OrderModel extends OrderModel {
       final List<OrderStatusHistoryItem> statusHistory = const [],
       required this.createdAt})
       : _orderItems = orderItems,
+        _codDetails = codDetails,
         _statusHistory = statusHistory,
         super._();
 
@@ -1616,6 +1650,19 @@ class _OrderModel extends OrderModel {
   final TaxBreakdownModel? taxBreakdown;
   @override
   final String? customerGstin;
+  @override
+  @JsonKey()
+  final double codFee;
+  final Map<String, dynamic>? _codDetails;
+  @override
+  Map<String, dynamic>? get codDetails {
+    final value = _codDetails;
+    if (value == null) return null;
+    if (_codDetails is EqualUnmodifiableMapView) return _codDetails;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
+
   @override
   final String status;
   @override
@@ -1685,6 +1732,9 @@ class _OrderModel extends OrderModel {
                 other.taxBreakdown == taxBreakdown) &&
             (identical(other.customerGstin, customerGstin) ||
                 other.customerGstin == customerGstin) &&
+            (identical(other.codFee, codFee) || other.codFee == codFee) &&
+            const DeepCollectionEquality()
+                .equals(other._codDetails, _codDetails) &&
             (identical(other.status, status) || other.status == status) &&
             (identical(other.payment, payment) || other.payment == payment) &&
             (identical(other.carrier, carrier) || other.carrier == carrier) &&
@@ -1718,6 +1768,8 @@ class _OrderModel extends OrderModel {
         discount,
         taxBreakdown,
         customerGstin,
+        codFee,
+        const DeepCollectionEquality().hash(_codDetails),
         status,
         payment,
         carrier,
@@ -1730,7 +1782,7 @@ class _OrderModel extends OrderModel {
 
   @override
   String toString() {
-    return 'OrderModel(id: $id, orderNumber: $orderNumber, orderItems: $orderItems, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, totalAmount: $totalAmount, currency: $currency, currencySymbol: $currencySymbol, taxableAmount: $taxableAmount, discount: $discount, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, status: $status, payment: $payment, carrier: $carrier, trackingNumber: $trackingNumber, cancellationReason: $cancellationReason, canCancel: $canCancel, statusHistory: $statusHistory, createdAt: $createdAt)';
+    return 'OrderModel(id: $id, orderNumber: $orderNumber, orderItems: $orderItems, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, totalAmount: $totalAmount, currency: $currency, currencySymbol: $currencySymbol, taxableAmount: $taxableAmount, discount: $discount, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, codFee: $codFee, codDetails: $codDetails, status: $status, payment: $payment, carrier: $carrier, trackingNumber: $trackingNumber, cancellationReason: $cancellationReason, canCancel: $canCancel, statusHistory: $statusHistory, createdAt: $createdAt)';
   }
 }
 
@@ -1758,6 +1810,8 @@ abstract mixin class _$OrderModelCopyWith<$Res>
       double discount,
       TaxBreakdownModel? taxBreakdown,
       String? customerGstin,
+      double codFee,
+      Map<String, dynamic>? codDetails,
       String status,
       PaymentModel? payment,
       String carrier,
@@ -1802,6 +1856,8 @@ class __$OrderModelCopyWithImpl<$Res> implements _$OrderModelCopyWith<$Res> {
     Object? discount = null,
     Object? taxBreakdown = freezed,
     Object? customerGstin = freezed,
+    Object? codFee = null,
+    Object? codDetails = freezed,
     Object? status = null,
     Object? payment = freezed,
     Object? carrier = null,
@@ -1872,6 +1928,14 @@ class __$OrderModelCopyWithImpl<$Res> implements _$OrderModelCopyWith<$Res> {
           ? _self.customerGstin
           : customerGstin // ignore: cast_nullable_to_non_nullable
               as String?,
+      codFee: null == codFee
+          ? _self.codFee
+          : codFee // ignore: cast_nullable_to_non_nullable
+              as double,
+      codDetails: freezed == codDetails
+          ? _self._codDetails
+          : codDetails // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
       status: null == status
           ? _self.status
           : status // ignore: cast_nullable_to_non_nullable

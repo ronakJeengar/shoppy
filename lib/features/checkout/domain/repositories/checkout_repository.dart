@@ -7,6 +7,7 @@ abstract class CheckoutRepository {
   Future<Result<CheckoutValidationEntity>> validateCheckout(
     String addressId, {
     String shippingMethod = 'STANDARD',
+    String paymentMethod = 'CARD',
   });
 
   Future<Result<Map<String, dynamic>>> createOrder({

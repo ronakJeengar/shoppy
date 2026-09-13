@@ -174,10 +174,88 @@ class OrderConfirmationPage extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Payment Method',
+                        style: AppTypography.caption.copyWith(color: AppColors.slate500),
+                      ),
+                      Text(
+                        order?.isCod == true ? 'Cash on Delivery' : 'Card Payment',
+                        style: AppTypography.bodySmall.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.slate800,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Payment Status',
+                        style: AppTypography.caption.copyWith(color: AppColors.slate500),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: order?.isCod == true ? AppColors.primary50 : AppColors.successLight,
+                          borderRadius: AppRadius.borderFull,
+                        ),
+                        child: Text(
+                          order?.isCod == true ? 'Pending (Pay on Delivery)' : 'Paid',
+                          style: AppTypography.label.copyWith(
+                            color: order?.isCod == true ? AppColors.primary : AppColors.success,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
+
+            // COD Reminder Banner (if COD order)
+            if (order?.isCod == true) ...[
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.primary50,
+                  borderRadius: AppRadius.borderMd,
+                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.25)),
+                ),
+                child: Row(
+                  children: [
+                    const AppIcon(AppIcons.cash, color: AppColors.primary, size: AppIconSizes.medium),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Cash on Delivery Confirmed',
+                            style: AppTypography.bodySmall.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Please keep ${CurrencyFormatter.format(order!.totalAmount)} exact cash ready for the delivery courier.',
+                            style: AppTypography.caption.copyWith(color: AppColors.slate700),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
 
             // Delivery Address Snapshot Card (if available)
             if (order?.shippingAddress != null)
@@ -282,6 +360,14 @@ class OrderConfirmationPage extends StatelessWidget {
                       order!.shippingFee == 0 ? 'FREE' : CurrencyFormatter.format(order!.shippingFee),
                       color: order!.shippingFee == 0 ? AppColors.success : null,
                     ),
+                    if (order!.isCod) ...[
+                      const SizedBox(height: 6),
+                      _summaryRow(
+                        'COD Fee',
+                        order!.codFee == 0 ? 'FREE' : CurrencyFormatter.format(order!.codFee),
+                        color: order!.codFee == 0 ? AppColors.success : null,
+                      ),
+                    ],
                     const SizedBox(height: 6),
                     if (order!.taxBreakdown != null) ...[
                       if (order!.taxBreakdown!.taxableAmount > 0) ...[
@@ -300,7 +386,7 @@ class OrderConfirmationPage extends StatelessWidget {
                     ],
                     const Divider(height: 20, color: AppColors.slate200),
                     _summaryRow(
-                      'Total Paid',
+                      order!.isCod ? 'Amount Payable on Delivery' : 'Total Paid',
                       CurrencyFormatter.format(order!.totalAmount),
                       isTotal: true,
                       color: AppColors.primary,

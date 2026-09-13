@@ -51,6 +51,8 @@ abstract class OrderEntity with _$OrderEntity {
     @Default(0.0) double discount,
     TaxBreakdownEntity? taxBreakdown,
     String? customerGstin,
+    @Default(0.0) double codFee,
+    Map<String, dynamic>? codDetails,
     required String status,
     PaymentEntity? payment,
     @Default('') String carrier,
@@ -61,6 +63,7 @@ abstract class OrderEntity with _$OrderEntity {
     required DateTime createdAt,
   }) = _OrderEntity;
 
+  bool get isCod => payment?.paymentMethod == 'COD' || codDetails?['isCod'] == true;
   bool get isCancelled => status == 'CANCELLED';
   bool get isDelivered => status == 'DELIVERED';
   bool get isShipped => status == 'SHIPPED';

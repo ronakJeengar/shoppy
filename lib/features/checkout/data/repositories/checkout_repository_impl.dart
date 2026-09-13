@@ -20,10 +20,14 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
   Future<Result<CheckoutValidationEntity>> validateCheckout(
     String addressId, {
     String shippingMethod = 'STANDARD',
+    String paymentMethod = 'CARD',
   }) async {
     try {
-      final model =
-          await _remoteDataSource.validateCheckout(addressId, shippingMethod);
+      final model = await _remoteDataSource.validateCheckout(
+        addressId,
+        shippingMethod,
+        paymentMethod: paymentMethod,
+      );
       return Success(model.toEntity());
     } on DioException catch (e) {
       final msg = extractDioErrorMessage(e, 'Failed to validate checkout');

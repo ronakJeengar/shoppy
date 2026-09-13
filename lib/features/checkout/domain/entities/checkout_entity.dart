@@ -5,6 +5,40 @@ import 'tax_breakdown_entity.dart';
 part 'checkout_entity.freezed.dart';
 
 @freezed
+abstract class PaymentMethodOptionEntity with _$PaymentMethodOptionEntity {
+  const factory PaymentMethodOptionEntity({
+    required String type,
+    required String name,
+    required bool available,
+    @Default(0.0) double fee,
+    @Default(0.0) double standardFee,
+    @Default(false) bool isFeeFree,
+    String? reasonCode,
+    String? message,
+    double? freeAboveAmount,
+    double? minOrderValue,
+    double? maxOrderValue,
+  }) = _PaymentMethodOptionEntity;
+}
+
+@freezed
+abstract class CodDetailsEntity with _$CodDetailsEntity {
+  const factory CodDetailsEntity({
+    @Default(false) bool isCod,
+    @Default(0.0) double fee,
+    @Default(0.0) double standardFee,
+    @Default(false) bool isFeeFree,
+    @Default(1499.0) double freeAboveAmount,
+    @Default(299.0) double minOrderValue,
+    @Default(50000.0) double maxOrderValue,
+    @Default(true) bool isEligible,
+    String? reasonCode,
+    String? message,
+    @Default([]) List<String> eligibleShippingZones,
+  }) = _CodDetailsEntity;
+}
+
+@freezed
 abstract class CheckoutValidationEntity with _$CheckoutValidationEntity {
   const factory CheckoutValidationEntity({
     required bool valid,
@@ -23,5 +57,8 @@ abstract class CheckoutValidationEntity with _$CheckoutValidationEntity {
     String? deliveryWindow,
     bool? isFreeShipping,
     Map<String, dynamic>? shippingDetails,
+    @Default(0.0) double codFee,
+    CodDetailsEntity? codDetails,
+    @Default([]) List<PaymentMethodOptionEntity> paymentMethods,
   }) = _CheckoutValidationEntity;
 }

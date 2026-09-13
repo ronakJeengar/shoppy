@@ -116,6 +116,8 @@ abstract class OrderModel with _$OrderModel {
     @Default(0.0) double discount,
     TaxBreakdownModel? taxBreakdown,
     String? customerGstin,
+    @Default(0.0) double codFee,
+    Map<String, dynamic>? codDetails,
     required String status,
     PaymentModel? payment,
     @Default('') String carrier,
@@ -126,6 +128,7 @@ abstract class OrderModel with _$OrderModel {
     required DateTime createdAt,
   }) = _OrderModel;
 
+  bool get isCod => payment?.paymentMethod == 'COD' || codDetails?['isCod'] == true;
   bool get isCancelled => status == 'CANCELLED';
   bool get isDelivered => status == 'DELIVERED';
   bool get isShipped => status == 'SHIPPED';
@@ -228,6 +231,10 @@ abstract class OrderModel with _$OrderModel {
           : 0.0,
       taxBreakdown: taxBreakdown,
       customerGstin: json['customerGstin']?.toString(),
+      codFee: (json['codFee'] is num) ? (json['codFee'] as num).toDouble() : 0.0,
+      codDetails: json['codDetails'] is Map<String, dynamic>
+          ? json['codDetails'] as Map<String, dynamic>
+          : null,
       status: rawStatus,
       payment: paymentObj,
       carrier: json['carrier']?.toString() ?? '',
