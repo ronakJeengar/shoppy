@@ -13,6 +13,7 @@ import 'package:shopp_app/features/orders/presentation/screens/orders_page.dart'
 import 'package:shopp_app/core/widgets/app_button.dart';
 import 'package:shopp_app/core/widgets/app_network_image.dart';
 import 'package:shopp_app/core/utils/currency_formatter.dart';
+import 'package:go_router/go_router.dart';
 
 class OrderConfirmationPage extends StatelessWidget {
   final OrderEntity? order;
@@ -398,6 +399,19 @@ class OrderConfirmationPage extends StatelessWidget {
             ],
 
             // Actions
+            if (order?.id != null || orderId != null) ...[
+              AppButton(
+                label: 'View Tax Invoice',
+                icon: AppIcons.invoice,
+                variant: AppButtonVariant.outline,
+                isFullWidth: true,
+                onPressed: () {
+                  final targetId = order?.id ?? orderId!;
+                  context.push('/orders/$targetId/invoice');
+                },
+              ),
+              const SizedBox(height: 10),
+            ],
             AppButton(
               label: 'Continue Shopping',
               icon: AppIcons.store,

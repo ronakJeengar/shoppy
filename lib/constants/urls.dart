@@ -53,6 +53,8 @@ class Urls {
   static const String paymentsVerify = ApiEndpoints.paymentsVerify;
   static const String paymentsFail = ApiEndpoints.paymentsFail;
   static const String orders = ApiEndpoints.orders;
+  static String orderInvoice(String id) => ApiEndpoints.orderInvoice(id);
+  static String orderInvoiceHtml(String id) => ApiEndpoints.orderInvoiceHtml(id);
 
   // Shipping & Serviceability modules
   static String shippingServiceability(String pinCode) => ApiEndpoints.shippingServiceability(pinCode);

@@ -30,6 +30,7 @@ import 'package:shopp_app/features/checkout/presentation/screens/order_confirmat
 import 'package:shopp_app/features/notifications/presentation/screens/notifications_page.dart';
 import 'package:shopp_app/features/orders/presentation/screens/order_detail_page.dart';
 import 'package:shopp_app/features/orders/presentation/screens/orders_page.dart';
+import 'package:shopp_app/features/invoices/presentation/screens/invoice_page.dart';
 import 'package:shopp_app/features/profile/presentation/screens/profile_page.dart';
 import 'package:shopp_app/features/search/presentation/screens/search_page.dart';
 import 'package:shopp_app/features/wishlist/presentation/screens/wishlist_page.dart';
@@ -192,6 +193,15 @@ final routerProvider = Provider<GoRouter>((ref) {
               final id = state.pathParameters['id'] ?? '';
               return OrderDetailPage(orderId: id);
             },
+            routes: [
+              GoRoute(
+                path: 'invoice',
+                builder: (context, state) {
+                  final id = state.pathParameters['id'] ?? '';
+                  return InvoicePage(orderId: id);
+                },
+              ),
+            ],
           ),
         ],
       ),

@@ -1,10 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shopp_app/features/checkout/data/mappers/checkout_mappers.dart';
 import 'package:shopp_app/features/checkout/data/models/checkout_validation_model.dart';
-import 'package:shopp_app/features/checkout/domain/entities/checkout_entity.dart';
 import 'package:shopp_app/features/orders/data/mappers/order_mappers.dart';
 import 'package:shopp_app/features/orders/data/models/order_model.dart';
-import 'package:shopp_app/features/orders/domain/entities/order_entity.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

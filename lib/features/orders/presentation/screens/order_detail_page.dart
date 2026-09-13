@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopp_app/core/constants/app_icon_sizes.dart';
 import 'package:shopp_app/core/theme/app_colors.dart';
@@ -195,7 +196,33 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
 
             // 6. Price Breakdown Card
             _buildPriceBreakdownCard(order, theme),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
+
+            // View Tax Invoice Action Button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: AppRadius.borderMd,
+                  ),
+                ),
+                icon: const AppIcon(
+                  AppIcons.invoice,
+                  size: AppIconSizes.action,
+                  color: Colors.white,
+                ),
+                label: Text(
+                  'View Tax Invoice',
+                  style: AppTypography.buttonText.copyWith(color: Colors.white),
+                ),
+                onPressed: () => context.push('/orders/${order.id}/invoice'),
+              ),
+            ),
+            const SizedBox(height: 12),
 
             // 7. Cancel Order Action Button (if eligible)
             if (order.canCancel && !order.isCancelled)

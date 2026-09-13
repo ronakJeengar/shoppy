@@ -55,6 +55,8 @@ class ApiEndpoints {
   // Orders
   static const String orders = 'orders';
   static String orderDetail(String id) => 'orders/$id';
+  static String orderInvoice(String id) => 'orders/$id/invoice';
+  static String orderInvoiceHtml(String id) => 'orders/$id/invoice/html';
 
   // Notifications
   static const String notifications = 'notifications';

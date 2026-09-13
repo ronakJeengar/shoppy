@@ -13,6 +13,7 @@ class RouteNames {
   static const String checkoutSuccess = '/checkout/success/:orderId';
   static const String orders = '/orders';
   static const String orderDetails = '/orders/:id';
+  static const String orderInvoice = '/orders/:id/invoice';
   static const String notifications = '/notifications';
   static const String addresses = '/addresses';
   static const String assistant = '/assistant';
@@ -26,6 +27,7 @@ class RouteNames {
   // Generator Helpers
   static String productDetail(String id) => '/product/$id';
   static String orderDetail(String id) => '/orders/$id';
+  static String invoiceDetail(String id) => '/orders/$id/invoice';
   static String checkoutSuccessWithId(String orderId) => '/checkout/success/$orderId';
   static String loginWithRedirect(String redirect) =>
       '/login?redirect=${Uri.encodeComponent(redirect)}';

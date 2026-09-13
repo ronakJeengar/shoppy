@@ -68,3 +68,17 @@ Base URL: `http://localhost:8000/api/v1`
 - `PATCH /admin/campaigns/:id` - Update campaign parameters with schema validation.
 - `PATCH /admin/campaigns/:id/status` - Toggle active/inactive status.
 - `DELETE /admin/campaigns/:id` - Delete campaign.
+
+## 11. Indian Shipping & PIN-Code Serviceability (Feature 5)
+- `GET /shipping/check-serviceability?pinCode=XXXXXX` - Authoritatively check PIN-code serviceability, delivery tier (Metro/Tier1/Tier2/Tier3/Remote), estimated delivery window, available shipping methods, and standard/express charges.
+- `GET /shipping/methods` - Fetch active shipping methods and business rules.
+
+## 12. Cash on Delivery (Feature 6)
+- `POST /checkout/validate` - Evaluates payment method options (including COD eligibility, threshold, and ₹40 fee / free above ₹1499).
+- `POST /checkout/create` - Place COD orders atomically without third-party payment gateway redirection.
+
+## 13. GST Invoices (Feature 7)
+- `GET /orders/:id/invoice` - Fetch authoritative, immutable GST tax invoice snapshot for order (IDOR protected; admin or order owner).
+- `GET /orders/:id/invoice/html` - Fetch server-rendered, printable, responsive HTML tax invoice (IDOR protected; admin or order owner).
+- `GET /admin/invoices` - List historical invoices with filtering by date range, invoice status, and search by invoice/order number. Requires ADMIN role.
+
