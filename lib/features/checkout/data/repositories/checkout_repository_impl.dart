@@ -21,12 +21,14 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
     String addressId, {
     String shippingMethod = 'STANDARD',
     String paymentMethod = 'CARD',
+    Map<String, dynamic>? emiPlan,
   }) async {
     try {
       final model = await _remoteDataSource.validateCheckout(
         addressId,
         shippingMethod,
         paymentMethod: paymentMethod,
+        emiPlan: emiPlan,
       );
       return Success(model.toEntity());
     } on DioException catch (e) {
@@ -42,6 +44,7 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
     required String addressId,
     String shippingMethod = 'STANDARD',
     String paymentMethod = 'CARD',
+    Map<String, dynamic>? emiPlan,
     String? idempotencyKey,
   }) async {
     try {
@@ -49,6 +52,7 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
         addressId: addressId,
         shippingMethod: shippingMethod,
         paymentMethod: paymentMethod,
+        emiPlan: emiPlan,
         idempotencyKey: idempotencyKey,
       );
       final order = OrderModel.fromJson(data['order'] as Map<String, dynamic>);

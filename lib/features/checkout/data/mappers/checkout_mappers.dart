@@ -1,4 +1,5 @@
 import 'package:shopp_app/features/addresses/data/mappers/address_mappers.dart';
+import 'package:shopp_app/features/emi/data/mappers/emi_mappers.dart';
 import '../../domain/entities/checkout_entity.dart';
 import '../../domain/entities/payment_entity.dart';
 import '../models/checkout_validation_model.dart';
@@ -128,6 +129,8 @@ extension CheckoutValidationModelMapper on CheckoutValidationModel {
       shippingDetails: shippingDetails,
       codFee: codFee,
       codDetails: codDetails?.toEntity(),
+      emiDetails: emiDetails?.toEntity(),
+      emiQuote: emiQuote?.toEntity(),
       paymentMethods: paymentMethods.map((p) => p.toEntity()).toList(),
     );
   }
@@ -154,6 +157,8 @@ extension CheckoutValidationEntityMapper on CheckoutValidationEntity {
       shippingDetails: shippingDetails,
       codFee: codFee,
       codDetails: codDetails?.toModel(),
+      emiDetails: emiDetails?.toModel(),
+      emiQuote: emiQuote?.toModel(),
       paymentMethods: paymentMethods.map((p) => p.toModel()).toList(),
     );
   }

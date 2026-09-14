@@ -184,7 +184,11 @@ class OrderConfirmationPage extends StatelessWidget {
                         style: AppTypography.caption.copyWith(color: AppColors.slate500),
                       ),
                       Text(
-                        order?.isCod == true ? 'Cash on Delivery' : 'Card Payment',
+                        order?.isEmi == true
+                            ? 'EMI Financing (${order?.emiDetails?.provider ?? "Bank"})'
+                            : order?.isCod == true
+                                ? 'Cash on Delivery'
+                                : 'Card Payment',
                         style: AppTypography.bodySmall.copyWith(
                           fontWeight: FontWeight.w600,
                           color: AppColors.slate800,
@@ -203,13 +207,21 @@ class OrderConfirmationPage extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: order?.isCod == true ? AppColors.primary50 : AppColors.successLight,
+                          color: (order?.isEmi == true || order?.isCod == true)
+                              ? AppColors.primary50
+                              : AppColors.successLight,
                           borderRadius: AppRadius.borderFull,
                         ),
                         child: Text(
-                          order?.isCod == true ? 'Pending (Pay on Delivery)' : 'Paid',
+                          order?.isEmi == true
+                              ? 'Pending Financing Approval'
+                              : order?.isCod == true
+                                  ? 'Pending (Pay on Delivery)'
+                                  : 'Paid',
                           style: AppTypography.label.copyWith(
-                            color: order?.isCod == true ? AppColors.primary : AppColors.success,
+                            color: (order?.isEmi == true || order?.isCod == true)
+                                ? AppColors.primary
+                                : AppColors.success,
                           ),
                         ),
                       ),
@@ -252,6 +264,68 @@ class OrderConfirmationPage extends StatelessWidget {
                         ],
                       ),
                     ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+
+            // EMI Financing Card (if EMI order)
+            if (order?.isEmi == true && order?.emiDetails != null) ...[
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: AppRadius.borderMd,
+                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                  boxShadow: AppShadows.card,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const AppIcon(AppIcons.creditCard, color: AppColors.primary, size: AppIconSizes.medium),
+                        const SizedBox(width: 8),
+                        Text(
+                          'EMI Financing Plan',
+                          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const Spacer(),
+                        if (order!.emiDetails!.isNoCost)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: const BoxDecoration(
+                              color: AppColors.successLight,
+                              borderRadius: AppRadius.borderSm,
+                            ),
+                            child: Text(
+                              'NO COST EMI',
+                              style: AppTypography.label.copyWith(
+                                color: AppColors.success,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    _summaryRow('Bank / Provider', order!.emiDetails!.provider),
+                    const SizedBox(height: 6),
+                    _summaryRow('Tenure', '${order!.emiDetails!.tenureMonths} Months'),
+                    const SizedBox(height: 6),
+                    _summaryRow('Monthly Installment', '${CurrencyFormatter.format(order!.emiDetails!.monthlyInstallment)}/mo', color: AppColors.primary),
+                    const SizedBox(height: 6),
+                    _summaryRow('Annual Interest Rate', '${order!.emiDetails!.interestRate}% p.a.'),
+                    const SizedBox(height: 6),
+                    _summaryRow('Total Interest', CurrencyFormatter.format(order!.emiDetails!.totalInterest)),
+                    if (order!.emiDetails!.processingFee > 0) ...[
+                      const SizedBox(height: 6),
+                      _summaryRow('Processing Fee', CurrencyFormatter.format(order!.emiDetails!.processingFee)),
+                    ],
+                    const Divider(height: 16, color: AppColors.slate200),
+                    _summaryRow('Total Financed Amount', CurrencyFormatter.format(order!.emiDetails!.totalPayable), isTotal: true),
                   ],
                 ),
               ),
@@ -387,7 +461,11 @@ class OrderConfirmationPage extends StatelessWidget {
                     ],
                     const Divider(height: 20, color: AppColors.slate200),
                     _summaryRow(
-                      order!.isCod ? 'Amount Payable on Delivery' : 'Total Paid',
+                      order!.isCod
+                          ? 'Amount Payable on Delivery'
+                          : order!.isEmi
+                              ? 'Total Financed Order'
+                              : 'Total Paid',
                       CurrencyFormatter.format(order!.totalAmount),
                       isTotal: true,
                       color: AppColors.primary,

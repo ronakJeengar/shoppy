@@ -1,6 +1,7 @@
 import 'package:shopp_app/features/addresses/data/mappers/address_mappers.dart';
 import 'package:shopp_app/features/checkout/data/mappers/checkout_mappers.dart';
 import 'package:shopp_app/features/checkout/data/models/tax_breakdown_model.dart';
+import 'package:shopp_app/features/emi/data/mappers/emi_mappers.dart';
 import '../../domain/entities/order_entity.dart';
 import '../models/order_model.dart';
 
@@ -80,6 +81,7 @@ extension OrderModelMapper on OrderModel {
       customerGstin: customerGstin,
       codFee: codFee,
       codDetails: codDetails,
+      emiDetails: emiDetails?.toEntity(),
       status: status,
       payment: payment?.toEntity(),
       carrier: carrier,
@@ -112,6 +114,7 @@ extension OrderEntityMapper on OrderEntity {
       customerGstin: customerGstin,
       codFee: codFee,
       codDetails: codDetails,
+      emiDetails: emiDetails?.toModel(),
       status: status,
       payment: payment?.toModel(),
       carrier: carrier,

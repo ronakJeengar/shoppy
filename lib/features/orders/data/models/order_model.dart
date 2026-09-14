@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:shopp_app/features/addresses/data/models/address_model.dart';
 import 'package:shopp_app/features/checkout/data/models/payment_model.dart';
 import 'package:shopp_app/features/checkout/data/models/tax_breakdown_model.dart';
+import 'package:shopp_app/features/emi/data/models/emi_plan_model.dart';
 
 part 'order_model.freezed.dart';
 
@@ -118,6 +119,7 @@ abstract class OrderModel with _$OrderModel {
     String? customerGstin,
     @Default(0.0) double codFee,
     Map<String, dynamic>? codDetails,
+    EmiDetailsSnapshotModel? emiDetails,
     required String status,
     PaymentModel? payment,
     @Default('') String carrier,
@@ -129,6 +131,8 @@ abstract class OrderModel with _$OrderModel {
   }) = _OrderModel;
 
   bool get isCod => payment?.paymentMethod == 'COD' || codDetails?['isCod'] == true;
+  bool get isEmi => payment?.paymentMethod == 'EMI' || emiDetails?.isEmi == true;
+  bool get isPendingPayment => status == 'PENDING_PAYMENT';
   bool get isCancelled => status == 'CANCELLED';
   bool get isDelivered => status == 'DELIVERED';
   bool get isShipped => status == 'SHIPPED';
@@ -193,6 +197,13 @@ abstract class OrderModel with _$OrderModel {
       );
     }
 
+    EmiDetailsSnapshotModel? emiDetailsObj;
+    if (json['emiDetails'] is Map<String, dynamic>) {
+      emiDetailsObj = EmiDetailsSnapshotModel.fromJson(
+        json['emiDetails'] as Map<String, dynamic>,
+      );
+    }
+
     DateTime parsedDate = DateTime.now();
     if (json['createdAt'] != null) {
       parsedDate = DateTime.tryParse(json['createdAt'].toString()) ?? DateTime.now();
@@ -235,6 +246,7 @@ abstract class OrderModel with _$OrderModel {
       codDetails: json['codDetails'] is Map<String, dynamic>
           ? json['codDetails'] as Map<String, dynamic>
           : null,
+      emiDetails: emiDetailsObj,
       status: rawStatus,
       payment: paymentObj,
       carrier: json['carrier']?.toString() ?? '',

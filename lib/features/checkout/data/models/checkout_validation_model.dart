@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:shopp_app/features/addresses/data/models/address_model.dart';
+import 'package:shopp_app/features/emi/data/models/emi_plan_model.dart';
 import 'package:shopp_app/features/orders/data/models/order_model.dart';
 import 'tax_breakdown_model.dart';
 
@@ -105,6 +106,8 @@ abstract class CheckoutValidationModel with _$CheckoutValidationModel {
     Map<String, dynamic>? shippingDetails,
     @Default(0.0) double codFee,
     CodDetailsModel? codDetails,
+    EmiDetailsSnapshotModel? emiDetails,
+    EmiQuoteModel? emiQuote,
     @Default([]) List<PaymentMethodOptionModel> paymentMethods,
   }) = _CheckoutValidationModel;
 
@@ -156,6 +159,16 @@ abstract class CheckoutValidationModel with _$CheckoutValidationModel {
       codDetails = CodDetailsModel.fromJson(json['codDetails'] as Map<String, dynamic>);
     }
 
+    EmiDetailsSnapshotModel? emiDetails;
+    if (json['emiDetails'] is Map<String, dynamic>) {
+      emiDetails = EmiDetailsSnapshotModel.fromJson(json['emiDetails'] as Map<String, dynamic>);
+    }
+
+    EmiQuoteModel? emiQuote;
+    if (json['emiQuote'] is Map<String, dynamic>) {
+      emiQuote = EmiQuoteModel.fromJson(json['emiQuote'] as Map<String, dynamic>);
+    }
+
     return CheckoutValidationModel(
       valid: json['valid'] == true,
       items: items,
@@ -185,6 +198,8 @@ abstract class CheckoutValidationModel with _$CheckoutValidationModel {
       shippingDetails: shipDetails,
       codFee: (json['codFee'] is num) ? (json['codFee'] as num).toDouble() : 0.0,
       codDetails: codDetails,
+      emiDetails: emiDetails,
+      emiQuote: emiQuote,
       paymentMethods: paymentMethods,
     );
   }

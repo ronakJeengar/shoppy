@@ -89,12 +89,13 @@ class CheckoutNotifier extends StateNotifier<CheckoutState> {
     state = state.copyWith(selectedShippingMethod: method);
   }
 
-  Future<void> validateCheckout(String addressId) async {
+  Future<void> validateCheckout(String addressId, {Map<String, dynamic>? emiPlan}) async {
     state = state.copyWith(isValidating: true, clearError: true);
     final result = await _validateUseCase(
       addressId,
       shippingMethod: state.selectedShippingMethod,
       paymentMethod: state.selectedPaymentMethod,
+      emiPlan: emiPlan,
     );
 
     result.fold(
@@ -109,6 +110,7 @@ class CheckoutNotifier extends StateNotifier<CheckoutState> {
 
   Future<OrderEntity?> placeOrder({
     required String addressId,
+    Map<String, dynamic>? emiPlan,
     String? idempotencyKey,
   }) async {
     state = state.copyWith(isPlacingOrder: true, clearError: true);
@@ -116,6 +118,7 @@ class CheckoutNotifier extends StateNotifier<CheckoutState> {
       addressId: addressId,
       shippingMethod: state.selectedShippingMethod,
       paymentMethod: state.selectedPaymentMethod,
+      emiPlan: emiPlan,
       idempotencyKey: idempotencyKey,
     );
 

@@ -82,3 +82,15 @@ Base URL: `http://localhost:8000/api/v1`
 - `GET /orders/:id/invoice/html` - Fetch server-rendered, printable, responsive HTML tax invoice (IDOR protected; admin or order owner).
 - `GET /admin/invoices` - List historical invoices with filtering by date range, invoice status, and search by invoice/order number. Requires ADMIN role.
 
+## 14. EMI & Buy Now Pay Later (Feature 8)
+- `GET /emi/plans?amount=:amount` - Authoritatively list eligible EMI plans and calculated tenures for the given order amount. Returns eligibility flag, reasonCode (`EMI_AMOUNT_TOO_LOW`, `EMI_AMOUNT_TOO_HIGH`, `EMI_DISABLED`), minimum/maximum order limits, and bank options with monthly installments, interest rates, No-Cost EMI badges, and processing fees.
+- `POST /emi/calculate` - Authoritatively calculate an exact EMI quote for a specific plan and tenure. Body: `{ amount, planId, tenureMonths }`. Returns principal, monthlyInstallment, interestRate, totalInterest, processingFee, and totalPayable.
+- `POST /checkout/validate` (Extended) - Supports `emiPlan: { planId, tenureMonths }` in payload. Returns `emiQuote` snapshot and evaluates `EMI` in payment method options.
+- `POST /checkout/create` (Extended) - When `paymentMethod: "EMI"`, validates plan & tenure eligibility, creates order in `PENDING_PAYMENT` status with payment status `PENDING`, captures immutable `emiDetails` snapshot on order and `emi` details on payment. Mutually exclusive with COD.
+- `GET /admin/emi/plans` - List all configured EMI plans (active & inactive). Requires ADMIN role.
+- `POST /admin/emi/plans` - Create a new EMI plan with tenures, interest rates, processing fees, and minimum/maximum amounts. Requires ADMIN role.
+- `PATCH /admin/emi/plans/:id` - Update EMI plan details, tenures, or rates. Requires ADMIN role.
+- `PATCH /admin/emi/plans/:id/status` - Toggle active/inactive status of an EMI plan. Requires ADMIN role.
+- `DELETE /admin/emi/plans/:id` - Delete an EMI plan. Requires ADMIN role.
+
+

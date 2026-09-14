@@ -93,4 +93,9 @@ class ApiEndpoints {
 
   // App Bootstrap & Remote Configuration
   static const String appBootstrap = 'app/bootstrap';
+
+  // EMI & Pay Later
+  static const String emiPlans = 'emi/plans';
+  static const String emiCalculate = 'emi/calculate';
+  static const String adminEmiPlans = 'admin/emi/plans';
 }

@@ -1209,6 +1209,8 @@ mixin _$CheckoutValidationEntity {
   Map<String, dynamic>? get shippingDetails;
   double get codFee;
   CodDetailsEntity? get codDetails;
+  EmiDetailsSnapshotEntity? get emiDetails;
+  EmiQuoteEntity? get emiQuote;
   List<PaymentMethodOptionEntity> get paymentMethods;
 
   /// Create a copy of CheckoutValidationEntity
@@ -1257,6 +1259,10 @@ mixin _$CheckoutValidationEntity {
             (identical(other.codFee, codFee) || other.codFee == codFee) &&
             (identical(other.codDetails, codDetails) ||
                 other.codDetails == codDetails) &&
+            (identical(other.emiDetails, emiDetails) ||
+                other.emiDetails == emiDetails) &&
+            (identical(other.emiQuote, emiQuote) ||
+                other.emiQuote == emiQuote) &&
             const DeepCollectionEquality()
                 .equals(other.paymentMethods, paymentMethods));
   }
@@ -1282,12 +1288,14 @@ mixin _$CheckoutValidationEntity {
         const DeepCollectionEquality().hash(shippingDetails),
         codFee,
         codDetails,
+        emiDetails,
+        emiQuote,
         const DeepCollectionEquality().hash(paymentMethods)
       ]);
 
   @override
   String toString() {
-    return 'CheckoutValidationEntity(valid: $valid, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, grandTotal: $grandTotal, taxableAmount: $taxableAmount, discount: $discount, currency: $currency, currencySymbol: $currencySymbol, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, deliveryWindow: $deliveryWindow, isFreeShipping: $isFreeShipping, shippingDetails: $shippingDetails, codFee: $codFee, codDetails: $codDetails, paymentMethods: $paymentMethods)';
+    return 'CheckoutValidationEntity(valid: $valid, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, grandTotal: $grandTotal, taxableAmount: $taxableAmount, discount: $discount, currency: $currency, currencySymbol: $currencySymbol, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, deliveryWindow: $deliveryWindow, isFreeShipping: $isFreeShipping, shippingDetails: $shippingDetails, codFee: $codFee, codDetails: $codDetails, emiDetails: $emiDetails, emiQuote: $emiQuote, paymentMethods: $paymentMethods)';
   }
 }
 
@@ -1316,11 +1324,15 @@ abstract mixin class $CheckoutValidationEntityCopyWith<$Res> {
       Map<String, dynamic>? shippingDetails,
       double codFee,
       CodDetailsEntity? codDetails,
+      EmiDetailsSnapshotEntity? emiDetails,
+      EmiQuoteEntity? emiQuote,
       List<PaymentMethodOptionEntity> paymentMethods});
 
   $AddressEntityCopyWith<$Res>? get shippingAddress;
   $TaxBreakdownEntityCopyWith<$Res>? get taxBreakdown;
   $CodDetailsEntityCopyWith<$Res>? get codDetails;
+  $EmiDetailsSnapshotEntityCopyWith<$Res>? get emiDetails;
+  $EmiQuoteEntityCopyWith<$Res>? get emiQuote;
 }
 
 /// @nodoc
@@ -1354,6 +1366,8 @@ class _$CheckoutValidationEntityCopyWithImpl<$Res>
     Object? shippingDetails = freezed,
     Object? codFee = null,
     Object? codDetails = freezed,
+    Object? emiDetails = freezed,
+    Object? emiQuote = freezed,
     Object? paymentMethods = null,
   }) {
     return _then(_self.copyWith(
@@ -1429,6 +1443,14 @@ class _$CheckoutValidationEntityCopyWithImpl<$Res>
           ? _self.codDetails
           : codDetails // ignore: cast_nullable_to_non_nullable
               as CodDetailsEntity?,
+      emiDetails: freezed == emiDetails
+          ? _self.emiDetails
+          : emiDetails // ignore: cast_nullable_to_non_nullable
+              as EmiDetailsSnapshotEntity?,
+      emiQuote: freezed == emiQuote
+          ? _self.emiQuote
+          : emiQuote // ignore: cast_nullable_to_non_nullable
+              as EmiQuoteEntity?,
       paymentMethods: null == paymentMethods
           ? _self.paymentMethods
           : paymentMethods // ignore: cast_nullable_to_non_nullable
@@ -1475,6 +1497,34 @@ class _$CheckoutValidationEntityCopyWithImpl<$Res>
 
     return $CodDetailsEntityCopyWith<$Res>(_self.codDetails!, (value) {
       return _then(_self.copyWith(codDetails: value));
+    });
+  }
+
+  /// Create a copy of CheckoutValidationEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $EmiDetailsSnapshotEntityCopyWith<$Res>? get emiDetails {
+    if (_self.emiDetails == null) {
+      return null;
+    }
+
+    return $EmiDetailsSnapshotEntityCopyWith<$Res>(_self.emiDetails!, (value) {
+      return _then(_self.copyWith(emiDetails: value));
+    });
+  }
+
+  /// Create a copy of CheckoutValidationEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $EmiQuoteEntityCopyWith<$Res>? get emiQuote {
+    if (_self.emiQuote == null) {
+      return null;
+    }
+
+    return $EmiQuoteEntityCopyWith<$Res>(_self.emiQuote!, (value) {
+      return _then(_self.copyWith(emiQuote: value));
     });
   }
 }
@@ -1591,6 +1641,8 @@ extension CheckoutValidationEntityPatterns on CheckoutValidationEntity {
             Map<String, dynamic>? shippingDetails,
             double codFee,
             CodDetailsEntity? codDetails,
+            EmiDetailsSnapshotEntity? emiDetails,
+            EmiQuoteEntity? emiQuote,
             List<PaymentMethodOptionEntity> paymentMethods)?
         $default, {
     required TResult orElse(),
@@ -1617,6 +1669,8 @@ extension CheckoutValidationEntityPatterns on CheckoutValidationEntity {
             _that.shippingDetails,
             _that.codFee,
             _that.codDetails,
+            _that.emiDetails,
+            _that.emiQuote,
             _that.paymentMethods);
       case _:
         return orElse();
@@ -1657,6 +1711,8 @@ extension CheckoutValidationEntityPatterns on CheckoutValidationEntity {
             Map<String, dynamic>? shippingDetails,
             double codFee,
             CodDetailsEntity? codDetails,
+            EmiDetailsSnapshotEntity? emiDetails,
+            EmiQuoteEntity? emiQuote,
             List<PaymentMethodOptionEntity> paymentMethods)
         $default,
   ) {
@@ -1682,6 +1738,8 @@ extension CheckoutValidationEntityPatterns on CheckoutValidationEntity {
             _that.shippingDetails,
             _that.codFee,
             _that.codDetails,
+            _that.emiDetails,
+            _that.emiQuote,
             _that.paymentMethods);
       case _:
         throw StateError('Unexpected subclass');
@@ -1721,6 +1779,8 @@ extension CheckoutValidationEntityPatterns on CheckoutValidationEntity {
             Map<String, dynamic>? shippingDetails,
             double codFee,
             CodDetailsEntity? codDetails,
+            EmiDetailsSnapshotEntity? emiDetails,
+            EmiQuoteEntity? emiQuote,
             List<PaymentMethodOptionEntity> paymentMethods)?
         $default,
   ) {
@@ -1746,6 +1806,8 @@ extension CheckoutValidationEntityPatterns on CheckoutValidationEntity {
             _that.shippingDetails,
             _that.codFee,
             _that.codDetails,
+            _that.emiDetails,
+            _that.emiQuote,
             _that.paymentMethods);
       case _:
         return null;
@@ -1775,6 +1837,8 @@ class _CheckoutValidationEntity implements CheckoutValidationEntity {
       final Map<String, dynamic>? shippingDetails,
       this.codFee = 0.0,
       this.codDetails,
+      this.emiDetails,
+      this.emiQuote,
       final List<PaymentMethodOptionEntity> paymentMethods = const []})
       : _shippingDetails = shippingDetails,
         _paymentMethods = paymentMethods;
@@ -1829,6 +1893,10 @@ class _CheckoutValidationEntity implements CheckoutValidationEntity {
   final double codFee;
   @override
   final CodDetailsEntity? codDetails;
+  @override
+  final EmiDetailsSnapshotEntity? emiDetails;
+  @override
+  final EmiQuoteEntity? emiQuote;
   final List<PaymentMethodOptionEntity> _paymentMethods;
   @override
   @JsonKey()
@@ -1885,6 +1953,10 @@ class _CheckoutValidationEntity implements CheckoutValidationEntity {
             (identical(other.codFee, codFee) || other.codFee == codFee) &&
             (identical(other.codDetails, codDetails) ||
                 other.codDetails == codDetails) &&
+            (identical(other.emiDetails, emiDetails) ||
+                other.emiDetails == emiDetails) &&
+            (identical(other.emiQuote, emiQuote) ||
+                other.emiQuote == emiQuote) &&
             const DeepCollectionEquality()
                 .equals(other._paymentMethods, _paymentMethods));
   }
@@ -1910,12 +1982,14 @@ class _CheckoutValidationEntity implements CheckoutValidationEntity {
         const DeepCollectionEquality().hash(_shippingDetails),
         codFee,
         codDetails,
+        emiDetails,
+        emiQuote,
         const DeepCollectionEquality().hash(_paymentMethods)
       ]);
 
   @override
   String toString() {
-    return 'CheckoutValidationEntity(valid: $valid, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, grandTotal: $grandTotal, taxableAmount: $taxableAmount, discount: $discount, currency: $currency, currencySymbol: $currencySymbol, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, deliveryWindow: $deliveryWindow, isFreeShipping: $isFreeShipping, shippingDetails: $shippingDetails, codFee: $codFee, codDetails: $codDetails, paymentMethods: $paymentMethods)';
+    return 'CheckoutValidationEntity(valid: $valid, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, grandTotal: $grandTotal, taxableAmount: $taxableAmount, discount: $discount, currency: $currency, currencySymbol: $currencySymbol, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, deliveryWindow: $deliveryWindow, isFreeShipping: $isFreeShipping, shippingDetails: $shippingDetails, codFee: $codFee, codDetails: $codDetails, emiDetails: $emiDetails, emiQuote: $emiQuote, paymentMethods: $paymentMethods)';
   }
 }
 
@@ -1946,6 +2020,8 @@ abstract mixin class _$CheckoutValidationEntityCopyWith<$Res>
       Map<String, dynamic>? shippingDetails,
       double codFee,
       CodDetailsEntity? codDetails,
+      EmiDetailsSnapshotEntity? emiDetails,
+      EmiQuoteEntity? emiQuote,
       List<PaymentMethodOptionEntity> paymentMethods});
 
   @override
@@ -1954,6 +2030,10 @@ abstract mixin class _$CheckoutValidationEntityCopyWith<$Res>
   $TaxBreakdownEntityCopyWith<$Res>? get taxBreakdown;
   @override
   $CodDetailsEntityCopyWith<$Res>? get codDetails;
+  @override
+  $EmiDetailsSnapshotEntityCopyWith<$Res>? get emiDetails;
+  @override
+  $EmiQuoteEntityCopyWith<$Res>? get emiQuote;
 }
 
 /// @nodoc
@@ -1987,6 +2067,8 @@ class __$CheckoutValidationEntityCopyWithImpl<$Res>
     Object? shippingDetails = freezed,
     Object? codFee = null,
     Object? codDetails = freezed,
+    Object? emiDetails = freezed,
+    Object? emiQuote = freezed,
     Object? paymentMethods = null,
   }) {
     return _then(_CheckoutValidationEntity(
@@ -2062,6 +2144,14 @@ class __$CheckoutValidationEntityCopyWithImpl<$Res>
           ? _self.codDetails
           : codDetails // ignore: cast_nullable_to_non_nullable
               as CodDetailsEntity?,
+      emiDetails: freezed == emiDetails
+          ? _self.emiDetails
+          : emiDetails // ignore: cast_nullable_to_non_nullable
+              as EmiDetailsSnapshotEntity?,
+      emiQuote: freezed == emiQuote
+          ? _self.emiQuote
+          : emiQuote // ignore: cast_nullable_to_non_nullable
+              as EmiQuoteEntity?,
       paymentMethods: null == paymentMethods
           ? _self._paymentMethods
           : paymentMethods // ignore: cast_nullable_to_non_nullable
@@ -2108,6 +2198,34 @@ class __$CheckoutValidationEntityCopyWithImpl<$Res>
 
     return $CodDetailsEntityCopyWith<$Res>(_self.codDetails!, (value) {
       return _then(_self.copyWith(codDetails: value));
+    });
+  }
+
+  /// Create a copy of CheckoutValidationEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $EmiDetailsSnapshotEntityCopyWith<$Res>? get emiDetails {
+    if (_self.emiDetails == null) {
+      return null;
+    }
+
+    return $EmiDetailsSnapshotEntityCopyWith<$Res>(_self.emiDetails!, (value) {
+      return _then(_self.copyWith(emiDetails: value));
+    });
+  }
+
+  /// Create a copy of CheckoutValidationEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $EmiQuoteEntityCopyWith<$Res>? get emiQuote {
+    if (_self.emiQuote == null) {
+      return null;
+    }
+
+    return $EmiQuoteEntityCopyWith<$Res>(_self.emiQuote!, (value) {
+      return _then(_self.copyWith(emiQuote: value));
     });
   }
 }

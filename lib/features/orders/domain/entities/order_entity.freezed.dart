@@ -938,6 +938,7 @@ mixin _$OrderEntity {
   String? get customerGstin;
   double get codFee;
   Map<String, dynamic>? get codDetails;
+  EmiDetailsSnapshotEntity? get emiDetails;
   String get status;
   PaymentEntity? get payment;
   String get carrier;
@@ -990,6 +991,8 @@ mixin _$OrderEntity {
             (identical(other.codFee, codFee) || other.codFee == codFee) &&
             const DeepCollectionEquality()
                 .equals(other.codDetails, codDetails) &&
+            (identical(other.emiDetails, emiDetails) ||
+                other.emiDetails == emiDetails) &&
             (identical(other.status, status) || other.status == status) &&
             (identical(other.payment, payment) || other.payment == payment) &&
             (identical(other.carrier, carrier) || other.carrier == carrier) &&
@@ -1025,6 +1028,7 @@ mixin _$OrderEntity {
         customerGstin,
         codFee,
         const DeepCollectionEquality().hash(codDetails),
+        emiDetails,
         status,
         payment,
         carrier,
@@ -1037,7 +1041,7 @@ mixin _$OrderEntity {
 
   @override
   String toString() {
-    return 'OrderEntity(id: $id, orderNumber: $orderNumber, orderItems: $orderItems, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, totalAmount: $totalAmount, currency: $currency, currencySymbol: $currencySymbol, taxableAmount: $taxableAmount, discount: $discount, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, codFee: $codFee, codDetails: $codDetails, status: $status, payment: $payment, carrier: $carrier, trackingNumber: $trackingNumber, cancellationReason: $cancellationReason, canCancel: $canCancel, statusHistory: $statusHistory, createdAt: $createdAt)';
+    return 'OrderEntity(id: $id, orderNumber: $orderNumber, orderItems: $orderItems, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, totalAmount: $totalAmount, currency: $currency, currencySymbol: $currencySymbol, taxableAmount: $taxableAmount, discount: $discount, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, codFee: $codFee, codDetails: $codDetails, emiDetails: $emiDetails, status: $status, payment: $payment, carrier: $carrier, trackingNumber: $trackingNumber, cancellationReason: $cancellationReason, canCancel: $canCancel, statusHistory: $statusHistory, createdAt: $createdAt)';
   }
 }
 
@@ -1065,6 +1069,7 @@ abstract mixin class $OrderEntityCopyWith<$Res> {
       String? customerGstin,
       double codFee,
       Map<String, dynamic>? codDetails,
+      EmiDetailsSnapshotEntity? emiDetails,
       String status,
       PaymentEntity? payment,
       String carrier,
@@ -1076,6 +1081,7 @@ abstract mixin class $OrderEntityCopyWith<$Res> {
 
   $AddressEntityCopyWith<$Res>? get shippingAddress;
   $TaxBreakdownEntityCopyWith<$Res>? get taxBreakdown;
+  $EmiDetailsSnapshotEntityCopyWith<$Res>? get emiDetails;
   $PaymentEntityCopyWith<$Res>? get payment;
 }
 
@@ -1108,6 +1114,7 @@ class _$OrderEntityCopyWithImpl<$Res> implements $OrderEntityCopyWith<$Res> {
     Object? customerGstin = freezed,
     Object? codFee = null,
     Object? codDetails = freezed,
+    Object? emiDetails = freezed,
     Object? status = null,
     Object? payment = freezed,
     Object? carrier = null,
@@ -1186,6 +1193,10 @@ class _$OrderEntityCopyWithImpl<$Res> implements $OrderEntityCopyWith<$Res> {
           ? _self.codDetails
           : codDetails // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
+      emiDetails: freezed == emiDetails
+          ? _self.emiDetails
+          : emiDetails // ignore: cast_nullable_to_non_nullable
+              as EmiDetailsSnapshotEntity?,
       status: null == status
           ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
@@ -1246,6 +1257,20 @@ class _$OrderEntityCopyWithImpl<$Res> implements $OrderEntityCopyWith<$Res> {
 
     return $TaxBreakdownEntityCopyWith<$Res>(_self.taxBreakdown!, (value) {
       return _then(_self.copyWith(taxBreakdown: value));
+    });
+  }
+
+  /// Create a copy of OrderEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $EmiDetailsSnapshotEntityCopyWith<$Res>? get emiDetails {
+    if (_self.emiDetails == null) {
+      return null;
+    }
+
+    return $EmiDetailsSnapshotEntityCopyWith<$Res>(_self.emiDetails!, (value) {
+      return _then(_self.copyWith(emiDetails: value));
     });
   }
 
@@ -1375,6 +1400,7 @@ extension OrderEntityPatterns on OrderEntity {
             String? customerGstin,
             double codFee,
             Map<String, dynamic>? codDetails,
+            EmiDetailsSnapshotEntity? emiDetails,
             String status,
             PaymentEntity? payment,
             String carrier,
@@ -1407,6 +1433,7 @@ extension OrderEntityPatterns on OrderEntity {
             _that.customerGstin,
             _that.codFee,
             _that.codDetails,
+            _that.emiDetails,
             _that.status,
             _that.payment,
             _that.carrier,
@@ -1453,6 +1480,7 @@ extension OrderEntityPatterns on OrderEntity {
             String? customerGstin,
             double codFee,
             Map<String, dynamic>? codDetails,
+            EmiDetailsSnapshotEntity? emiDetails,
             String status,
             PaymentEntity? payment,
             String carrier,
@@ -1484,6 +1512,7 @@ extension OrderEntityPatterns on OrderEntity {
             _that.customerGstin,
             _that.codFee,
             _that.codDetails,
+            _that.emiDetails,
             _that.status,
             _that.payment,
             _that.carrier,
@@ -1529,6 +1558,7 @@ extension OrderEntityPatterns on OrderEntity {
             String? customerGstin,
             double codFee,
             Map<String, dynamic>? codDetails,
+            EmiDetailsSnapshotEntity? emiDetails,
             String status,
             PaymentEntity? payment,
             String carrier,
@@ -1560,6 +1590,7 @@ extension OrderEntityPatterns on OrderEntity {
             _that.customerGstin,
             _that.codFee,
             _that.codDetails,
+            _that.emiDetails,
             _that.status,
             _that.payment,
             _that.carrier,
@@ -1595,6 +1626,7 @@ class _OrderEntity extends OrderEntity {
       this.customerGstin,
       this.codFee = 0.0,
       final Map<String, dynamic>? codDetails,
+      this.emiDetails,
       required this.status,
       this.payment,
       this.carrier = '',
@@ -1663,6 +1695,8 @@ class _OrderEntity extends OrderEntity {
     return EqualUnmodifiableMapView(value);
   }
 
+  @override
+  final EmiDetailsSnapshotEntity? emiDetails;
   @override
   final String status;
   @override
@@ -1735,6 +1769,8 @@ class _OrderEntity extends OrderEntity {
             (identical(other.codFee, codFee) || other.codFee == codFee) &&
             const DeepCollectionEquality()
                 .equals(other._codDetails, _codDetails) &&
+            (identical(other.emiDetails, emiDetails) ||
+                other.emiDetails == emiDetails) &&
             (identical(other.status, status) || other.status == status) &&
             (identical(other.payment, payment) || other.payment == payment) &&
             (identical(other.carrier, carrier) || other.carrier == carrier) &&
@@ -1770,6 +1806,7 @@ class _OrderEntity extends OrderEntity {
         customerGstin,
         codFee,
         const DeepCollectionEquality().hash(_codDetails),
+        emiDetails,
         status,
         payment,
         carrier,
@@ -1782,7 +1819,7 @@ class _OrderEntity extends OrderEntity {
 
   @override
   String toString() {
-    return 'OrderEntity(id: $id, orderNumber: $orderNumber, orderItems: $orderItems, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, totalAmount: $totalAmount, currency: $currency, currencySymbol: $currencySymbol, taxableAmount: $taxableAmount, discount: $discount, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, codFee: $codFee, codDetails: $codDetails, status: $status, payment: $payment, carrier: $carrier, trackingNumber: $trackingNumber, cancellationReason: $cancellationReason, canCancel: $canCancel, statusHistory: $statusHistory, createdAt: $createdAt)';
+    return 'OrderEntity(id: $id, orderNumber: $orderNumber, orderItems: $orderItems, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, totalAmount: $totalAmount, currency: $currency, currencySymbol: $currencySymbol, taxableAmount: $taxableAmount, discount: $discount, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, codFee: $codFee, codDetails: $codDetails, emiDetails: $emiDetails, status: $status, payment: $payment, carrier: $carrier, trackingNumber: $trackingNumber, cancellationReason: $cancellationReason, canCancel: $canCancel, statusHistory: $statusHistory, createdAt: $createdAt)';
   }
 }
 
@@ -1812,6 +1849,7 @@ abstract mixin class _$OrderEntityCopyWith<$Res>
       String? customerGstin,
       double codFee,
       Map<String, dynamic>? codDetails,
+      EmiDetailsSnapshotEntity? emiDetails,
       String status,
       PaymentEntity? payment,
       String carrier,
@@ -1825,6 +1863,8 @@ abstract mixin class _$OrderEntityCopyWith<$Res>
   $AddressEntityCopyWith<$Res>? get shippingAddress;
   @override
   $TaxBreakdownEntityCopyWith<$Res>? get taxBreakdown;
+  @override
+  $EmiDetailsSnapshotEntityCopyWith<$Res>? get emiDetails;
   @override
   $PaymentEntityCopyWith<$Res>? get payment;
 }
@@ -1858,6 +1898,7 @@ class __$OrderEntityCopyWithImpl<$Res> implements _$OrderEntityCopyWith<$Res> {
     Object? customerGstin = freezed,
     Object? codFee = null,
     Object? codDetails = freezed,
+    Object? emiDetails = freezed,
     Object? status = null,
     Object? payment = freezed,
     Object? carrier = null,
@@ -1936,6 +1977,10 @@ class __$OrderEntityCopyWithImpl<$Res> implements _$OrderEntityCopyWith<$Res> {
           ? _self._codDetails
           : codDetails // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
+      emiDetails: freezed == emiDetails
+          ? _self.emiDetails
+          : emiDetails // ignore: cast_nullable_to_non_nullable
+              as EmiDetailsSnapshotEntity?,
       status: null == status
           ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
@@ -1996,6 +2041,20 @@ class __$OrderEntityCopyWithImpl<$Res> implements _$OrderEntityCopyWith<$Res> {
 
     return $TaxBreakdownEntityCopyWith<$Res>(_self.taxBreakdown!, (value) {
       return _then(_self.copyWith(taxBreakdown: value));
+    });
+  }
+
+  /// Create a copy of OrderEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $EmiDetailsSnapshotEntityCopyWith<$Res>? get emiDetails {
+    if (_self.emiDetails == null) {
+      return null;
+    }
+
+    return $EmiDetailsSnapshotEntityCopyWith<$Res>(_self.emiDetails!, (value) {
+      return _then(_self.copyWith(emiDetails: value));
     });
   }
 

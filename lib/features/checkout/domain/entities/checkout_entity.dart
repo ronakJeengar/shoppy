@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:shopp_app/features/addresses/domain/entities/address_entity.dart';
+import 'package:shopp_app/features/emi/domain/entities/emi_plan_entity.dart';
 import 'tax_breakdown_entity.dart';
 
 part 'checkout_entity.freezed.dart';
@@ -59,6 +60,8 @@ abstract class CheckoutValidationEntity with _$CheckoutValidationEntity {
     Map<String, dynamic>? shippingDetails,
     @Default(0.0) double codFee,
     CodDetailsEntity? codDetails,
+    EmiDetailsSnapshotEntity? emiDetails,
+    EmiQuoteEntity? emiQuote,
     @Default([]) List<PaymentMethodOptionEntity> paymentMethods,
   }) = _CheckoutValidationEntity;
 }

@@ -9,11 +9,13 @@ abstract class CheckoutRemoteDataSource {
     String addressId,
     String shippingMethod, {
     String paymentMethod = 'CARD',
+    Map<String, dynamic>? emiPlan,
   });
   Future<Map<String, dynamic>> createOrder({
     required String addressId,
     required String shippingMethod,
     required String paymentMethod,
+    Map<String, dynamic>? emiPlan,
     String? idempotencyKey,
   });
   Future<PaymentModel> processPayment({
@@ -38,6 +40,7 @@ class CheckoutRemoteDataSourceImpl implements CheckoutRemoteDataSource {
     String addressId,
     String shippingMethod, {
     String paymentMethod = 'CARD',
+    Map<String, dynamic>? emiPlan,
   }) async {
     final response = await _client.post(
       Urls.checkoutValidate,
@@ -45,6 +48,7 @@ class CheckoutRemoteDataSourceImpl implements CheckoutRemoteDataSource {
         'addressId': addressId,
         'shippingMethod': shippingMethod,
         'paymentMethod': paymentMethod,
+        if (emiPlan != null) 'emiPlan': emiPlan,
       },
     );
     final data = response.data;
@@ -58,6 +62,7 @@ class CheckoutRemoteDataSourceImpl implements CheckoutRemoteDataSource {
     required String addressId,
     required String shippingMethod,
     required String paymentMethod,
+    Map<String, dynamic>? emiPlan,
     String? idempotencyKey,
   }) async {
     final response = await _client.post(
@@ -66,6 +71,7 @@ class CheckoutRemoteDataSourceImpl implements CheckoutRemoteDataSource {
         'addressId': addressId,
         'shippingMethod': shippingMethod,
         'paymentMethod': paymentMethod,
+        if (emiPlan != null) 'emiPlan': emiPlan,
         if (idempotencyKey != null) 'idempotencyKey': idempotencyKey,
       },
     );

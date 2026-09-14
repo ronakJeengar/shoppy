@@ -97,6 +97,11 @@ class Urls {
   static const String recommendations = ApiEndpoints.recommendations;
   static const String recommendationEvents = ApiEndpoints.recommendationEvents;
 
+  // EMI & Pay Later module
+  static const String emiPlans = ApiEndpoints.emiPlans;
+  static const String emiCalculate = ApiEndpoints.emiCalculate;
+  static const String adminEmiPlans = ApiEndpoints.adminEmiPlans;
+
   // Backwards-compatibility aliases
   static const String signUp = register;
   static const String signIn = login;

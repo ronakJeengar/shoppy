@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:shopp_app/features/addresses/domain/entities/address_entity.dart';
 import 'package:shopp_app/features/checkout/domain/entities/payment_entity.dart';
 import 'package:shopp_app/features/checkout/domain/entities/tax_breakdown_entity.dart';
+import 'package:shopp_app/features/emi/domain/entities/emi_plan_entity.dart';
 
 part 'order_entity.freezed.dart';
 
@@ -53,6 +54,7 @@ abstract class OrderEntity with _$OrderEntity {
     String? customerGstin,
     @Default(0.0) double codFee,
     Map<String, dynamic>? codDetails,
+    EmiDetailsSnapshotEntity? emiDetails,
     required String status,
     PaymentEntity? payment,
     @Default('') String carrier,
@@ -64,6 +66,8 @@ abstract class OrderEntity with _$OrderEntity {
   }) = _OrderEntity;
 
   bool get isCod => payment?.paymentMethod == 'COD' || codDetails?['isCod'] == true;
+  bool get isEmi => payment?.paymentMethod == 'EMI' || emiDetails?.isEmi == true;
+  bool get isPendingPayment => status == 'PENDING_PAYMENT';
   bool get isCancelled => status == 'CANCELLED';
   bool get isDelivered => status == 'DELIVERED';
   bool get isShipped => status == 'SHIPPED';

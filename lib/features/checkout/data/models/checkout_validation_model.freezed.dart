@@ -1209,6 +1209,8 @@ mixin _$CheckoutValidationModel {
   Map<String, dynamic>? get shippingDetails;
   double get codFee;
   CodDetailsModel? get codDetails;
+  EmiDetailsSnapshotModel? get emiDetails;
+  EmiQuoteModel? get emiQuote;
   List<PaymentMethodOptionModel> get paymentMethods;
 
   /// Create a copy of CheckoutValidationModel
@@ -1258,6 +1260,10 @@ mixin _$CheckoutValidationModel {
             (identical(other.codFee, codFee) || other.codFee == codFee) &&
             (identical(other.codDetails, codDetails) ||
                 other.codDetails == codDetails) &&
+            (identical(other.emiDetails, emiDetails) ||
+                other.emiDetails == emiDetails) &&
+            (identical(other.emiQuote, emiQuote) ||
+                other.emiQuote == emiQuote) &&
             const DeepCollectionEquality()
                 .equals(other.paymentMethods, paymentMethods));
   }
@@ -1284,12 +1290,14 @@ mixin _$CheckoutValidationModel {
         const DeepCollectionEquality().hash(shippingDetails),
         codFee,
         codDetails,
+        emiDetails,
+        emiQuote,
         const DeepCollectionEquality().hash(paymentMethods)
       ]);
 
   @override
   String toString() {
-    return 'CheckoutValidationModel(valid: $valid, items: $items, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, grandTotal: $grandTotal, taxableAmount: $taxableAmount, discount: $discount, currency: $currency, currencySymbol: $currencySymbol, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, deliveryWindow: $deliveryWindow, isFreeShipping: $isFreeShipping, shippingDetails: $shippingDetails, codFee: $codFee, codDetails: $codDetails, paymentMethods: $paymentMethods)';
+    return 'CheckoutValidationModel(valid: $valid, items: $items, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, grandTotal: $grandTotal, taxableAmount: $taxableAmount, discount: $discount, currency: $currency, currencySymbol: $currencySymbol, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, deliveryWindow: $deliveryWindow, isFreeShipping: $isFreeShipping, shippingDetails: $shippingDetails, codFee: $codFee, codDetails: $codDetails, emiDetails: $emiDetails, emiQuote: $emiQuote, paymentMethods: $paymentMethods)';
   }
 }
 
@@ -1319,11 +1327,15 @@ abstract mixin class $CheckoutValidationModelCopyWith<$Res> {
       Map<String, dynamic>? shippingDetails,
       double codFee,
       CodDetailsModel? codDetails,
+      EmiDetailsSnapshotModel? emiDetails,
+      EmiQuoteModel? emiQuote,
       List<PaymentMethodOptionModel> paymentMethods});
 
   $AddressModelCopyWith<$Res>? get shippingAddress;
   $TaxBreakdownModelCopyWith<$Res>? get taxBreakdown;
   $CodDetailsModelCopyWith<$Res>? get codDetails;
+  $EmiDetailsSnapshotModelCopyWith<$Res>? get emiDetails;
+  $EmiQuoteModelCopyWith<$Res>? get emiQuote;
 }
 
 /// @nodoc
@@ -1358,6 +1370,8 @@ class _$CheckoutValidationModelCopyWithImpl<$Res>
     Object? shippingDetails = freezed,
     Object? codFee = null,
     Object? codDetails = freezed,
+    Object? emiDetails = freezed,
+    Object? emiQuote = freezed,
     Object? paymentMethods = null,
   }) {
     return _then(_self.copyWith(
@@ -1437,6 +1451,14 @@ class _$CheckoutValidationModelCopyWithImpl<$Res>
           ? _self.codDetails
           : codDetails // ignore: cast_nullable_to_non_nullable
               as CodDetailsModel?,
+      emiDetails: freezed == emiDetails
+          ? _self.emiDetails
+          : emiDetails // ignore: cast_nullable_to_non_nullable
+              as EmiDetailsSnapshotModel?,
+      emiQuote: freezed == emiQuote
+          ? _self.emiQuote
+          : emiQuote // ignore: cast_nullable_to_non_nullable
+              as EmiQuoteModel?,
       paymentMethods: null == paymentMethods
           ? _self.paymentMethods
           : paymentMethods // ignore: cast_nullable_to_non_nullable
@@ -1483,6 +1505,34 @@ class _$CheckoutValidationModelCopyWithImpl<$Res>
 
     return $CodDetailsModelCopyWith<$Res>(_self.codDetails!, (value) {
       return _then(_self.copyWith(codDetails: value));
+    });
+  }
+
+  /// Create a copy of CheckoutValidationModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $EmiDetailsSnapshotModelCopyWith<$Res>? get emiDetails {
+    if (_self.emiDetails == null) {
+      return null;
+    }
+
+    return $EmiDetailsSnapshotModelCopyWith<$Res>(_self.emiDetails!, (value) {
+      return _then(_self.copyWith(emiDetails: value));
+    });
+  }
+
+  /// Create a copy of CheckoutValidationModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $EmiQuoteModelCopyWith<$Res>? get emiQuote {
+    if (_self.emiQuote == null) {
+      return null;
+    }
+
+    return $EmiQuoteModelCopyWith<$Res>(_self.emiQuote!, (value) {
+      return _then(_self.copyWith(emiQuote: value));
     });
   }
 }
@@ -1600,6 +1650,8 @@ extension CheckoutValidationModelPatterns on CheckoutValidationModel {
             Map<String, dynamic>? shippingDetails,
             double codFee,
             CodDetailsModel? codDetails,
+            EmiDetailsSnapshotModel? emiDetails,
+            EmiQuoteModel? emiQuote,
             List<PaymentMethodOptionModel> paymentMethods)?
         $default, {
     required TResult orElse(),
@@ -1627,6 +1679,8 @@ extension CheckoutValidationModelPatterns on CheckoutValidationModel {
             _that.shippingDetails,
             _that.codFee,
             _that.codDetails,
+            _that.emiDetails,
+            _that.emiQuote,
             _that.paymentMethods);
       case _:
         return orElse();
@@ -1668,6 +1722,8 @@ extension CheckoutValidationModelPatterns on CheckoutValidationModel {
             Map<String, dynamic>? shippingDetails,
             double codFee,
             CodDetailsModel? codDetails,
+            EmiDetailsSnapshotModel? emiDetails,
+            EmiQuoteModel? emiQuote,
             List<PaymentMethodOptionModel> paymentMethods)
         $default,
   ) {
@@ -1694,6 +1750,8 @@ extension CheckoutValidationModelPatterns on CheckoutValidationModel {
             _that.shippingDetails,
             _that.codFee,
             _that.codDetails,
+            _that.emiDetails,
+            _that.emiQuote,
             _that.paymentMethods);
       case _:
         throw StateError('Unexpected subclass');
@@ -1734,6 +1792,8 @@ extension CheckoutValidationModelPatterns on CheckoutValidationModel {
             Map<String, dynamic>? shippingDetails,
             double codFee,
             CodDetailsModel? codDetails,
+            EmiDetailsSnapshotModel? emiDetails,
+            EmiQuoteModel? emiQuote,
             List<PaymentMethodOptionModel> paymentMethods)?
         $default,
   ) {
@@ -1760,6 +1820,8 @@ extension CheckoutValidationModelPatterns on CheckoutValidationModel {
             _that.shippingDetails,
             _that.codFee,
             _that.codDetails,
+            _that.emiDetails,
+            _that.emiQuote,
             _that.paymentMethods);
       case _:
         return null;
@@ -1790,6 +1852,8 @@ class _CheckoutValidationModel implements CheckoutValidationModel {
       final Map<String, dynamic>? shippingDetails,
       this.codFee = 0.0,
       this.codDetails,
+      this.emiDetails,
+      this.emiQuote,
       final List<PaymentMethodOptionModel> paymentMethods = const []})
       : _items = items,
         _shippingDetails = shippingDetails,
@@ -1854,6 +1918,10 @@ class _CheckoutValidationModel implements CheckoutValidationModel {
   final double codFee;
   @override
   final CodDetailsModel? codDetails;
+  @override
+  final EmiDetailsSnapshotModel? emiDetails;
+  @override
+  final EmiQuoteModel? emiQuote;
   final List<PaymentMethodOptionModel> _paymentMethods;
   @override
   @JsonKey()
@@ -1911,6 +1979,10 @@ class _CheckoutValidationModel implements CheckoutValidationModel {
             (identical(other.codFee, codFee) || other.codFee == codFee) &&
             (identical(other.codDetails, codDetails) ||
                 other.codDetails == codDetails) &&
+            (identical(other.emiDetails, emiDetails) ||
+                other.emiDetails == emiDetails) &&
+            (identical(other.emiQuote, emiQuote) ||
+                other.emiQuote == emiQuote) &&
             const DeepCollectionEquality()
                 .equals(other._paymentMethods, _paymentMethods));
   }
@@ -1937,12 +2009,14 @@ class _CheckoutValidationModel implements CheckoutValidationModel {
         const DeepCollectionEquality().hash(_shippingDetails),
         codFee,
         codDetails,
+        emiDetails,
+        emiQuote,
         const DeepCollectionEquality().hash(_paymentMethods)
       ]);
 
   @override
   String toString() {
-    return 'CheckoutValidationModel(valid: $valid, items: $items, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, grandTotal: $grandTotal, taxableAmount: $taxableAmount, discount: $discount, currency: $currency, currencySymbol: $currencySymbol, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, deliveryWindow: $deliveryWindow, isFreeShipping: $isFreeShipping, shippingDetails: $shippingDetails, codFee: $codFee, codDetails: $codDetails, paymentMethods: $paymentMethods)';
+    return 'CheckoutValidationModel(valid: $valid, items: $items, shippingAddress: $shippingAddress, shippingMethod: $shippingMethod, subtotal: $subtotal, shippingFee: $shippingFee, tax: $tax, grandTotal: $grandTotal, taxableAmount: $taxableAmount, discount: $discount, currency: $currency, currencySymbol: $currencySymbol, taxBreakdown: $taxBreakdown, customerGstin: $customerGstin, deliveryWindow: $deliveryWindow, isFreeShipping: $isFreeShipping, shippingDetails: $shippingDetails, codFee: $codFee, codDetails: $codDetails, emiDetails: $emiDetails, emiQuote: $emiQuote, paymentMethods: $paymentMethods)';
   }
 }
 
@@ -1974,6 +2048,8 @@ abstract mixin class _$CheckoutValidationModelCopyWith<$Res>
       Map<String, dynamic>? shippingDetails,
       double codFee,
       CodDetailsModel? codDetails,
+      EmiDetailsSnapshotModel? emiDetails,
+      EmiQuoteModel? emiQuote,
       List<PaymentMethodOptionModel> paymentMethods});
 
   @override
@@ -1982,6 +2058,10 @@ abstract mixin class _$CheckoutValidationModelCopyWith<$Res>
   $TaxBreakdownModelCopyWith<$Res>? get taxBreakdown;
   @override
   $CodDetailsModelCopyWith<$Res>? get codDetails;
+  @override
+  $EmiDetailsSnapshotModelCopyWith<$Res>? get emiDetails;
+  @override
+  $EmiQuoteModelCopyWith<$Res>? get emiQuote;
 }
 
 /// @nodoc
@@ -2016,6 +2096,8 @@ class __$CheckoutValidationModelCopyWithImpl<$Res>
     Object? shippingDetails = freezed,
     Object? codFee = null,
     Object? codDetails = freezed,
+    Object? emiDetails = freezed,
+    Object? emiQuote = freezed,
     Object? paymentMethods = null,
   }) {
     return _then(_CheckoutValidationModel(
@@ -2095,6 +2177,14 @@ class __$CheckoutValidationModelCopyWithImpl<$Res>
           ? _self.codDetails
           : codDetails // ignore: cast_nullable_to_non_nullable
               as CodDetailsModel?,
+      emiDetails: freezed == emiDetails
+          ? _self.emiDetails
+          : emiDetails // ignore: cast_nullable_to_non_nullable
+              as EmiDetailsSnapshotModel?,
+      emiQuote: freezed == emiQuote
+          ? _self.emiQuote
+          : emiQuote // ignore: cast_nullable_to_non_nullable
+              as EmiQuoteModel?,
       paymentMethods: null == paymentMethods
           ? _self._paymentMethods
           : paymentMethods // ignore: cast_nullable_to_non_nullable
@@ -2141,6 +2231,34 @@ class __$CheckoutValidationModelCopyWithImpl<$Res>
 
     return $CodDetailsModelCopyWith<$Res>(_self.codDetails!, (value) {
       return _then(_self.copyWith(codDetails: value));
+    });
+  }
+
+  /// Create a copy of CheckoutValidationModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $EmiDetailsSnapshotModelCopyWith<$Res>? get emiDetails {
+    if (_self.emiDetails == null) {
+      return null;
+    }
+
+    return $EmiDetailsSnapshotModelCopyWith<$Res>(_self.emiDetails!, (value) {
+      return _then(_self.copyWith(emiDetails: value));
+    });
+  }
+
+  /// Create a copy of CheckoutValidationModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $EmiQuoteModelCopyWith<$Res>? get emiQuote {
+    if (_self.emiQuote == null) {
+      return null;
+    }
+
+    return $EmiQuoteModelCopyWith<$Res>(_self.emiQuote!, (value) {
+      return _then(_self.copyWith(emiQuote: value));
     });
   }
 }

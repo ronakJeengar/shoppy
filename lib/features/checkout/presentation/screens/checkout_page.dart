@@ -19,6 +19,8 @@ import 'order_confirmation_page.dart';
 import 'package:shopp_app/features/addresses/presentation/widgets/address_form_dialog.dart';
 import 'package:shopp_app/core/widgets/app_button.dart';
 import 'package:shopp_app/core/utils/currency_formatter.dart';
+import 'package:shopp_app/features/emi/presentation/providers/emi_providers.dart';
+import 'package:shopp_app/features/emi/presentation/widgets/emi_plan_selector_widget.dart';
 
 class CheckoutPage extends ConsumerStatefulWidget {
   const CheckoutPage({super.key});
@@ -166,7 +168,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
             const SizedBox(height: 16),
             _buildShippingMethodSection(checkoutState, selectedAddress, shippingQuote),
             const SizedBox(height: 16),
-            _buildPaymentMethodSection(checkoutState, selectedAddress, shippingQuote),
+            _buildPaymentMethodSection(cart, checkoutState, selectedAddress, shippingQuote),
             const SizedBox(height: 16),
             _buildOrderReviewSection(cart, checkoutState, shippingQuote),
             const SizedBox(height: 32),
@@ -424,6 +426,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
   }
 
   Widget _buildPaymentMethodSection(
+    CartEntity cart,
     CheckoutState checkoutState,
     AddressEntity? selectedAddress,
     ShippingQuoteEntity? quote,
@@ -432,6 +435,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
     final paymentOptions = checkoutState.validation?.paymentMethods ?? [];
     final codOption = paymentOptions.where((p) => p.type == 'COD').firstOrNull;
     final cardOption = paymentOptions.where((p) => p.type == 'CARD').firstOrNull;
+    final emiOption = paymentOptions.where((p) => p.type == 'EMI').firstOrNull;
 
     final isRemote = quote?.shippingZone == 'REMOTE';
     final isCodAvailable = codOption != null
@@ -456,6 +460,17 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
     }
 
     final isCardAvailable = cardOption?.available ?? true;
+    final isEmiAvailable = emiOption?.available ?? true;
+
+    final validation = checkoutState.validation;
+    final subtotal = validation?.subtotal ?? cart.subtotal;
+    final discount = validation?.discount ?? cart.discount;
+    final shipping = validation?.shippingFee ?? quote?.shippingAmount ?? 0.0;
+    final orderTotal = validation?.grandTotal ?? (subtotal - discount + shipping);
+
+    final emiSubtitle = !isEmiAvailable
+        ? (emiOption?.message ?? 'EMI available on orders between ₹3,000 and ₹5,00,000')
+        : 'Pay in easy monthly installments • No Cost EMI available';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -513,6 +528,47 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                   }
                 : () {},
           ),
+          _buildSelectionTile(
+            title: emiOption?.name ?? 'EMI / Pay Later',
+            subtitle: emiSubtitle,
+            isSelected: currentMethod == 'EMI',
+            icon: AppIcons.wallet,
+            enabled: isEmiAvailable,
+            onTap: isEmiAvailable
+                ? () {
+                    ref.read(checkoutNotifierProvider.notifier).setPaymentMethod('EMI');
+                    if (selectedAddress != null) {
+                      final selectedEmi = ref.read(selectedEmiSelectionProvider);
+                      ref.read(checkoutNotifierProvider.notifier).validateCheckout(
+                        selectedAddress.id,
+                        emiPlan: selectedEmi != null
+                            ? {
+                                'planId': selectedEmi.plan.planId,
+                                'tenureMonths': selectedEmi.tenure.months,
+                              }
+                            : null,
+                      );
+                    }
+                  }
+                : () {},
+          ),
+          if (currentMethod == 'EMI') ...[
+            const SizedBox(height: 12),
+            EmiPlanSelectorWidget(
+              amount: orderTotal,
+              onSelectionChanged: (selection) {
+                if (selectedAddress != null && selection != null) {
+                  ref.read(checkoutNotifierProvider.notifier).validateCheckout(
+                    selectedAddress.id,
+                    emiPlan: {
+                      'planId': selection.plan.planId,
+                      'tenureMonths': selection.tenure.months,
+                    },
+                  );
+                }
+              },
+            ),
+          ],
         ],
       ),
     );
@@ -807,15 +863,21 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
 
     final isServiceable = quote == null || quote.serviceable;
     final isCod = checkoutState.selectedPaymentMethod == 'COD';
+    final isEmi = checkoutState.selectedPaymentMethod == 'EMI';
+    final selectedEmi = ref.watch(selectedEmiSelectionProvider);
+
     final codOption = checkoutState.validation?.paymentMethods.where((p) => p.type == 'COD').firstOrNull;
     final isCodEligible = !isCod ||
         (codOption != null
             ? codOption.available
             : quote?.shippingZone != 'REMOTE');
 
+    final isEmiReady = !isEmi || selectedEmi != null;
+
     final canPlace = selectedAddress != null &&
         isServiceable &&
         isCodEligible &&
+        isEmiReady &&
         !checkoutState.isPlacingOrder;
 
     String buttonLabel = 'Place Order';
@@ -827,6 +889,10 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
       buttonLabel = 'COD Unavailable';
     } else if (isCod) {
       buttonLabel = 'Confirm COD Order';
+    } else if (isEmi && selectedEmi == null) {
+      buttonLabel = 'Select EMI Plan';
+    } else if (isEmi) {
+      buttonLabel = 'Confirm EMI Order';
     }
 
     return Container(
@@ -844,11 +910,17 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isCod ? 'Pay on Delivery' : 'Total Payable',
+                  isCod
+                      ? 'Pay on Delivery'
+                      : (isEmi && selectedEmi != null)
+                          ? 'Monthly EMI'
+                          : 'Total Payable',
                   style: AppTypography.caption.copyWith(color: AppColors.slate500),
                 ),
                 Text(
-                  CurrencyFormatter.format(displayTotal),
+                  (isEmi && selectedEmi != null)
+                      ? '${CurrencyFormatter.format(selectedEmi.tenure.monthlyInstallment)}/mo'
+                      : CurrencyFormatter.format(displayTotal),
                   style: AppTypography.priceCard.copyWith(fontSize: 20),
                 ),
               ],
@@ -857,13 +929,25 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
             Expanded(
               child: AppButton(
                 label: buttonLabel,
-                icon: isCod ? AppIcons.cash : AppIcons.lock,
+                icon: isCod
+                    ? AppIcons.cash
+                    : isEmi
+                        ? AppIcons.creditCard
+                        : AppIcons.lock,
                 isLoading: checkoutState.isPlacingOrder,
                 isFullWidth: true,
                 onPressed: canPlace
                     ? () async {
+                        final Map<String, dynamic>? emiPlanPayload = isEmi && selectedEmi != null
+                            ? {
+                                'planId': selectedEmi.plan.planId,
+                                'tenureMonths': selectedEmi.tenure.months,
+                              }
+                            : null;
+
                         final order = await ref.read(checkoutNotifierProvider.notifier).placeOrder(
                           addressId: selectedAddress.id,
+                          emiPlan: emiPlanPayload,
                         );
                         if (order != null && context.mounted) {
                           ref.read(cartNotifierProvider.notifier).loadCart();

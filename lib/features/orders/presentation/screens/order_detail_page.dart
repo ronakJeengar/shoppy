@@ -194,6 +194,12 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
             _buildPaymentCard(order),
             const SizedBox(height: 16),
 
+            // 5b. EMI Financing Card (if EMI order)
+            if (order.isEmi && order.emiDetails != null) ...[
+              _buildEmiFinancingCard(order),
+              const SizedBox(height: 16),
+            ],
+
             // 6. Price Breakdown Card
             _buildPriceBreakdownCard(order, theme),
             const SizedBox(height: 20),
@@ -537,7 +543,11 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
                   style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
                 ),
                 Text(
-                  order.isCod ? 'Cash on Delivery (COD)' : (payment?.paymentMethod ?? 'CARD'),
+                  order.isEmi
+                      ? 'EMI Financing (${order.emiDetails?.provider ?? "Bank"})'
+                      : order.isCod
+                          ? 'Cash on Delivery (COD)'
+                          : (payment?.paymentMethod ?? 'CARD'),
                   style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
                 ),
               ],
@@ -551,16 +561,18 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
                   style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
                 ),
                 Text(
-                  order.isCod && payment?.status == 'PENDING'
-                      ? 'Pending (Pay on Delivery)'
-                      : (payment?.status ?? 'COMPLETED'),
+                  order.isEmi && payment?.status == 'PENDING'
+                      ? 'Pending Financing Approval'
+                      : order.isCod && payment?.status == 'PENDING'
+                          ? 'Pending (Pay on Delivery)'
+                          : (payment?.status ?? 'COMPLETED'),
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.bold,
                     color: (payment?.status == 'REFUNDED')
                         ? AppColors.warning
                         : (payment?.status == 'COMPLETED')
                             ? AppColors.success
-                            : (order.isCod)
+                            : (order.isCod || order.isEmi)
                                 ? AppColors.info
                                 : AppColors.slate900,
                   ),
@@ -586,6 +598,90 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildEmiFinancingCard(OrderEntity order) {
+    final emi = order.emiDetails!;
+
+    return Card(
+      elevation: 0.5,
+      shape: const RoundedRectangleBorder(
+        borderRadius: AppRadius.borderMd,
+        side: BorderSide(color: AppColors.primary, width: 1),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const AppIcon(AppIcons.creditCard, color: AppColors.primary, size: AppIconSizes.medium),
+                const SizedBox(width: 8),
+                const Text(
+                  'EMI Financing Details',
+                  style: AppTypography.headingSmall,
+                ),
+                const Spacer(),
+                if (emi.isNoCost)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: const BoxDecoration(
+                      color: AppColors.successLight,
+                      borderRadius: AppRadius.borderSm,
+                    ),
+                    child: Text(
+                      'NO COST EMI',
+                      style: AppTypography.labelSmall.copyWith(
+                        color: AppColors.success,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _buildEmiRow('Bank / Provider', emi.provider),
+            const SizedBox(height: 6),
+            _buildEmiRow('Tenure', '${emi.tenureMonths} Months'),
+            const SizedBox(height: 6),
+            _buildEmiRow('Monthly Installment', '${CurrencyFormatter.format(emi.monthlyInstallment)}/mo', isHighlight: true),
+            const SizedBox(height: 6),
+            _buildEmiRow('Annual Interest Rate', '${emi.interestRate}% p.a.'),
+            const SizedBox(height: 6),
+            _buildEmiRow('Total Interest', CurrencyFormatter.format(emi.totalInterest)),
+            if (emi.processingFee > 0) ...[
+              const SizedBox(height: 6),
+              _buildEmiRow('Processing Fee', CurrencyFormatter.format(emi.processingFee)),
+            ],
+            const Divider(height: 16, color: AppColors.slate200),
+            _buildEmiRow('Total Financed Amount', CurrencyFormatter.format(emi.totalPayable), isBold: true),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmiRow(String label, String value, {bool isHighlight = false, bool isBold = false}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: AppTypography.bodySmall.copyWith(
+            color: isBold ? AppColors.slate900 : AppColors.textSecondary,
+            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+        Text(
+          value,
+          style: AppTypography.bodyMedium.copyWith(
+            fontWeight: (isHighlight || isBold) ? FontWeight.bold : FontWeight.w600,
+            color: isHighlight ? AppColors.primary : (isBold ? AppColors.slate900 : AppColors.slate800),
+          ),
+        ),
+      ],
     );
   }
 
@@ -641,7 +737,9 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
             ],
             const Divider(height: 20),
             _summaryRow(
-              order.isCod && !order.isDelivered ? 'Total (Payable on Delivery)' : 'Total Paid',
+              order.isEmi
+                  ? 'Total Financed Order'
+                  : (order.isCod && !order.isDelivered ? 'Total (Payable on Delivery)' : 'Total Paid'),
               CurrencyFormatter.format(order.totalAmount),
               isTotal: true,
               valueColor: theme.primaryColor,

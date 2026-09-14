@@ -8,12 +8,14 @@ abstract class CheckoutRepository {
     String addressId, {
     String shippingMethod = 'STANDARD',
     String paymentMethod = 'CARD',
+    Map<String, dynamic>? emiPlan,
   });
 
   Future<Result<Map<String, dynamic>>> createOrder({
     required String addressId,
     String shippingMethod = 'STANDARD',
     String paymentMethod = 'CARD',
+    Map<String, dynamic>? emiPlan,
     String? idempotencyKey,
   });
 
